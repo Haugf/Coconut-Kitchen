@@ -29,7 +29,12 @@ echo "Installing to ~/mirror"
 mkdir -p "$HOME/mirror"
 rm -rf "$HOME/mirror/web"
 cp -r frontend/dist "$HOME/mirror/web"
-cp mirror-server deploy/setup-pi.sh "$HOME/mirror/"
+# The server is running, so a plain copy fails with "Text file busy".
+# Copy beside it and rename over it instead; the running process keeps
+# the old file until the restart below.
+cp mirror-server "$HOME/mirror/mirror-server.new"
+mv -f "$HOME/mirror/mirror-server.new" "$HOME/mirror/mirror-server"
+cp deploy/setup-pi.sh "$HOME/mirror/"
 if [ ! -f "$HOME/mirror/config.json" ]; then
   cp backend/config.example.json "$HOME/mirror/config.json"
   echo "Created ~/mirror/config.json. Add your calendar address there."
@@ -43,3 +48,6 @@ if systemctl list-unit-files mirror.service >/dev/null 2>&1 && [ -f /etc/systemd
 else
   bash "$HOME/mirror/setup-pi.sh"
 fi
+
+# Record what's installed, so update.sh retries if this run failed.
+git rev-parse HEAD > "$HOME/mirror/.installed" 2>/dev/null || true
