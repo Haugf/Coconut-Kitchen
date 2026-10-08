@@ -6,11 +6,21 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
-if ! command -v go >/dev/null; then
+# The server needs Go 1.22 or newer. Use apt's Go if it's new enough,
+# otherwise install the official arm64 build into /usr/local/go.
+go_ok() { command -v go >/dev/null && go version | grep -Eq 'go1\.(2[2-9]|[3-9][0-9])'; }
+export PATH="/usr/local/go/bin:$PATH"
+if ! go_ok; then
   echo "Installing Go"
   sudo apt-get update -qq
-  sudo apt-get install -y golang-go
+  sudo apt-get install -y golang-go || true
 fi
+if ! go_ok; then
+  echo "apt's Go is too old, installing Go 1.23 from go.dev"
+  curl -fsSL https://go.dev/dl/go1.23.4.linux-arm64.tar.gz -o /tmp/go.tgz
+  sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf /tmp/go.tgz
+fi
+go version
 
 echo "Building the server"
 (cd backend && go mod tidy && go build -o ../mirror-server .)
