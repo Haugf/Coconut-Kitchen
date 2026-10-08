@@ -153,6 +153,10 @@ func fetchICS(ctx context.Context, u string, start, end time.Time) ([]Event, err
 	if err != nil {
 		return nil, err
 	}
+	// Some calendar hosts (iCloud included) are picky about clients that
+	// don't look like a calendar app.
+	req.Header.Set("User-Agent", "Mozilla/5.0 (X11; Linux aarch64) mirror/1.0")
+	req.Header.Set("Accept", "text/calendar, */*")
 	resp, err := httpClient.Do(req)
 	if err != nil {
 		// The raw error includes the full URL, which is secret. Keep the host.
