@@ -1,0 +1,149 @@
+/*
+  Behind two-way glass, only lit pixels show through. Pure black reads as
+  mirror, so the background is #000 by necessity. Text uses a warm white
+  that looks like light on glass rather than a screen.
+  Sizes scale with viewport width, tuned for a 24" portrait monitor
+  (1080 x 1920).
+*/
+:root {
+  --glass: #000000;
+  --light: #f3eee4;
+  --dim: #8d8a84;
+  --faint: #4a4844;
+  --tide: #a9cfe0; /* the one accent: "happening now" and live messages */
+
+  --serif: 'Fraunces Variable', Georgia, serif;
+  --sans: 'Instrument Sans Variable', system-ui, sans-serif;
+
+  --unit: 1vw;
+  --space: calc(var(--unit) * 4);
+  --text: calc(var(--unit) * 3);
+  --text-small: calc(var(--unit) * 2.4);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body, #root { height: 100%; }
+
+body {
+  background: var(--glass);
+  color: var(--light);
+  font-family: var(--sans);
+  font-size: var(--text);
+  line-height: 1.35;
+  cursor: none;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+ul { list-style: none; }
+
+.muted { color: var(--dim); }
+
+/* Layout: one left-aligned column, hero at the top, message at the bottom */
+.mirror {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space) * 1.5);
+  padding: calc(var(--space) * 1.5) var(--space) var(--space);
+  transition: opacity 2s ease;
+}
+.mirror.is-dim { opacity: 0.45; }
+
+.slot-hero { margin-bottom: calc(var(--space) * 0.5); }
+
+/* Clock: the one memorable thing */
+.clock-time {
+  font-family: var(--serif);
+  font-size: calc(var(--unit) * 26);
+  font-weight: 340;
+  font-variation-settings: 'opsz' 144, 'SOFT' 100;
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+  font-variant-numeric: lining-nums;
+}
+.clock-colon { opacity: 0.55; margin: 0 0.02em; }
+.clock-meridiem {
+  font-size: 0.18em;
+  font-weight: 400;
+  color: var(--dim);
+  margin-left: 0.3em;
+  letter-spacing: 0;
+}
+.clock-date {
+  font-family: var(--serif);
+  font-size: calc(var(--unit) * 5);
+  font-weight: 360;
+  font-variation-settings: 'opsz' 48, 'SOFT' 100;
+  color: var(--dim);
+  margin-top: calc(var(--space) * 0.4);
+}
+
+/* Weather */
+.weather-now { display: flex; align-items: flex-start; gap: var(--space); }
+.weather-temp {
+  font-family: var(--serif);
+  font-size: calc(var(--unit) * 13);
+  font-weight: 360;
+  font-variation-settings: 'opsz' 144, 'SOFT' 100;
+  line-height: 0.9;
+}
+.weather-desc { font-size: calc(var(--unit) * 4); font-weight: 500; }
+.weather-rain { color: var(--tide); margin-top: 0.3em; }
+.weather-days {
+  margin-top: var(--space);
+  display: grid;
+  gap: calc(var(--unit) * 1.2);
+  font-size: var(--text-small);
+}
+.weather-days li {
+  display: grid;
+  grid-template-columns: 6em 1fr auto;
+  gap: 1em;
+  border-top: 1px solid var(--faint);
+  padding-top: calc(var(--unit) * 1.2);
+}
+
+/* Calendar */
+.calendar { display: grid; gap: calc(var(--space) * 0.8); }
+.calendar-day-label {
+  font-family: var(--serif);
+  font-size: calc(var(--unit) * 4);
+  font-weight: 420;
+  font-variation-settings: 'opsz' 48, 'SOFT' 100;
+  margin-bottom: calc(var(--unit) * 1.2);
+}
+.calendar-event {
+  display: grid;
+  grid-template-columns: 6em 1fr;
+  gap: 1em;
+  padding: calc(var(--unit) * 0.6) 0;
+}
+.calendar-time { color: var(--dim); font-variant-numeric: tabular-nums; }
+.calendar-title { overflow-wrap: anywhere; }
+.calendar-event.is-now .calendar-time,
+.calendar-event.is-now .calendar-title { color: var(--tide); }
+
+/* Live message (the v2 voice hook) */
+.message {
+  margin-top: auto;
+  min-height: calc(var(--unit) * 14);
+  opacity: 0;
+  transform: translateY(1rem);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.message.is-visible { opacity: 1; transform: none; }
+.message-source { color: var(--tide); font-size: var(--text-small); margin-bottom: 0.3em; }
+.message-text {
+  font-family: var(--serif);
+  font-size: calc(var(--unit) * 5);
+  font-weight: 360;
+  font-variation-settings: 'opsz' 48, 'SOFT' 100;
+  line-height: 1.25;
+  max-width: 28ch;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mirror, .message { transition: none; }
+}

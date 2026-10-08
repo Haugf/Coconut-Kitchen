@@ -1,0 +1,17 @@
+{
+  "addr": ":8080",
+  "staticDir": "../frontend/dist",
+  "eventsToken": "",
+  "weather": {
+    "latitude": 40.7044,
+    "longitude": -73.9018,
+    "units": "fahrenheit"
+  },
+  "calendar": {
+    "icsUrls": [
+      "https://calendar.google.com/calendar/ical/YOUR_ID/private-SECRET/basic.ics"
+    ],
+    "daysAhead": 7,
+    "maxEvents": 8
+  }
+}
