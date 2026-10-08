@@ -92,9 +92,14 @@
 
 /* Landscape has room for the few things that matter today, not tomorrow. */
 @media (orientation: landscape) {
-  .t-top { padding-top: calc(var(--u) * 5.5); padding-bottom: calc(var(--u) * 4); }
-  .t-land { max-height: calc(var(--u) * 24); }
-  .t-bottom { padding-top: calc(var(--u) * 4); }
+  .t-top { padding-top: calc(var(--u) * 5); padding-bottom: calc(var(--u) * 3.5); }
+  .t-headline { font-size: calc(var(--u) * 4.8); max-width: 40ch; }
+  .t-land { margin-top: calc(var(--u) * 2.5); }
+  .t-acts { margin-top: calc(var(--u) * 1.6); font-size: calc(var(--u) * 2.1); }
+  .t-bottom { padding-top: calc(var(--u) * 3.5); padding-bottom: calc(var(--u) * 2); gap: calc(var(--u) * 3); }
+  .t-list { gap: calc(var(--u) * 1.6); font-size: calc(var(--u) * 2.2); }
+  .t-items { gap: calc(var(--u) * 1.6); }
+  .t-title { font-size: calc(var(--u) * 2.6); }
   .t-list-tomorrow { display: none; }
   .t-items li:nth-child(n + 4) { display: none; }
 }

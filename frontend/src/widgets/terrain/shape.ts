@@ -4,9 +4,9 @@ import type { DayEvent } from './types'
 export const DAY_START = 6
 export const DAY_END = 23
 export const W = 1200
-export const H = 170
-export const BASE = 150
-const MAX_RISE = 120
+export const H = 150
+export const BASE = 134
+const MAX_RISE = 104
 
 export function xOf(hour: number): number {
   const t = (Math.min(Math.max(hour, DAY_START), DAY_END) - DAY_START) / (DAY_END - DAY_START)
