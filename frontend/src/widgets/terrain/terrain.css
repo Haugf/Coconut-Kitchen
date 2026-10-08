@@ -1,0 +1,118 @@
+/*
+  Terrain page. Two full-bleed bands meeting at a hard 1px edge; no
+  cards, borders, radii or shadows. The palette is closed: don't add to it.
+*/
+.terrain {
+  --bg: #FCFCFB;
+  --wash: #F9F9F7;
+  --ink: #2E2C27;
+  --ink-soft: #6B6A63;
+  --ink-grey: #B4B3A8;
+  --hairline: #E4E3DC;
+  --edge: #E1E1DF;
+  --clay: #C6613F;
+
+  /* One unit that tracks the short side, so landscape and portrait match. */
+  --u: 1vw;
+  --pad-x: calc(var(--u) * 7);
+
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, 'Segoe UI', 'Instrument Sans Variable', sans-serif;
+  font-style: normal;
+  line-height: 1.4;
+}
+@media (orientation: landscape) {
+  .terrain { --u: 1vh; --pad-x: calc(var(--u) * 9); }
+}
+
+.terrain p, .terrain h1, .terrain h2, .terrain ol { margin: 0; padding: 0; }
+.terrain ol { list-style: none; }
+
+.t-soft { color: var(--ink-soft); }
+
+/* Top band */
+.t-top {
+  background: var(--wash);
+  border-bottom: 1px solid var(--edge);
+  padding: calc(var(--u) * 7) var(--pad-x) calc(var(--u) * 5);
+  display: flex;
+  flex-direction: column;
+}
+.t-date { font-size: calc(var(--u) * 2.6); color: var(--ink-soft); }
+.t-headline {
+  font-family: 'Fraunces Variable', Georgia, serif;
+  font-weight: 600;
+  font-size: calc(var(--u) * 5.6);
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+  margin-top: calc(var(--u) * 1.4) !important;
+  max-width: 30ch;
+}
+.t-land { width: 100%; height: auto; margin-top: calc(var(--u) * 3.5); overflow: visible; }
+.t-line { stroke: var(--ink); stroke-width: 3; stroke-linecap: round; }
+.t-dot { fill: var(--ink); }
+.t-hollow { fill: var(--wash); stroke: var(--ink); stroke-width: 2.5; }
+.t-clay { fill: var(--clay); }
+.t-birds { stroke: var(--ink-grey); stroke-width: 2.5; stroke-linecap: round; }
+.t-now { stroke: var(--ink-grey); stroke-width: 1.5; stroke-dasharray: 3 6; }
+
+.t-acts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: calc(var(--u) * 2.4);
+  font-size: calc(var(--u) * 2.3);
+}
+.t-act { display: flex; flex-direction: column; gap: calc(var(--u) * 0.6); padding: 0 calc(var(--u) * 2.4); border-left: 1px solid var(--hairline); }
+.t-act:first-child { padding-left: 0; border-left: 0; }
+.t-act-label { font-weight: 650; }
+
+/* Bottom band: stacked lists, single column, full width */
+.t-bottom {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  padding: calc(var(--u) * 5) var(--pad-x);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--u) * 5);
+}
+.t-list { display: flex; flex-direction: column; gap: calc(var(--u) * 2); font-size: calc(var(--u) * 2.4); }
+.t-heading { font-size: calc(var(--u) * 2.6); font-weight: 650; }
+.t-items { display: flex; flex-direction: column; gap: calc(var(--u) * 2); }
+.t-items li { display: grid; grid-template-columns: calc(var(--u) * 4.5) 1fr; }
+.t-num { color: var(--ink-grey); font-variant-numeric: tabular-nums; }
+.t-title { font-weight: 650; font-size: calc(var(--u) * 2.8); }
+.t-source { text-decoration: underline; text-underline-offset: 0.2em; text-decoration-color: var(--ink-soft); }
+
+/* Landscape has room for the few things that matter today, not tomorrow. */
+@media (orientation: landscape) {
+  .t-top { padding-top: calc(var(--u) * 5.5); padding-bottom: calc(var(--u) * 4); }
+  .t-land { max-height: calc(var(--u) * 24); }
+  .t-bottom { padding-top: calc(var(--u) * 4); }
+  .t-list-tomorrow { display: none; }
+  .t-items li:nth-child(n + 4) { display: none; }
+}
+
+/* Live messages sit over the bottom band, in the page's own voice. */
+.mirror-page { height: 100%; position: relative; transition: opacity 2s ease; }
+.mirror-page.is-dim { opacity: 0.35; }
+.mirror-page .message {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  min-height: 0;
+  margin: 0;
+  padding: calc(var(--u-msg, 1vmin) * 4) calc(var(--u-msg, 1vmin) * 7);
+  background: #F9F9F7;
+  border-top: 1px solid #E1E1DF;
+  color: #2E2C27;
+}
+.mirror-page .message:not(.is-visible) { pointer-events: none; }
+.mirror-page .message-source { color: #6B6A63; font-size: calc(1vmin * 2.4); font-family: -apple-system, 'Segoe UI', 'Instrument Sans Variable', sans-serif; }
+.mirror-page .message-text { color: #2E2C27; font-size: calc(1vmin * 4.4); font-weight: 600; max-width: 40ch; }
+@media (prefers-reduced-motion: reduce) { .mirror-page { transition: none; } }

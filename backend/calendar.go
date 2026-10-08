@@ -47,14 +47,8 @@ func fetchCalendar(ctx context.Context, cfg CalendarConfig) ([]Event, error) {
 		events = append(events, evs...)
 	}
 
-	// Drop timed events that already ended today.
-	kept := events[:0]
-	for _, e := range events {
-		if e.AllDay || e.End.IsZero() || e.End.After(now) {
-			kept = append(kept, e)
-		}
-	}
-	events = kept
+	// Today's finished events are kept on purpose: the terrain draws the
+	// whole day. Widgets that only want what's ahead filter on their own.
 
 	sort.Slice(events, func(i, j int) bool {
 		if events[i].Start.Equal(events[j].Start) {

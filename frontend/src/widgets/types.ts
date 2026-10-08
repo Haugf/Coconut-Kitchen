@@ -5,8 +5,9 @@ import type { ComponentType } from 'react'
  * hero: the one large element at the top of a scene
  * block: a normal section
  * compact: a short strip
+ * page: takes over the whole screen on its own
  */
-export type WidgetSize = 'hero' | 'block' | 'compact'
+export type WidgetSize = 'hero' | 'block' | 'compact' | 'page'
 
 export interface WidgetDef {
   /** Unique id, referenced by scenes. */

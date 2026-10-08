@@ -34,7 +34,7 @@ func loadConfig(path string) (*Config, error) {
 		Addr:      ":8080",
 		StaticDir: "../frontend/dist",
 		Weather:   WeatherConfig{Latitude: 40.7128, Longitude: -74.0060, Units: "fahrenheit"},
-		Calendar:  CalendarConfig{DaysAhead: 7, MaxEvents: 8},
+		Calendar:  CalendarConfig{DaysAhead: 7, MaxEvents: 30},
 	}
 	b, err := os.ReadFile(path)
 	if err != nil {

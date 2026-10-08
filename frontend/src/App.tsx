@@ -14,6 +14,18 @@ export default function App() {
   const drift = now.getHours() % 4
   const offset = { transform: `translate(${(drift % 2) * 3}px, ${Math.floor(drift / 2) * 3}px)` }
 
+  // A page widget owns the whole screen.
+  const page = scene.widgets.map((id) => registry[id]).find((d) => d?.size === 'page')
+  if (page) {
+    const Page = page.component
+    return (
+      <main className={scene.dim ? 'mirror-page is-dim' : 'mirror-page'} data-scene={scene.name}>
+        <Page />
+        <MessageBar message={message} />
+      </main>
+    )
+  }
+
   return (
     <main className={scene.dim ? 'mirror is-dim' : 'mirror'} data-scene={scene.name} style={offset}>
       {scene.widgets.map((id) => {

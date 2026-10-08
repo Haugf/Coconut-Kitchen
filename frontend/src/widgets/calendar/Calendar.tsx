@@ -38,7 +38,10 @@ export function Calendar() {
     )
   }
 
-  if (data.length === 0) {
+  // The API returns the whole day; this widget only shows what's ahead.
+  const upcoming = data.filter((e) => e.allDay || !e.end || new Date(e.end) > now)
+
+  if (upcoming.length === 0) {
     return (
       <section className="widget calendar">
         <p className="muted">Nothing on the calendar this week.</p>
@@ -47,7 +50,7 @@ export function Calendar() {
   }
 
   const groups = new Map<string, { label: string; events: CalendarEvent[] }>()
-  for (const e of data) {
+  for (const e of upcoming) {
     const start = new Date(e.start)
     const key = dayKey(start)
     if (!groups.has(key)) groups.set(key, { label: dayLabel(start, now), events: [] })

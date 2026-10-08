@@ -12,6 +12,6 @@
       "https://calendar.google.com/calendar/ical/YOUR_ID/private-SECRET/basic.ics"
     ],
     "daysAhead": 7,
-    "maxEvents": 8
+    "maxEvents": 30
   }
 }

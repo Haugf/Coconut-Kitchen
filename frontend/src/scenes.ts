@@ -13,11 +13,12 @@ export interface Scene {
 }
 
 export const scenes: Scene[] = [
-  { name: 'morning', from: 5, widgets: ['clock', 'weather', 'calendar'] },
-  { name: 'day', from: 10, widgets: ['clock', 'calendar', 'weather'] },
-  { name: 'evening', from: 18, widgets: ['clock', 'weather', 'calendar'] },
-  { name: 'night', from: 23, widgets: ['clock'], dim: true },
+  { name: 'day', from: 5, widgets: ['terrain'] },
+  { name: 'night', from: 23, widgets: ['terrain'], dim: true },
 ]
+
+// The earlier dark layout, kept for when the mirror glass goes on:
+//   { name: 'morning', from: 5, widgets: ['clock', 'weather', 'calendar'] },
 
 export function sceneFor(date: Date): Scene {
   const hour = date.getHours()
