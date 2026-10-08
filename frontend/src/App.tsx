@@ -21,7 +21,7 @@ export default function App() {
         if (!def) return null
         const Widget = def.component
         return (
-          <div key={id} className={`slot slot-${def.size}`}>
+          <div key={id} className={`slot slot-${def.size} slot-${id}`}>
             <Widget />
           </div>
         )

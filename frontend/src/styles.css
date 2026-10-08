@@ -147,3 +147,27 @@ ul { list-style: none; }
 @media (prefers-reduced-motion: reduce) {
   .mirror, .message { transition: none; }
 }
+
+/*
+  Landscape (monitor on its stand): two columns sized off the screen
+  height. Clock with the next widget on the left, the other on the right.
+*/
+@media (orientation: landscape) {
+  :root { --unit: 1.1vh; }
+
+  .mirror {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    grid-template-rows: auto auto 1fr;
+    column-gap: calc(var(--space) * 2.5);
+    row-gap: calc(var(--space) * 1.2);
+    padding: calc(var(--space) * 1.5) calc(var(--space) * 2);
+  }
+  /* Clock and weather stack on the left; the calendar gets the full
+     height of the right column since it's the one that grows. */
+  .slot-hero { grid-column: 1; grid-row: 1; margin-bottom: 0; }
+  .slot-block { grid-column: 1; grid-row: 2; }
+  .slot-calendar { grid-column: 2; grid-row: 1 / span 2; padding-top: calc(var(--space) * 0.6); overflow: hidden; }
+  .message { grid-column: 1 / -1; grid-row: 3; align-self: end; min-height: 0; }
+  .message-text { max-width: 48ch; }
+}

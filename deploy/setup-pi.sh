@@ -4,7 +4,7 @@
 set -euo pipefail
 
 MIRROR_DIR="$HOME/mirror"
-ROTATION="${ROTATION:-90}"   # 90 or 270 depending on which way the monitor is turned
+ROTATION="${ROTATION:-normal}"   # normal = horizontal; 90 or 270 once the monitor is turned vertical
 # 720p because the current micro HDMI cable flickers at 1080p.
 # With a better cable, rerun with MODE=1920x1080@60Hz.
 MODE="${MODE:-1280x720@60Hz}"
