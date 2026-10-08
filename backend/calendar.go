@@ -63,12 +63,9 @@ func realURLs(urls []string) []string {
 	var out []string
 	for _, u := range urls {
 		u = strings.TrimSpace(u)
-		// Apple Calendar's share links start with webcal://, which is
-		// plain HTTPS underneath.
-		if strings.HasPrefix(u, "webcal://") {
-			u = "https://" + strings.TrimPrefix(u, "webcal://")
-		}
-		if strings.HasPrefix(u, "https://") && !strings.Contains(u, "YOUR_ID") {
+		// Apple Calendar's share links start with webcal://; fetchICS
+		// decides how to request them.
+		if (strings.HasPrefix(u, "https://") || strings.HasPrefix(u, "webcal://")) && !strings.Contains(u, "YOUR_ID") {
 			out = append(out, u)
 		}
 	}
@@ -148,7 +145,24 @@ func contains(xs []string, x string) bool {
 	return false
 }
 
+// fetchICS reads one calendar. webcal:// links are tried over HTTPS
+// first and then plain HTTP, since some iCloud links only answer the
+// latter (it redirects to HTTPS itself).
 func fetchICS(ctx context.Context, u string, start, end time.Time) ([]Event, error) {
+	if rest, ok := strings.CutPrefix(u, "webcal://"); ok {
+		evs, err := fetchICSOnce(ctx, "https://"+rest, start, end)
+		if err == nil {
+			return evs, nil
+		}
+		if evs2, err2 := fetchICSOnce(ctx, "http://"+rest, start, end); err2 == nil {
+			return evs2, nil
+		}
+		return nil, err
+	}
+	return fetchICSOnce(ctx, u, start, end)
+}
+
+func fetchICSOnce(ctx context.Context, u string, start, end time.Time) ([]Event, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
 	if err != nil {
 		return nil, err
