@@ -41,14 +41,13 @@ type openMeteo struct {
 	} `json:"daily"`
 }
 
-func weatherHandler(cfg WeatherConfig) http.Handler {
-	c := &cached[Weather]{
+func newWeatherSource(cfg WeatherConfig) *cached[Weather] {
+	return &cached[Weather]{
 		ttl: 10 * time.Minute,
 		fetch: func(ctx context.Context) (Weather, error) {
 			return fetchWeather(ctx, cfg)
 		},
 	}
-	return serveCached(c)
 }
 
 func fetchWeather(ctx context.Context, cfg WeatherConfig) (Weather, error) {

@@ -28,16 +28,17 @@ type CalendarResponse struct {
 	// In config order. The first person is drawn as the solid line.
 	People []string `json:"people"`
 	Events []Event  `json:"events"`
+	// People whose calendar couldn't be read on the last refresh.
+	Failed []string `json:"failed,omitempty"`
 }
 
-func calendarHandler(cfg CalendarConfig) http.Handler {
-	c := &cached[CalendarResponse]{
+func newCalendarSource(cfg CalendarConfig) *cached[CalendarResponse] {
+	return &cached[CalendarResponse]{
 		ttl: 5 * time.Minute,
 		fetch: func(ctx context.Context) (CalendarResponse, error) {
 			return fetchCalendar(ctx, cfg)
 		},
 	}
-	return serveCached(c)
 }
 
 // people turns the config into one list, accepting the older flat
@@ -99,6 +100,9 @@ func fetchCalendar(ctx context.Context, cfg CalendarConfig) (CalendarResponse, e
 			if err != nil {
 				log.Printf("calendar for %q: %v", p.Name, err)
 				failures = append(failures, err)
+				if !contains(resp.Failed, p.Name) {
+					resp.Failed = append(resp.Failed, p.Name)
+				}
 				continue
 			}
 			for _, e := range evs {

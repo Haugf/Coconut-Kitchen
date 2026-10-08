@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"sort"
@@ -53,8 +54,9 @@ type TransitRow struct {
 	Label    string `json:"label"`
 	StopName string `json:"stopName"`
 	// Whole minutes until each of the next few arrivals.
-	Minutes []int `json:"minutes"`
-	OK      bool  `json:"ok"`
+	Minutes []int  `json:"minutes"`
+	OK      bool   `json:"ok"`
+	Error   string `json:"error,omitempty"`
 }
 
 type TransitResponse struct {
@@ -86,11 +88,12 @@ func feedFor(route string) string {
 	}
 }
 
-func transitHandler(cfg TransitConfig) http.Handler {
-	t := &transit{cfg: cfg, feeds: map[string]*cached[[]rtTrip]{}, buses: map[string]*cached[[]busArrival]{}}
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		writeJSON(w, http.StatusOK, t.snapshot(r.Context()))
-	})
+func newTransit(cfg TransitConfig) *transit {
+	return &transit{cfg: cfg, feeds: map[string]*cached[[]rtTrip]{}, buses: map[string]*cached[[]busArrival]{}}
+}
+
+func (t *transit) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	writeJSON(w, http.StatusOK, t.snapshot(r.Context()))
 }
 
 type transit struct {
@@ -134,6 +137,10 @@ func (t *transit) snapshot(ctx context.Context) TransitResponse {
 	for _, s := range t.cfg.Subway {
 		row := TransitRow{Kind: "subway", Route: s.Route, Label: s.Label, StopName: s.StopName, Minutes: []int{}}
 		trips, err := t.feed(feedFor(s.Route)).get(ctx)
+		if err != nil {
+			log.Printf("transit %s %s: %v", s.Route, s.Stop, err)
+			row.Error = err.Error()
+		}
 		if err == nil {
 			row.OK = true
 			var times []int64
@@ -159,6 +166,12 @@ func (t *transit) snapshot(ctx context.Context) TransitResponse {
 			}
 			row := TransitRow{Kind: "bus", Route: s.Route, Label: s.Label, StopName: s.StopName, Minutes: []int{}}
 			arrivals, err := t.bus(s.StopCode, s.Route).get(ctx)
+			if err != nil {
+				// The request URL carries the API key; keep it out of logs.
+				msg := strings.ReplaceAll(err.Error(), t.cfg.BusAPIKey, "KEY")
+				log.Printf("transit bus %s %s: %s", s.Route, s.StopCode, msg)
+				row.Error = msg
+			}
 			if err == nil {
 				row.OK = true
 				var times []int64

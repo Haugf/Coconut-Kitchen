@@ -13,12 +13,14 @@ var httpClient = &http.Client{Timeout: 10 * time.Second}
 // cached wraps an upstream fetch with a TTL. If a refresh fails it keeps
 // serving the last good value, so the mirror rides out network blips.
 type cached[T any] struct {
-	mu    sync.Mutex
-	ttl   time.Duration
-	fetch func(context.Context) (T, error)
-	val   T
-	at    time.Time
-	ok    bool
+	mu      sync.Mutex
+	ttl     time.Duration
+	fetch   func(context.Context) (T, error)
+	val     T
+	at      time.Time
+	ok      bool
+	lastErr error
+	errAt   time.Time
 }
 
 func (c *cached[T]) get(ctx context.Context) (T, error) {
@@ -29,13 +31,36 @@ func (c *cached[T]) get(ctx context.Context) (T, error) {
 	}
 	v, err := c.fetch(ctx)
 	if err != nil {
+		c.lastErr, c.errAt = err, time.Now()
 		if c.ok {
 			return c.val, nil
 		}
 		return v, err
 	}
 	c.val, c.at, c.ok = v, time.Now(), true
+	c.lastErr = nil
 	return v, nil
+}
+
+// health reports when the source last worked and its latest error, for
+// /api/status.
+type health struct {
+	OK        bool      `json:"ok"`
+	LastOK    time.Time `json:"lastOk,omitempty"`
+	Error     string    `json:"error,omitempty"`
+	ErrorAt   time.Time `json:"errorAt,omitempty"`
+	ServingOK bool      `json:"servingCachedData,omitempty"`
+}
+
+func (c *cached[T]) health() health {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	h := health{OK: c.ok && c.lastErr == nil, LastOK: c.at}
+	if c.lastErr != nil {
+		h.Error, h.ErrorAt = c.lastErr.Error(), c.errAt
+		h.ServingOK = c.ok
+	}
+	return h
 }
 
 func serveCached[T any](c *cached[T]) http.Handler {

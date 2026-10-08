@@ -25,13 +25,20 @@ func main() {
 	hub := newHub(cfg.EventsToken)
 
 	mux := http.NewServeMux()
-	mux.Handle("GET /api/weather", weatherHandler(cfg.Weather))
-	mux.Handle("GET /api/calendar", calendarHandler(cfg.Calendar))
+	weather := newWeatherSource(cfg.Weather)
+	calendar := newCalendarSource(cfg.Calendar)
 	transitCfg := defaultTransit()
 	if cfg.Transit != nil {
 		transitCfg = *cfg.Transit
 	}
-	mux.Handle("GET /api/transit", transitHandler(transitCfg))
+	trains := newTransit(transitCfg)
+	board := &statusBoard{started: time.Now(), calendar: calendar, weather: weather, transit: trains}
+
+	mux.Handle("GET /api/weather", serveCached(weather))
+	mux.Handle("GET /api/calendar", serveCached(calendar))
+	mux.Handle("GET /api/transit", trains)
+	mux.HandleFunc("GET /api/status", board.status)
+	mux.HandleFunc("POST /api/heartbeat", board.heartbeat)
 	mux.HandleFunc("GET /api/events", hub.stream)
 	mux.HandleFunc("POST /api/events", hub.publish)
 	mux.Handle("/", spaHandler(cfg.StaticDir))

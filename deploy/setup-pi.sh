@@ -106,4 +106,32 @@ UNIT
   sudo systemctl restart mirror-update.timer
 fi
 
+echo "Installing mirror-status"
+sudo ln -sf "$MIRROR_DIR/mirror-status.sh" /usr/local/bin/mirror-status
+sudo tee /etc/systemd/system/mirror-status.service >/dev/null <<UNIT
+[Unit]
+Description=Publish mirror status to GitHub (after report-setup.sh)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=$USER
+Environment=HOME=$HOME
+ExecStart=/usr/bin/env bash $MIRROR_DIR/push-status.sh
+UNIT
+sudo tee /etc/systemd/system/mirror-status.timer >/dev/null <<UNIT
+[Unit]
+Description=Publish mirror status every 5 minutes
+
+[Timer]
+OnBootSec=3min
+OnUnitActiveSec=5min
+
+[Install]
+WantedBy=timers.target
+UNIT
+sudo systemctl daemon-reload
+sudo systemctl enable --now mirror-status.timer
+
 echo "Setup done. On a first install, reboot to start the mirror:  sudo reboot"
