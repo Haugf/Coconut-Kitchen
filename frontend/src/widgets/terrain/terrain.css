@@ -118,3 +118,4 @@
 .mirror-page .message-source { color: #6B6A63; font-size: calc(1vmin * 2.4); font-family: -apple-system, 'Segoe UI', 'Instrument Sans Variable', sans-serif; }
 .mirror-page .message-text { color: #2E2C27; font-size: calc(1vmin * 4.4); font-weight: 600; max-width: 40ch; }
 @media (prefers-reduced-motion: reduce) { .mirror-page { transition: none; } }
+.t-acts[hidden] { display: none; }
