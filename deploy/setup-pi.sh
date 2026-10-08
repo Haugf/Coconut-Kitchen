@@ -4,10 +4,21 @@
 set -euo pipefail
 
 MIRROR_DIR="$HOME/mirror"
-ROTATION="${ROTATION:-normal}"   # normal = horizontal; 90 or 270 once the monitor is turned vertical
-# 720p because the current micro HDMI cable flickers at 1080p.
-# With a better cable, rerun with MODE=1920x1080@60Hz.
-MODE="${MODE:-1280x720@60Hz}"
+mkdir -p "$MIRROR_DIR"
+
+# Display settings live in ~/mirror/display.env so updates keep them.
+# Values passed on the command line win and get saved for next time:
+#   MODE=1280x720@50Hz bash ~/mirror/setup-pi.sh
+#   ROTATION=90 bash ~/mirror/setup-pi.sh   (90 or 270 once the monitor is vertical)
+SETTINGS="$MIRROR_DIR/display.env"
+ARG_MODE="${MODE:-}"
+ARG_ROTATION="${ROTATION:-}"
+if [ -f "$SETTINGS" ]; then . "$SETTINGS"; fi
+# 720p by default because the current micro HDMI cable shimmers at 1080p.
+MODE="${ARG_MODE:-${MODE:-1280x720@60Hz}}"
+ROTATION="${ARG_ROTATION:-${ROTATION:-normal}}"
+printf 'MODE=%s\nROTATION=%s\n' "$MODE" "$ROTATION" > "$SETTINGS"
+echo "Display: $MODE, rotation $ROTATION"
 
 echo "Installing backend service"
 sudo tee /etc/systemd/system/mirror.service >/dev/null <<UNIT
