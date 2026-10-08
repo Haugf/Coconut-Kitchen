@@ -40,14 +40,13 @@ if [ ! -f "$HOME/mirror/config.json" ]; then
   echo "Created ~/mirror/config.json. Add your calendar address there."
 fi
 
-if systemctl list-unit-files mirror.service >/dev/null 2>&1 && [ -f /etc/systemd/system/mirror.service ]; then
-  sudo systemctl restart mirror.service
-  # Close the kiosk browser; kiosk.sh reopens it with the new version.
-  pkill -f -- '--app=http://localhost:8080' || true
-  echo "Updated and restarted."
-else
-  bash "$HOME/mirror/setup-pi.sh"
-fi
+# setup-pi.sh is safe to rerun; it keeps the service, kiosk and timer
+# current with whatever this version expects.
+bash "$HOME/mirror/setup-pi.sh"
+sudo systemctl restart mirror.service
+# No need to touch the browser: the page notices the new build within a
+# minute and reloads itself.
+echo "Installed $(git rev-parse --short HEAD 2>/dev/null). The screen refreshes within a minute."
 
 # Record what's installed, so update.sh retries if this run failed.
 git rev-parse HEAD > "$HOME/mirror/.installed" 2>/dev/null || true

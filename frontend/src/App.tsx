@@ -3,11 +3,13 @@ import { sceneFor } from './scenes'
 import { useNow } from './lib/useNow'
 import { useMessages } from './lib/useMessages'
 import { MessageBar } from './components/MessageBar'
+import { useReloadOnUpdate } from './lib/useReloadOnUpdate'
 
 export default function App() {
   const now = useNow(60 * 1000)
   const scene = sceneFor(now)
   const message = useMessages()
+  useReloadOnUpdate()
 
   // Nudge the whole layout a few pixels every hour so static elements
   // never sit on exactly the same pixels all day.

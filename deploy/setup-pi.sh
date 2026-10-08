@@ -33,7 +33,9 @@ echo "Turning off screen blanking"
 sudo raspi-config nonint do_blanking 1 || true
 
 echo "Writing kiosk launcher"
-cat > "$MIRROR_DIR/kiosk.sh" <<KIOSK
+# Written beside the old one and renamed, so a kiosk.sh that's already
+# running keeps working until the next boot.
+cat > "$MIRROR_DIR/kiosk.sh.new" <<KIOSK
 #!/usr/bin/env bash
 OUTPUT=\$(wlr-randr | awk '/^HDMI/ {print \$1; exit}')
 if [ -n "\$OUTPUT" ]; then
@@ -42,16 +44,18 @@ if [ -n "\$OUTPUT" ]; then
 fi
 until curl -fs http://localhost:8080 >/dev/null; do sleep 1; done
 BROWSER=\$(command -v chromium || command -v chromium-browser)
-# Relaunch the browser whenever it exits, so an update can refresh the
-# screen just by closing it.
+# Relaunch the browser if it ever crashes. Wait for any leftover
+# Chromium to fully exit first, or the new one quits straight away.
 while true; do
-  "\$BROWSER" --kiosk --noerrdialogs --disable-infobars --no-first-run \\
+  while pgrep -x chromium >/dev/null || pgrep -x chromium-browser >/dev/null; do sleep 1; done
+  "\$BROWSER" --disable-session-crashed-bubble --kiosk --noerrdialogs --disable-infobars --no-first-run \\
     --password-store=basic --check-for-update-interval=31536000 \\
     --app=http://localhost:8080
   sleep 2
 done
 KIOSK
-chmod +x "$MIRROR_DIR/kiosk.sh"
+chmod +x "$MIRROR_DIR/kiosk.sh.new"
+mv -f "$MIRROR_DIR/kiosk.sh.new" "$MIRROR_DIR/kiosk.sh"
 
 mkdir -p "$HOME/.config/labwc"
 AUTOSTART="$HOME/.config/labwc/autostart"
@@ -89,4 +93,4 @@ UNIT
   sudo systemctl enable --now mirror-update.timer
 fi
 
-echo "Done. Reboot to start the mirror:  sudo reboot"
+echo "Setup done. On a first install, reboot to start the mirror:  sudo reboot"

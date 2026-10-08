@@ -12,3 +12,4 @@ if [ "$target" != "$installed" ]; then
   git reset -q --hard origin/main
   exec bash install.sh
 fi
+echo "Already up to date (${installed:0:7})."
