@@ -22,7 +22,7 @@ curl -fsSL https://raw.githubusercontent.com/Haugf/coconut-kitchen/main/bootstra
 
 It clones this repo to `~/mirror-src`, builds the server, installs the kiosk,
 turns on auto-update, and reboots. After that the Pi checks GitHub every
-5 minutes and installs anything new pushed to `main`, then refreshes the screen.
+minute and installs anything new pushed to `main`; the page reloads itself.
 Anyone who can push to `main` can change what runs on the Pi, so keep push
 access to yourself.
 

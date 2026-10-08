@@ -75,7 +75,7 @@ grep -q "mirror/kiosk.sh" "$AUTOSTART" || echo "$MIRROR_DIR/kiosk.sh &" >> "$AUT
 
 SRC_DIR="${SRC_DIR:-$HOME/mirror-src}"
 if [ -d "$SRC_DIR/.git" ]; then
-  echo "Turning on auto-update from GitHub (checks every 5 minutes)"
+  echo "Turning on auto-update from GitHub (checks every minute)"
   sudo tee /etc/systemd/system/mirror-update.service >/dev/null <<UNIT
 [Unit]
 Description=Pull the mirror from GitHub and reinstall if it changed
@@ -94,14 +94,16 @@ UNIT
 Description=Check GitHub for mirror updates
 
 [Timer]
-OnBootSec=2min
-OnUnitActiveSec=5min
+OnBootSec=1min
+OnUnitActiveSec=1min
 
 [Install]
 WantedBy=timers.target
 UNIT
   sudo systemctl daemon-reload
-  sudo systemctl enable --now mirror-update.timer
+  sudo systemctl enable mirror-update.timer
+  # restart so a changed interval takes effect
+  sudo systemctl restart mirror-update.timer
 fi
 
 echo "Setup done. On a first install, reboot to start the mirror:  sudo reboot"
