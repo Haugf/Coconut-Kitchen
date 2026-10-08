@@ -29,8 +29,8 @@ type CalendarConfig struct {
 	People []Person `json:"people"`
 	// Older single-person form, still accepted.
 	ICSURLs   stringList `json:"icsUrls"`
-	DaysAhead int      `json:"daysAhead"`
-	MaxEvents int      `json:"maxEvents"`
+	DaysAhead int        `json:"daysAhead"`
+	MaxEvents int        `json:"maxEvents"`
 }
 
 type Person struct {
