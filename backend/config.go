@@ -24,7 +24,8 @@ type WeatherConfig struct {
 
 type CalendarConfig struct {
 	// One entry per person whose day shows on the mirror. Each URL is a
-	// Google Calendar "Secret address in iCal format".
+	// Google Calendar "Secret address in iCal format" or an Apple
+	// Calendar public link (webcal:// is fine).
 	People []Person `json:"people"`
 	// Older single-person form, still accepted.
 	ICSURLs   []string `json:"icsUrls"`

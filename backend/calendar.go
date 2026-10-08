@@ -60,6 +60,12 @@ func people(cfg CalendarConfig) []Person {
 func realURLs(urls []string) []string {
 	var out []string
 	for _, u := range urls {
+		u = strings.TrimSpace(u)
+		// Apple Calendar's share links start with webcal://, which is
+		// plain HTTPS underneath.
+		if strings.HasPrefix(u, "webcal://") {
+			u = "https://" + strings.TrimPrefix(u, "webcal://")
+		}
 		if strings.HasPrefix(u, "https://") && !strings.Contains(u, "YOUR_ID") {
 			out = append(out, u)
 		}
