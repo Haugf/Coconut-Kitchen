@@ -4,6 +4,14 @@ export interface CalendarEvent {
   end: string
   allDay: boolean
   location?: string
+  /** Whose calendar it's on. Two names means both. */
+  who?: string[]
+}
+
+export interface CalendarData {
+  /** Config order; the first person is the solid line. */
+  people: string[]
+  events: CalendarEvent[]
 }
 
 export interface WeatherDay {
@@ -28,4 +36,5 @@ export interface DayEvent {
   end: Date
   startH: number
   endH: number
+  who: string[]
 }

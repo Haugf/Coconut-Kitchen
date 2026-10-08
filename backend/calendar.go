@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/apognu/gocal"
@@ -17,40 +18,95 @@ type Event struct {
 	End      time.Time `json:"end"`
 	AllDay   bool      `json:"allDay"`
 	Location string    `json:"location,omitempty"`
+	// Whose calendar it's on, by name. Two names means it's on both.
+	Who []string `json:"who"`
+}
+
+type CalendarResponse struct {
+	// In config order. The first person is drawn as the solid line.
+	People []string `json:"people"`
+	Events []Event  `json:"events"`
 }
 
 func calendarHandler(cfg CalendarConfig) http.Handler {
-	c := &cached[[]Event]{
+	c := &cached[CalendarResponse]{
 		ttl: 5 * time.Minute,
-		fetch: func(ctx context.Context) ([]Event, error) {
+		fetch: func(ctx context.Context) (CalendarResponse, error) {
 			return fetchCalendar(ctx, cfg)
 		},
 	}
 	return serveCached(c)
 }
 
-func fetchCalendar(ctx context.Context, cfg CalendarConfig) ([]Event, error) {
-	if len(cfg.ICSURLs) == 0 {
-		return nil, errors.New("calendar: no icsUrls in config")
+// people turns the config into one list, accepting the older flat
+// icsUrls list as a single unnamed person.
+func people(cfg CalendarConfig) []Person {
+	var out []Person
+	for _, p := range cfg.People {
+		if urls := realURLs(p.ICSURLs); len(urls) > 0 {
+			out = append(out, Person{Name: p.Name, ICSURLs: urls})
+		}
+	}
+	if len(out) == 0 {
+		if urls := realURLs(cfg.ICSURLs); len(urls) > 0 {
+			out = append(out, Person{Name: "", ICSURLs: urls})
+		}
+	}
+	return out
+}
+
+// realURLs skips placeholders, so a person without an address yet is
+// simply left off instead of breaking everyone's calendar.
+func realURLs(urls []string) []string {
+	var out []string
+	for _, u := range urls {
+		if strings.HasPrefix(u, "https://") && !strings.Contains(u, "YOUR_ID") {
+			out = append(out, u)
+		}
+	}
+	return out
+}
+
+func fetchCalendar(ctx context.Context, cfg CalendarConfig) (CalendarResponse, error) {
+	ppl := people(cfg)
+	if len(ppl) == 0 {
+		return CalendarResponse{}, errors.New("calendar: no calendar addresses in config")
 	}
 
 	now := time.Now()
 	start := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
 	end := start.AddDate(0, 0, cfg.DaysAhead)
 
-	var events []Event
-	for _, u := range cfg.ICSURLs {
-		evs, err := fetchICS(ctx, u, start, end)
-		if err != nil {
-			return nil, err
+	resp := CalendarResponse{People: []string{}, Events: []Event{}}
+	// The same event on both calendars (an invite) becomes one event
+	// with both names.
+	byKey := map[string]int{}
+	for _, p := range ppl {
+		resp.People = append(resp.People, p.Name)
+		for _, u := range p.ICSURLs {
+			evs, err := fetchICS(ctx, u, start, end)
+			if err != nil {
+				return CalendarResponse{}, err
+			}
+			for _, e := range evs {
+				key := e.Title + "|" + e.Start.Format(time.RFC3339)
+				if i, ok := byKey[key]; ok {
+					if !contains(resp.Events[i].Who, p.Name) {
+						resp.Events[i].Who = append(resp.Events[i].Who, p.Name)
+					}
+					continue
+				}
+				e.Who = []string{p.Name}
+				byKey[key] = len(resp.Events)
+				resp.Events = append(resp.Events, e)
+			}
 		}
-		events = append(events, evs...)
 	}
 
 	// Today's finished events are kept on purpose: the terrain draws the
 	// whole day. Widgets that only want what's ahead filter on their own.
-
-	sort.Slice(events, func(i, j int) bool {
+	events := resp.Events
+	sort.SliceStable(events, func(i, j int) bool {
 		if events[i].Start.Equal(events[j].Start) {
 			return events[i].AllDay && !events[j].AllDay
 		}
@@ -59,10 +115,17 @@ func fetchCalendar(ctx context.Context, cfg CalendarConfig) ([]Event, error) {
 	if cfg.MaxEvents > 0 && len(events) > cfg.MaxEvents {
 		events = events[:cfg.MaxEvents]
 	}
-	if events == nil {
-		events = []Event{}
+	resp.Events = events
+	return resp, nil
+}
+
+func contains(xs []string, x string) bool {
+	for _, v := range xs {
+		if v == x {
+			return true
+		}
 	}
-	return events, nil
+	return false
 }
 
 func fetchICS(ctx context.Context, u string, start, end time.Time) ([]Event, error) {

@@ -27,7 +27,8 @@ function timeLabel(e: CalendarEvent): string {
 }
 
 export function Calendar() {
-  const { data, error } = useWidgetData<CalendarEvent[]>('/api/calendar', 5 * 60 * 1000)
+  const { data: res, error } = useWidgetData<{ events: CalendarEvent[] }>('/api/calendar', 5 * 60 * 1000)
+  const data = res?.events ?? null
   const now = useNow(60 * 1000)
 
   if (!data) {

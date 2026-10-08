@@ -55,6 +55,8 @@
 .t-land { width: 100%; height: auto; margin-top: calc(var(--u) * 3.5); overflow: visible; }
 .t-line { stroke: var(--ink); stroke-width: 3; stroke-linecap: round; }
 .t-dot { fill: var(--ink); }
+.t-line-second { stroke-opacity: 0.5; stroke-width: 2.5; stroke-dasharray: 8 8; }
+.t-dot-second { fill-opacity: 0.5; }
 .t-hollow { fill: var(--wash); stroke: var(--ink); stroke-width: 2.5; }
 .t-clay { fill: var(--clay); }
 .t-birds { stroke: var(--ink-grey); stroke-width: 2.5; stroke-linecap: round; }

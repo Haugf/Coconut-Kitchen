@@ -16,7 +16,7 @@ export function timedEventsOn(events: CalendarEvent[], day: Date): DayEvent[] {
       const start = new Date(e.start)
       const end = e.end ? new Date(e.end) : new Date(start.getTime() + 30 * 60 * 1000)
       const endH = sameDay(end, day) ? hours(end) : 24
-      return { title: e.title, start, end, startH: hours(start), endH: Math.max(endH, hours(start) + 0.25) }
+      return { title: e.title, start, end, startH: hours(start), endH: Math.max(endH, hours(start) + 0.25), who: e.who ?? [] }
     })
     .sort((a, b) => a.startH - b.startH)
 }
@@ -43,4 +43,17 @@ export function shortClock(d: Date): string {
   const h = d.getHours() % 12 || 12
   const m = d.getMinutes()
   return m === 0 ? `${h}` : `${h}:${String(m).padStart(2, '0')}`
+}
+
+/** Events on one person's calendar. With a single unnamed person, everything. */
+export function belongsTo<T extends { who?: string[] }>(items: T[], name: string | undefined): T[] {
+  if (name === undefined) return []
+  return items.filter((e) => !e.who || e.who.length === 0 || e.who.includes(name))
+}
+
+/** "on your calendar", "on Ally's calendar", "on both calendars" */
+export function sourcePhrase(who: string[] | undefined, people: string[]): string {
+  if (people.length < 2 || !who || who.length === 0) return 'on your calendar'
+  if (who.length >= 2) return 'on both calendars'
+  return `on ${who[0]}’s calendar`
 }

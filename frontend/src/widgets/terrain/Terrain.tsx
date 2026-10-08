@@ -1,8 +1,8 @@
 import { useWidgetData } from '../../lib/useWidgetData'
 import { useNow } from '../../lib/useNow'
 import { describe } from '../weather/codes'
-import type { CalendarEvent, WeatherData } from './types'
-import { timedEventsOn, eventsOn, clock } from './day'
+import type { CalendarData, CalendarEvent, WeatherData } from './types'
+import { timedEventsOn, eventsOn, clock, belongsTo, sourcePhrase } from './day'
 import { terrainPath, dots, clayMotif, eveningIsFree, xOf, yAt, W, H, BASE, DAY_START, DAY_END } from './shape'
 import { headline, acts, partOfDay } from './voice'
 import './terrain.css'
@@ -24,12 +24,12 @@ function dateLine(now: Date, weather: WeatherData | null): string {
   return parts.join(' · ')
 }
 
-function todayItems(events: CalendarEvent[], weather: WeatherData | null, now: Date): Item[] {
+function todayItems(events: CalendarEvent[], people: string[], weather: WeatherData | null, now: Date): Item[] {
   const items: Item[] = []
   for (const e of eventsOn(events, now)) {
     if (!e.allDay && e.end && new Date(e.end) <= now) continue
     if (e.allDay) {
-      items.push({ title: e.title, before: 'All day, ', source: 'on your calendar', after: '.' })
+      items.push({ title: e.title, before: 'All day, ', source: sourcePhrase(e.who, people), after: '.' })
     } else {
       const start = new Date(e.start)
       const end = e.end ? new Date(e.end) : null
@@ -37,7 +37,7 @@ function todayItems(events: CalendarEvent[], weather: WeatherData | null, now: D
       items.push({
         title: happening ? `${e.title}, now` : `${e.title} at ${clock(start)}`,
         before: end ? `Until ${clock(end)}, ` : '',
-        source: 'on your calendar',
+        source: sourcePhrase(e.who, people),
         after: '.',
       })
     }
@@ -49,13 +49,13 @@ function todayItems(events: CalendarEvent[], weather: WeatherData | null, now: D
   return items
 }
 
-function tomorrowItems(events: CalendarEvent[], now: Date): Item[] {
+function tomorrowItems(events: CalendarEvent[], people: string[], now: Date): Item[] {
   const tomorrow = new Date(now)
   tomorrow.setDate(now.getDate() + 1)
   return eventsOn(events, tomorrow).map((e) => ({
     title: e.title,
     before: e.allDay ? 'All day, ' : `At ${clock(new Date(e.start))}, `,
-    source: 'on your calendar',
+    source: sourcePhrase(e.who, people),
     after: '.',
   }))
 }
@@ -89,17 +89,22 @@ function List({ heading, items, empty, className }: { heading: string; items: It
 
 export function Terrain() {
   const now = useNow(60 * 1000)
-  const cal = useWidgetData<CalendarEvent[]>('/api/calendar', 5 * 60 * 1000)
+  const cal = useWidgetData<CalendarData>('/api/calendar', 5 * 60 * 1000)
   const wx = useWidgetData<WeatherData>('/api/weather', 10 * 60 * 1000)
 
-  const all = cal.data ?? []
+  const all = cal.data?.events ?? []
+  const people = cal.data?.people ?? []
+  // Everything today drives the words; each person gets their own line.
   const today = timedEventsOn(all, now)
+  const first = belongsTo(today, people[0])
+  const second = people.length > 1 ? belongsTo(today, people[1]) : []
+  const secondOnly = second.filter((e) => !first.includes(e))
   const motif = clayMotif(today)
   const nowH = now.getHours() + now.getMinutes() / 60
   const showNow = nowH > DAY_START && nowH < DAY_END
 
-  const todayList = todayItems(all, wx.data, now)
-  const tomorrowList = tomorrowItems(all, now)
+  const todayList = todayItems(all, people, wx.data, now)
+  const tomorrowList = tomorrowItems(all, people, now)
 
   return (
     <div className="terrain">
@@ -114,9 +119,13 @@ export function Terrain() {
           {eveningIsFree(today) && (
             <path d={`M${xOf(19.5)} 70 q9 -10 18 0 q9 -10 18 0 M${xOf(20.4)} 52 q7 -8 14 0 q7 -8 14 0`} className="t-birds" />
           )}
-          {showNow && <line x1={xOf(nowH)} x2={xOf(nowH)} y1={14} y2={yAt(nowH, today) - 10} className="t-now" />}
-          <path d={terrainPath(today)} className="t-line" />
-          {dots(today).map((d, i) =>
+          {showNow && <line x1={xOf(nowH)} x2={xOf(nowH)} y1={14} y2={yAt(nowH, first) - 10} className="t-now" />}
+          {people.length > 1 && <path d={terrainPath(second)} className="t-line t-line-second" />}
+          <path d={terrainPath(first)} className="t-line" />
+          {secondOnly.map((e, i) => (
+            <circle key={`s${i}`} cx={xOf(e.startH)} cy={yAt(e.startH, second)} r={7} className="t-dot t-dot-second" />
+          ))}
+          {dots(first).map((d, i) =>
             d.collision ? (
               <g key={i}>
                 <circle cx={d.x - d.r * 0.45} cy={d.y} r={d.r} className="t-hollow" />

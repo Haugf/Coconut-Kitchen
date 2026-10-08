@@ -23,10 +23,18 @@ type WeatherConfig struct {
 }
 
 type CalendarConfig struct {
-	// Google Calendar: Settings > your calendar > "Secret address in iCal format".
+	// One entry per person whose day shows on the mirror. Each URL is a
+	// Google Calendar "Secret address in iCal format".
+	People []Person `json:"people"`
+	// Older single-person form, still accepted.
 	ICSURLs   []string `json:"icsUrls"`
 	DaysAhead int      `json:"daysAhead"`
 	MaxEvents int      `json:"maxEvents"`
+}
+
+type Person struct {
+	Name    string   `json:"name"`
+	ICSURLs []string `json:"icsUrls"`
 }
 
 func loadConfig(path string) (*Config, error) {

@@ -8,8 +8,15 @@
     "units": "fahrenheit"
   },
   "calendar": {
-    "icsUrls": [
-      "https://calendar.google.com/calendar/ical/YOUR_ID/private-SECRET/basic.ics"
+    "people": [
+      {
+        "name": "Fred",
+        "icsUrls": ["PASTE_FREDS_SECRET_ICAL_ADDRESS_HERE"]
+      },
+      {
+        "name": "Ally",
+        "icsUrls": ["PASTE_ALLYS_SECRET_ICAL_ADDRESS_HERE"]
+      }
     ],
     "daysAhead": 7,
     "maxEvents": 30
