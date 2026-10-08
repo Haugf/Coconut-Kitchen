@@ -37,6 +37,8 @@ fi
 
 if systemctl list-unit-files mirror.service >/dev/null 2>&1 && [ -f /etc/systemd/system/mirror.service ]; then
   sudo systemctl restart mirror.service
+  # Close the kiosk browser; kiosk.sh reopens it with the new version.
+  pkill -f -- '--app=http://localhost:8080' || true
   echo "Updated and restarted."
 else
   bash "$HOME/mirror/setup-pi.sh"

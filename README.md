@@ -12,6 +12,20 @@ deploy/     One-time Pi setup (systemd service, kiosk autostart, rotation).
 Makefile    setup, dev, build, deploy from the Mac.
 ```
 
+## Set up a Pi in one line
+
+On a fresh Raspberry Pi OS (64-bit) with SSH:
+
+```
+curl -fsSL https://raw.githubusercontent.com/Haugf/coconut-kitchen/main/bootstrap.sh | bash
+```
+
+It clones this repo to `~/mirror-src`, builds the server, installs the kiosk,
+turns on auto-update, and reboots. After that the Pi checks GitHub every
+5 minutes and installs anything new pushed to `main`, then refreshes the screen.
+Anyone who can push to `main` can change what runs on the Pi, so keep push
+access to yourself.
+
 ## Run it on the Mac first
 
 ```
