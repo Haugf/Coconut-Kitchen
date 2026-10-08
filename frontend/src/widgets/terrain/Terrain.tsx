@@ -136,7 +136,7 @@ export function Terrain() {
             ),
           )}
         </svg>
-        <div className="t-acts">
+        <div className="t-acts" hidden={!cal.data}>
           {acts(today).map((a) => (
             <div className="t-act" key={a.label}>
               <p className="t-act-label">{a.label}</p>
@@ -146,7 +146,11 @@ export function Terrain() {
         </div>
       </header>
       <div className="t-bottom">
-        <List heading="Today" items={todayList} empty={`Nothing needs you ${partOfDay(now)}.`} />
+        <List
+          heading="Today"
+          items={todayList}
+          empty={cal.data ? `Nothing needs you ${partOfDay(now)}.` : 'Add calendar addresses to config.json on the Pi to fill this in.'}
+        />
         <List heading="Tomorrow" items={tomorrowList} empty="Nothing on the calendar yet." className="t-list-tomorrow" />
       </div>
     </div>
