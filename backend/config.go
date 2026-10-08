@@ -28,14 +28,32 @@ type CalendarConfig struct {
 	// Calendar public link (webcal:// is fine).
 	People []Person `json:"people"`
 	// Older single-person form, still accepted.
-	ICSURLs   []string `json:"icsUrls"`
+	ICSURLs   stringList `json:"icsUrls"`
 	DaysAhead int      `json:"daysAhead"`
 	MaxEvents int      `json:"maxEvents"`
 }
 
 type Person struct {
-	Name    string   `json:"name"`
-	ICSURLs []string `json:"icsUrls"`
+	Name    string     `json:"name"`
+	ICSURLs stringList `json:"icsUrls"`
+}
+
+// stringList accepts either ["a", "b"] or a single "a", since a lone
+// address without brackets is an easy mistake to make by hand.
+type stringList []string
+
+func (l *stringList) UnmarshalJSON(b []byte) error {
+	var one string
+	if err := json.Unmarshal(b, &one); err == nil {
+		*l = stringList{one}
+		return nil
+	}
+	var many []string
+	if err := json.Unmarshal(b, &many); err != nil {
+		return fmt.Errorf("expected an address or a list of addresses: %w", err)
+	}
+	*l = many
+	return nil
 }
 
 func loadConfig(path string) (*Config, error) {
