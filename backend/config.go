@@ -14,6 +14,8 @@ type Config struct {
 	EventsToken string         `json:"eventsToken"`
 	Weather     WeatherConfig  `json:"weather"`
 	Calendar    CalendarConfig `json:"calendar"`
+	// Optional; without it the mirror shows the default Ridgewood trains.
+	Transit *TransitConfig `json:"transit"`
 }
 
 type WeatherConfig struct {

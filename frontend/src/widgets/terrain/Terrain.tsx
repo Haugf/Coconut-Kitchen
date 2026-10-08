@@ -5,6 +5,7 @@ import type { CalendarData, CalendarEvent, WeatherData } from './types'
 import { timedEventsOn, eventsOn, clock, belongsTo, sourcePhrase } from './day'
 import { terrainPath, dots, clayMotif, eveningIsFree, xOf, yAt, W, H, BASE, DAY_START, DAY_END } from './shape'
 import { headline, acts, partOfDay } from './voice'
+import { Transit } from './Transit'
 import './terrain.css'
 
 interface Item {
@@ -146,12 +147,15 @@ export function Terrain() {
         </div>
       </header>
       <div className="t-bottom">
+        <div className="t-col">
         <List
           heading="Today"
           items={todayList}
           empty={cal.data ? `Nothing needs you ${partOfDay(now)}.` : 'Add calendar addresses to config.json on the Pi to fill this in.'}
         />
         <List heading="Tomorrow" items={tomorrowList} empty="Nothing on the calendar yet." className="t-list-tomorrow" />
+        </div>
+        <Transit />
       </div>
     </div>
   )

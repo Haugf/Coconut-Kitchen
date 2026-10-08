@@ -90,6 +90,24 @@
 .t-title { font-weight: 650; font-size: calc(var(--u) * 2.8); }
 .t-source { text-decoration: underline; text-underline-offset: 0.2em; text-decoration-color: var(--ink-soft); }
 
+.t-col { display: flex; flex-direction: column; gap: calc(var(--u) * 5); min-width: 0; }
+
+/* Transit: one line per route, times aligned on the right. */
+.t-rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.t-rows li {
+  display: grid;
+  grid-template-columns: calc(var(--u) * 6) 1fr auto;
+  align-items: baseline;
+  gap: calc(var(--u) * 1.5);
+  padding: calc(var(--u) * 0.9) 0;
+  border-top: 1px solid var(--hairline);
+}
+.t-rows li:first-child { border-top: 0; padding-top: 0; }
+.t-route { font-weight: 700; }
+.t-dest { color: var(--ink-soft); }
+.t-times { font-weight: 650; font-variant-numeric: tabular-nums; text-align: right; }
+.t-from { font-size: 0.9em; }
+
 /* Landscape has room for the few things that matter today, not tomorrow. */
 @media (orientation: landscape) {
   .t-top { padding-top: calc(var(--u) * 5); padding-bottom: calc(var(--u) * 3.5); }
@@ -101,6 +119,10 @@
   .t-items { gap: calc(var(--u) * 1.6); }
   .t-title { font-size: calc(var(--u) * 2.6); }
   .t-list-tomorrow { display: none; }
+  /* Landscape only: today on the left, getting around on the right,
+     split by a hairline. Portrait keeps everything in one column. */
+  .t-bottom { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); column-gap: calc(var(--u) * 6); }
+  .t-transit { border-left: 1px solid var(--hairline); padding-left: calc(var(--u) * 6); }
   .t-items li:nth-child(n + 4) { display: none; }
 }
 

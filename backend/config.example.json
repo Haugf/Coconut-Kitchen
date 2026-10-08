@@ -11,14 +11,55 @@
     "people": [
       {
         "name": "Fred",
-        "icsUrls": ["PASTE_FREDS_SECRET_ICAL_ADDRESS_HERE"]
+        "icsUrls": [
+          "PASTE_FREDS_SECRET_ICAL_ADDRESS_HERE"
+        ]
       },
       {
         "name": "Ally",
-        "icsUrls": ["PASTE_ALLYS_SECRET_ICAL_ADDRESS_HERE"]
+        "icsUrls": [
+          "PASTE_ALLYS_SECRET_ICAL_ADDRESS_HERE"
+        ]
       }
     ],
     "daysAhead": 7,
     "maxEvents": 30
+  },
+  "transit": {
+    "subway": [
+      {
+        "route": "L",
+        "stop": "L17N",
+        "label": "Manhattan",
+        "stopName": "Myrtle–Wyckoff"
+      },
+      {
+        "route": "L",
+        "stop": "L17S",
+        "label": "Canarsie",
+        "stopName": "Myrtle–Wyckoff"
+      },
+      {
+        "route": "M",
+        "stop": "M05N",
+        "label": "Manhattan",
+        "stopName": "Forest Av"
+      }
+    ],
+    "busApiKey": "",
+    "bus": [
+      {
+        "route": "B13",
+        "stopCode": "",
+        "label": "",
+        "stopName": "Gates & Fairview"
+      },
+      {
+        "route": "B13",
+        "stopCode": "",
+        "label": "",
+        "stopName": "Gates & Fairview"
+      }
+    ]
   }
 }

@@ -27,6 +27,11 @@ func main() {
 	mux := http.NewServeMux()
 	mux.Handle("GET /api/weather", weatherHandler(cfg.Weather))
 	mux.Handle("GET /api/calendar", calendarHandler(cfg.Calendar))
+	transitCfg := defaultTransit()
+	if cfg.Transit != nil {
+		transitCfg = *cfg.Transit
+	}
+	mux.Handle("GET /api/transit", transitHandler(transitCfg))
 	mux.HandleFunc("GET /api/events", hub.stream)
 	mux.HandleFunc("POST /api/events", hub.publish)
 	mux.Handle("/", spaHandler(cfg.StaticDir))
