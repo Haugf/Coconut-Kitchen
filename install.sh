@@ -34,7 +34,12 @@ cp -r frontend/dist "$HOME/mirror/web"
 # the old file until the restart below.
 cp mirror-server "$HOME/mirror/mirror-server.new"
 mv -f "$HOME/mirror/mirror-server.new" "$HOME/mirror/mirror-server"
-cp deploy/setup-pi.sh deploy/mirror-status.sh deploy/push-status.sh deploy/report-setup.sh "$HOME/mirror/"
+cp deploy/setup-pi.sh deploy/mirror-status.sh deploy/push-status.sh deploy/report-setup.sh deploy/mirror.sh "$HOME/mirror/"
+chmod +x "$HOME/mirror/mirror.sh" "$HOME/mirror/mirror-status.sh"
+# The `mirror` command. ~/.local/bin is on the PATH on Raspberry Pi OS
+# (from the next login once the folder exists); no sudo needed.
+mkdir -p "$HOME/.local/bin"
+ln -sf "$HOME/mirror/mirror.sh" "$HOME/.local/bin/mirror"
 if [ ! -f "$HOME/mirror/config.json" ]; then
   cp backend/config.example.json "$HOME/mirror/config.json"
   echo "Created ~/mirror/config.json. Add your calendar address there."

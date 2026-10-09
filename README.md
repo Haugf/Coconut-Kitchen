@@ -120,17 +120,23 @@ run once: `bash ~/mirror/report-setup.sh`. It makes a deploy key; add it to the
 repo with write access. Reports go to the `pi-status` branch and contain counts
 and health only, never event titles, calendar links, or API keys.
 
-### Other handy commands
+### The `mirror` command
+
+Everyday chores, from any SSH session on the Pi:
 
 | Do this | Command |
 |---|---|
-| Update now instead of waiting | `bash ~/mirror-src/update.sh` |
-| Server logs | `journalctl -u mirror -n 50` |
-| Update logs | `journalctl -u mirror-update -n 30` |
-| Restart the server | `sudo systemctl restart mirror` |
-| Change display mode | `MODE=1280x720@50Hz bash ~/mirror/setup-pi.sh` |
-| Rotate for vertical | `ROTATION=90 bash ~/mirror/setup-pi.sh` then `sudo reboot` |
-| Edit settings | `nano ~/mirror/config.json` then restart the server |
+| Check everything | `mirror status` |
+| Screen off / on now | `mirror off`, `mirror on` |
+| See or set sleep hours | `mirror sleep`, `mirror sleep 00:30 07:00`, `mirror sleep never` |
+| Put a message on screen | `mirror say "Laundry is done" 15` |
+| Centre the minimap on home | `mirror home "your address"` |
+| Update now instead of waiting | `mirror update` |
+| Restart, follow the log | `mirror restart`, `mirror logs` |
+| Edit settings safely | `mirror config` (restarts only if the JSON is valid) |
+
+It's installed with every update. If the shell says `mirror: command not
+found` the first time, log out and back in (or run `~/mirror/mirror.sh`).
 
 ## Set up a fresh Pi
 
