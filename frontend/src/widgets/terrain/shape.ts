@@ -1,8 +1,8 @@
 import type { DayEvent } from './types'
 
-/** The drawing spans 6 AM to 11 PM. */
+/** The drawing spans 6 AM to midnight. */
 export const DAY_START = 6
-export const DAY_END = 23
+export const DAY_END = 24
 export const W = 1200
 export const H = 150
 export const BASE = 134
