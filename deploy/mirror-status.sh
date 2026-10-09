@@ -58,6 +58,10 @@ check(w.get("ok"), "Weather", w.get("error", ""))
 for row in st.get("transit") or []:
     mins = ", ".join(str(m) for m in row.get("minutes", [])) or "none soon"
     check(row.get("ok"), f'{row.get("route")} to {row.get("label")}', row.get("error") or f"{mins} min")
+mp = st.get("map") or {}
+check(mp.get("streets", 0) > 0, "Minimap",
+      f'{mp.get("streets", 0)} streets, {mp.get("vehicles", 0)} trains and buses'
+      + ("" if mp.get("homeSet") else ", home not set (centred on Forest Av)"))
 seen = page.get("seen") or {}
 check(seen.get("transitRows", 0) > 0, "Transit visible on screen", f'{seen.get("transitRows", 0)} rows')
 check(e["throttled"] in ("0x0", ""), "Power", f'throttled={e["throttled"]}, {e["temp"]}')

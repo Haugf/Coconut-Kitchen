@@ -6,6 +6,7 @@ import { timedEventsOn, eventsOn, clock, belongsTo, sourcePhrase } from './day'
 import { terrainPath, dots, clayMotif, eveningIsFree, xOf, yAt, W, H, BASE, DAY_START, DAY_END } from './shape'
 import { headline, acts, partOfDay } from './voice'
 import { Transit } from './Transit'
+import { Minimap } from './Minimap'
 import './terrain.css'
 
 interface Item {
@@ -157,6 +158,7 @@ export function Terrain() {
         <List heading="Tomorrow" items={tomorrowList} empty="Nothing on the calendar yet." className="t-list-tomorrow" />
         </div>
         <Transit />
+        <Minimap />
       </div>
     </div>
   )

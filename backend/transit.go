@@ -234,6 +234,9 @@ func fetchSubwayFeed(ctx context.Context, u string) ([]rtTrip, error) {
 type busArrival struct {
 	At          time.Time
 	Destination string
+	Vehicle     string
+	Lat, Lon    float64 // where the bus is now; 0 when Bus Time doesn't say
+	Away        string  // "2 stops away"
 }
 
 // fetchBusStop asks MTA Bus Time (SIRI StopMonitoring) for upcoming buses.
@@ -265,9 +268,19 @@ func fetchBusStop(ctx context.Context, key, code, route string) ([]busArrival, e
 					MonitoredStopVisit []struct {
 						MonitoredVehicleJourney struct {
 							DestinationName json.RawMessage
-							MonitoredCall   struct {
+							VehicleRef      string
+							VehicleLocation struct {
+								Latitude  float64
+								Longitude float64
+							}
+							MonitoredCall struct {
 								ExpectedArrivalTime string
 								AimedArrivalTime    string
+								Extensions          struct {
+									Distances struct {
+										PresentableDistance string
+									}
+								}
 							}
 						}
 					}
@@ -290,7 +303,14 @@ func fetchBusStop(ctx context.Context, key, code, route string) ([]busArrival, e
 			if err != nil {
 				continue
 			}
-			out = append(out, busArrival{At: at, Destination: titleCase(firstString(j.DestinationName))})
+			out = append(out, busArrival{
+				At:          at,
+				Destination: titleCase(firstString(j.DestinationName)),
+				Vehicle:     j.VehicleRef,
+				Lat:         j.VehicleLocation.Latitude,
+				Lon:         j.VehicleLocation.Longitude,
+				Away:        j.MonitoredCall.Extensions.Distances.PresentableDistance,
+			})
 		}
 	}
 	return out, nil

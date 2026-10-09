@@ -23,6 +23,7 @@ type statusBoard struct {
 	calendar *cached[CalendarResponse]
 	weather  *cached[Weather]
 	transit  *transit
+	minimap  *minimap
 
 	mu   sync.Mutex
 	beat heartbeat
@@ -94,6 +95,12 @@ func (s *statusBoard) status(w http.ResponseWriter, r *http.Request) {
 		rows = append(rows, map[string]any{"route": row.Route, "label": row.Label, "ok": row.OK, "minutes": row.Minutes, "error": row.Error})
 	}
 	out["transit"] = rows
+
+	// Counts only: never the home location.
+	if s.minimap != nil {
+		mp := s.minimap.snapshot(ctx)
+		out["map"] = map[string]any{"homeSet": mp.Home != nil, "streets": len(mp.Streets), "vehicles": len(mp.Vehicles)}
+	}
 
 	writeJSON(w, http.StatusOK, out)
 }

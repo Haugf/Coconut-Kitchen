@@ -1,15 +1,15 @@
 /*
   Terrain page. Two full-bleed bands meeting at a hard 1px edge; no
-  cards, borders, radii or shadows. The palette is closed: don't add to it.
+  cards, borders, radii or shadows. The palette is closed: don't add to it. Warm sand, after Claude's ivory.
 */
 .terrain {
-  --bg: #FCFCFB;
-  --wash: #F9F9F7;
+  --bg: #FAF9F5;
+  --wash: #F0EEE6;
   --ink: #2E2C27;
   --ink-soft: #6B6A63;
-  --ink-grey: #B4B3A8;
-  --hairline: #E4E3DC;
-  --edge: #E1E1DF;
+  --ink-grey: #B3AE9F;
+  --hairline: #E3DFD3;
+  --edge: #DCD7C9;
   --clay: #C6613F;
 
   /* One unit that tracks the short side, so landscape and portrait match. */
@@ -96,17 +96,40 @@
 .t-rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
 .t-rows li {
   display: grid;
-  grid-template-columns: calc(var(--u) * 6) 1fr auto;
+  grid-template-columns: calc(var(--u) * 7.5) 1fr auto;
   align-items: baseline;
   gap: calc(var(--u) * 1.5);
   padding: calc(var(--u) * 0.9) 0;
   border-top: 1px solid var(--hairline);
 }
 .t-rows li:first-child { border-top: 0; padding-top: 0; }
-.t-route { font-weight: 700; }
+.t-route { font-weight: 700; display: inline-flex; align-items: center; gap: calc(var(--u) * 0.8); white-space: nowrap; }
+.t-swatch { width: 0.55em; height: 0.55em; border-radius: 50%; flex: none; }
+.t-swatch.is-bus { border-radius: 0.12em; }
 .t-dest { color: var(--ink-soft); }
 .t-times { font-weight: 650; font-variant-numeric: tabular-nums; text-align: right; }
 .t-from { font-size: 0.9em; }
+
+/* Minimap: a quiet circle of the neighbourhood. Streets are hairlines;
+   only the lines, three stations, home and the vehicles have color. */
+.t-minimap { margin: 0; width: min(100%, calc(var(--u) * 52)); aspect-ratio: 1; align-self: center; }
+.t-minimap svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.t-mm-ground { fill: var(--bg); }
+.t-mm-streets path { fill: none; stroke: var(--hairline); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+.t-mm-line { fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.t-mm-station { fill: var(--bg); stroke: var(--ink); stroke-width: 1.2; }
+.t-mm-name, .t-mm-min, .t-mm-north {
+  font-family: -apple-system, 'Segoe UI', 'Instrument Sans Variable', sans-serif;
+  paint-order: stroke; stroke: var(--bg); stroke-width: 3px; stroke-linejoin: round;
+}
+.t-mm-name { font-size: 7.5px; fill: var(--ink-soft); }
+.t-mm-min { font-size: 9px; font-weight: 650; fill: var(--ink); font-variant-numeric: tabular-nums; }
+.t-mm-north { font-size: 7px; font-weight: 650; fill: var(--ink-soft); letter-spacing: 0.1em; }
+.t-mm-ring { fill: none; stroke: var(--edge); stroke-width: 1; }
+.t-mm-home { fill: var(--clay); }
+.t-mm-home-glow { fill: var(--clay); opacity: 0.15; }
+.t-mm-trail { fill: none; stroke-width: 4.5; stroke-linecap: round; stroke-opacity: 0.35; }
+.t-mm-stale { opacity: 0.4; }
 
 /* Landscape has room for the few things that matter today, not tomorrow. */
 @media (orientation: landscape) {
@@ -121,8 +144,9 @@
   .t-list-tomorrow { display: none; }
   /* Landscape only: today on the left, getting around on the right,
      split by a hairline. Portrait keeps everything in one column. */
-  .t-bottom { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); column-gap: calc(var(--u) * 6); }
-  .t-transit { border-left: 1px solid var(--hairline); padding-left: calc(var(--u) * 6); }
+  .t-bottom { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) auto; column-gap: calc(var(--u) * 5); }
+  .t-minimap { width: calc(var(--u) * 38); align-self: start; margin-top: calc(var(--u) * -1); }
+  .t-transit { border-left: 1px solid var(--hairline); padding-left: calc(var(--u) * 5); }
   .t-items li:nth-child(n + 4) { display: none; }
 }
 
@@ -152,8 +176,8 @@
   min-height: 0;
   margin: 0;
   padding: calc(var(--u-msg, 1vmin) * 4) calc(var(--u-msg, 1vmin) * 7);
-  background: #F9F9F7;
-  border-top: 1px solid #E1E1DF;
+  background: #F0EEE6;
+  border-top: 1px solid #DCD7C9;
   color: #2E2C27;
 }
 .mirror-page .message:not(.is-visible) { pointer-events: none; }

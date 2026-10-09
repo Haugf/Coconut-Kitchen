@@ -16,6 +16,8 @@ type Config struct {
 	Calendar    CalendarConfig `json:"calendar"`
 	// Optional; without it the mirror shows the default Ridgewood trains.
 	Transit *TransitConfig `json:"transit"`
+	// Optional; the minimap centres on Forest Av until home is set.
+	Map MapConfig `json:"map"`
 }
 
 type WeatherConfig struct {

@@ -61,5 +61,11 @@
         "stopName": "Gates & Fairview"
       }
     ]
+  },
+  "map": {
+    "home": {
+      "address": ""
+    },
+    "radiusMeters": 1300
   }
 }

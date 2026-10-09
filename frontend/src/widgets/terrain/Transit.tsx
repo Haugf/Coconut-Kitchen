@@ -29,6 +29,12 @@ function stopsSentence(rows: TransitRow[]): string {
   return `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`
 }
 
+// Same colors as the minimap.
+function swatch(r: TransitRow): string {
+  if (r.kind === 'bus') return '#2F6BFF'
+  return ({ M: '#FF6319', L: '#A7A9AC' } as Record<string, string>)[r.route] ?? '#8C8A80'
+}
+
 export function Transit() {
   // Arrival times move quickly; check every 30 seconds.
   const { data } = useWidgetData<TransitData>('/api/transit', 30 * 1000)
@@ -40,7 +46,10 @@ export function Transit() {
       <ul className="t-rows">
         {data.rows.map((r) => (
           <li key={`${r.kind}${r.route}${r.label}${r.stopName}`}>
-            <span className="t-route">{r.route}</span>
+            <span className="t-route">
+              <i className={r.kind === 'bus' ? 't-swatch is-bus' : 't-swatch'} style={{ background: swatch(r) }} />
+              {r.route}
+            </span>
             <span className="t-dest">to {r.label || '…'}</span>
             <span className={r.ok && r.minutes.length ? 't-times' : 't-times t-soft'}>{times(r)}</span>
           </li>
