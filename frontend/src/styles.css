@@ -171,3 +171,5 @@ ul { list-style: none; }
   .message { grid-column: 1 / -1; grid-row: 3; align-self: end; min-height: 0; }
   .message-text { max-width: 48ch; }
 }
+
+.mirror-asleep { height: 100%; background: #000; }

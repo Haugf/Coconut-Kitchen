@@ -24,6 +24,7 @@ type statusBoard struct {
 	weather  *cached[Weather]
 	transit  *transit
 	minimap  *minimap
+	sleep    *sleeper
 
 	mu   sync.Mutex
 	beat heartbeat
@@ -49,6 +50,10 @@ func (s *statusBoard) status(w http.ResponseWriter, r *http.Request) {
 	defer cancel()
 
 	out := map[string]any{"now": time.Now(), "serverStarted": s.started}
+	if s.sleep != nil {
+		out["asleep"] = s.sleep.asleep(time.Now())
+		out["sleepHours"] = s.sleep.cfg.From + "–" + s.sleep.cfg.To
+	}
 
 	if b, err := os.ReadFile(".installed"); err == nil {
 		out["installed"] = strings.TrimSpace(string(b))

@@ -17,6 +17,7 @@ tell you it's healthy without anyone walking over to look.
 | Getting around | L both ways at Myrtle–Wyckoff, M to Manhattan at Forest Av, B13 both ways at Gates/Fairview | MTA GTFS-realtime, MTA Bus Time | 30 s |
 | Minimap | A small round map around home: the M and L, three stations, and a dot for every train or bus heading to your stops, with its minutes. A hollow mark means it hasn't left the start of the line yet | Same feeds, streets from OpenStreetMap | 15 s |
 | Night mode | Same page, dark palette, dimmer | Clock | 10 pm to 5 am |
+| Sleep | Screen off (monitor in standby); the Pi keeps running and updating | Clock | 1:00 to 6:30 am |
 
 ```mermaid
 gantt
@@ -168,6 +169,7 @@ Never committed. Treat calendar links and keys like passwords.
 
 - **Fred's calendar:** Google Calendar on the web > Settings > the calendar > "Secret address in iCal format".
 - **Ally's calendar:** iPhone Calendar > Calendars > (i) next to the calendar > Public Calendar > Share Link.
+- **Sleep hours:** `"sleep": {"from": "01:00", "to": "06:30"}`. Set both to `""` to keep the screen on all night.
 - **Minimap:** put your address under `map.home.address` and restart the server. The Pi looks it up once and keeps it in `~/mirror/map-home.json`. Without it the map centres on Forest Av. Trains are placed between stations from their arrival times (the subway feed has no GPS); buses are real GPS once the Bus Time key is in.
 - **B13:** get a free key at register.developer.obanyc.com, then look up the two stop codes at Gates Av / Fairview Av on bustime.mta.info. The subway rows work with no key.
 

@@ -10,6 +10,7 @@ import (
 	"sort"
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/apognu/gocal"
 )
@@ -203,7 +204,7 @@ func fetchICSOnce(ctx context.Context, u string, start, end time.Time) ([]Event,
 		if e.Start == nil {
 			continue
 		}
-		ev := Event{Title: e.Summary, Start: e.Start.Local(), Location: e.Location}
+		ev := Event{Title: plainTitle(e.Summary), Start: e.Start.Local(), Location: e.Location}
 		if e.End != nil {
 			ev.End = e.End.Local()
 		}
@@ -225,4 +226,17 @@ func hostOf(u string) string {
 		return parsed.Host
 	}
 	return "calendar"
+}
+
+// plainTitle drops emoji and other pictographs: the Pi has no emoji font,
+// so they'd show as empty boxes.
+func plainTitle(s string) string {
+	var b strings.Builder
+	for _, r := range s {
+		if unicode.Is(unicode.So, r) || r == 0x200D || (r >= 0xFE00 && r <= 0xFE0F) || (r >= 0x1F3FB && r <= 0x1F3FF) {
+			continue
+		}
+		b.WriteRune(r)
+	}
+	return strings.Join(strings.Fields(b.String()), " ")
 }

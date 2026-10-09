@@ -63,7 +63,10 @@ check(mp.get("streets", 0) > 0, "Minimap",
       f'{mp.get("streets", 0)} streets, {mp.get("vehicles", 0)} trains and buses'
       + ("" if mp.get("homeSet") else ", home not set (centred on Forest Av)"))
 seen = page.get("seen") or {}
-check(seen.get("transitRows", 0) > 0, "Transit visible on screen", f'{seen.get("transitRows", 0)} rows')
+if st.get("asleep"):
+    check(True, "Screen asleep", f'sleeps {st.get("sleepHours", "")}')
+else:
+    check(seen.get("transitRows", 0) > 0, "Transit visible on screen", f'{seen.get("transitRows", 0)} rows')
 check(e["throttled"] in ("0x0", ""), "Power", f'throttled={e["throttled"]}, {e["temp"]}')
 
 report = {"now": st.get("now"), "display": e["display"].strip(), "checks": checks,

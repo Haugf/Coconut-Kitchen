@@ -18,6 +18,8 @@ type Config struct {
 	Transit *TransitConfig `json:"transit"`
 	// Optional; the minimap centres on Forest Av until home is set.
 	Map MapConfig `json:"map"`
+	// Optional; the screen sleeps 1:00 to 6:30 unless set.
+	Sleep *SleepConfig `json:"sleep"`
 }
 
 type WeatherConfig struct {

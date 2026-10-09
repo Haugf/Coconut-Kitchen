@@ -33,12 +33,15 @@ func main() {
 	}
 	trains := newTransit(transitCfg)
 	minimap := newMinimap(cfg.Map, trains)
-	board := &statusBoard{started: time.Now(), calendar: calendar, weather: weather, transit: trains, minimap: minimap}
+	sleep := newSleeper(cfg.Sleep)
+	board := &statusBoard{started: time.Now(), calendar: calendar, weather: weather, transit: trains, minimap: minimap, sleep: sleep}
 
 	mux.Handle("GET /api/weather", serveCached(weather))
 	mux.Handle("GET /api/calendar", serveCached(calendar))
 	mux.Handle("GET /api/transit", trains)
 	mux.Handle("GET /api/map", minimap)
+	go sleep.run()
+	mux.Handle("GET /api/sleep", sleep)
 	mux.HandleFunc("GET /api/status", board.status)
 	mux.HandleFunc("POST /api/heartbeat", board.heartbeat)
 	mux.HandleFunc("GET /api/events", hub.stream)

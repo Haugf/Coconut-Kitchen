@@ -4,12 +4,17 @@ import { useNow } from './lib/useNow'
 import { useMessages } from './lib/useMessages'
 import { MessageBar } from './components/MessageBar'
 import { useReloadOnUpdate } from './lib/useReloadOnUpdate'
+import { useWidgetData } from './lib/useWidgetData'
 
 export default function App() {
   const now = useNow(60 * 1000)
   const scene = sceneFor(now)
   const message = useMessages()
   useReloadOnUpdate()
+  // Overnight the Pi turns the screen off. The page goes black too, in
+  // case the screen can't be switched off.
+  const sleep = useWidgetData<{ asleep: boolean }>('/api/sleep', 60 * 1000)
+  if (sleep.data?.asleep) return <main className="mirror-asleep" data-scene="asleep" />
 
   // Nudge the whole layout a few pixels every hour so static elements
   // never sit on exactly the same pixels all day.

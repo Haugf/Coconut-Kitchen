@@ -67,5 +67,9 @@
       "address": ""
     },
     "radiusMeters": 1300
+  },
+  "sleep": {
+    "from": "01:00",
+    "to": "06:30"
   }
 }
