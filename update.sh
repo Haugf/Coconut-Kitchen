@@ -7,7 +7,8 @@ cd "$(dirname "$0")"
 git fetch -q origin main
 target=$(git rev-parse origin/main)
 installed=$(cat "$HOME/mirror/.installed" 2>/dev/null || true)
-if [ "$target" != "$installed" ]; then
+# A terminal run always installs, so a password-needing setup can finish.
+if [ "$target" != "$installed" ] || { [ -t 0 ] && [ "${1:-}" = "--force" ]; }; then
   echo "Installing $target"
   git reset -q --hard origin/main
   exec bash install.sh

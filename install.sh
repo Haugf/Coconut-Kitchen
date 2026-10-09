@@ -40,10 +40,29 @@ if [ ! -f "$HOME/mirror/config.json" ]; then
   echo "Created ~/mirror/config.json. Add your calendar address there."
 fi
 
-# setup-pi.sh is safe to rerun; it keeps the service, kiosk and timer
-# current with whatever this version expects.
-bash "$HOME/mirror/setup-pi.sh"
-sudo systemctl restart mirror.service
+# Automatic updates run without a terminal, so they can't answer a sudo
+# password prompt. Routine updates only need to restart the server, which
+# setup-pi.sh allows without a password. The full setup (services, kiosk,
+# timers) needs sudo, so it only runs when setup-pi.sh itself changed, and
+# only when sudo can work: from a terminal, or with passwordless sudo.
+setup_hash=$(sha256sum deploy/setup-pi.sh | cut -d' ' -f1)
+if [ "$setup_hash" != "$(cat "$HOME/mirror/.setup-hash" 2>/dev/null)" ]; then
+  if [ -t 0 ] || sudo -n true 2>/dev/null; then
+    bash "$HOME/mirror/setup-pi.sh"
+    echo "$setup_hash" > "$HOME/mirror/.setup-hash"
+  else
+    echo "NOTE: setup changed and needs your password once. Run:  bash ~/mirror-src/update.sh"
+  fi
+fi
+
+if sudo -n systemctl restart mirror.service 2>/dev/null; then
+  :
+elif [ -t 0 ]; then
+  sudo systemctl restart mirror.service
+else
+  echo "ERROR: can't restart the server without a password. Run once from a terminal:  bash ~/mirror-src/update.sh"
+  exit 1
+fi
 # No need to touch the browser: the page notices the new build within a
 # minute and reloads itself.
 echo "Installed $(git rev-parse --short HEAD 2>/dev/null). The screen refreshes within a minute."

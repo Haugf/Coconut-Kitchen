@@ -40,6 +40,12 @@ UNIT
 sudo systemctl daemon-reload
 sudo systemctl enable --now mirror.service
 
+echo "Allowing automatic updates to restart the server without a password"
+# Only this one command; everything else still asks for your password.
+echo "$USER ALL=(root) NOPASSWD: /usr/bin/systemctl restart mirror.service" | sudo tee /etc/sudoers.d/mirror-restart >/dev/null
+sudo chmod 440 /etc/sudoers.d/mirror-restart
+sudo visudo -cf /etc/sudoers.d/mirror-restart >/dev/null || sudo rm -f /etc/sudoers.d/mirror-restart
+
 echo "Turning off screen blanking"
 sudo raspi-config nonint do_blanking 1 || true
 

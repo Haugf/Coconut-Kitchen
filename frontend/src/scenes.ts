@@ -14,7 +14,7 @@ export interface Scene {
 
 export const scenes: Scene[] = [
   { name: 'day', from: 5, widgets: ['terrain'] },
-  { name: 'night', from: 23, widgets: ['terrain'], dim: true },
+  { name: 'night', from: 22, widgets: ['terrain'], dim: true },
 ]
 
 // The earlier dark layout, kept for when the mirror glass goes on:

@@ -128,7 +128,22 @@
 
 /* Live messages sit over the bottom band, in the page's own voice. */
 .mirror-page { height: 100%; position: relative; transition: opacity 2s ease; }
-.mirror-page.is-dim { opacity: 0.35; }
+/* Night: the same page, ink on black and dimmed, so it doesn't light up
+   the room. */
+.mirror-page.is-dim { opacity: 0.7; }
+.mirror-page.is-dim .terrain {
+  --bg: #000000;
+  --wash: #000000;
+  --ink: #EDEAE2;
+  --ink-soft: #9C9990;
+  --ink-grey: #55534C;
+  --hairline: #2A2925;
+  --edge: #2A2925;
+  --clay: #E08A68;
+}
+.mirror-page.is-dim .message { background: #000000; border-top-color: #2A2925; }
+.mirror-page.is-dim .message-text { color: #EDEAE2; }
+.mirror-page.is-dim .message-source { color: #9C9990; }
 .mirror-page .message {
   position: absolute;
   left: 0;

@@ -44,7 +44,8 @@ function todayItems(events: CalendarEvent[], people: string[], weather: WeatherD
     }
   }
   const today = weather?.days[0]
-  if (today && today.rainChance >= 40) {
+  // Today's rain chance stops being news by evening.
+  if (today && today.rainChance >= 40 && now.getHours() < 18) {
     items.push({ title: 'Rain likely later', before: `A ${today.rainChance}% chance `, source: 'in the forecast', after: '.' })
   }
   return items
