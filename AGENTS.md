@@ -7,14 +7,19 @@ how to change it safely.
 
 ## The one thing to know first
 
-**A push to `main` goes live on a real screen in about two minutes.** A
-Raspberry Pi in Fred's apartment checks GitHub every minute, rebuilds the
-Go server, copies `frontend/dist`, and restarts. Nobody reviews it in
-between. So:
+**Only Fred merges into `main`.** Whatever lands on `main` goes live on a
+real screen in about two minutes: a Raspberry Pi in Fred's apartment checks
+GitHub every minute, rebuilds the Go server, copies `frontend/dist`, and
+restarts. So `main` is protected:
 
-- Work on a branch and open a pull request unless you were told to push
-  to `main`.
-- Never push a broken build. Run the checks below first.
+- Never push to `main`, and never merge a pull request, even if your token
+  would allow it. Push a branch, open a pull request, and tell Fred it's
+  ready. He reviews and merges.
+- Don't change branch protection, repository settings, deploy keys, or the
+  Pi's update scripts (`update.sh`, `install.sh`, `bootstrap.sh`,
+  `deploy/`) unless Fred asked for that specific change, and say so in
+  the pull request.
+- Never open a pull request with a broken build. Run the checks below first.
 - If you change the frontend, rebuild it and commit `frontend/dist`. The Pi
   has no Node; it serves exactly what's committed there.
 
