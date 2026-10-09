@@ -86,8 +86,8 @@ sequenceDiagram
 
 The frontend is prebuilt in `frontend/dist`, so the Pi never needs Node. If an
 install fails, `.installed` isn't written and the next minute tries again.
-Anyone who can push to `main` changes what runs on the Pi, so keep push access
-to yourself.
+Whatever reaches `main` runs on the Pi, so `main` only takes pull requests
+that Fred merges (a GitHub ruleset; see "Keeping main safe" below).
 
 ## Checking on it
 
@@ -131,6 +131,20 @@ and health only, never event titles, calendar links, or API keys.
 | Change display mode | `MODE=1280x720@50Hz bash ~/mirror/setup-pi.sh` |
 | Rotate for vertical | `ROTATION=90 bash ~/mirror/setup-pi.sh` then `sudo reboot` |
 | Edit settings | `nano ~/mirror/config.json` then restart the server |
+
+## Keeping main safe
+
+The Pi runs whatever is on `main`, so only Fred can change it:
+
+- **Ruleset "Protect main"** (Settings > Rules > Rulesets):
+  - Restricts updates, blocks force pushes and deletion, and requires a
+    pull request.
+  - Only the Repository admin role can bypass it, and only through a pull
+    request.
+- **Agents and helpers** push branches and open pull requests; Fred merges.
+- **The Pi's status deploy key** (if `report-setup.sh` was run) can write,
+  but the ruleset keeps it off `main`; it only updates the `pi-status`
+  branch.
 
 ## Set up a fresh Pi
 
