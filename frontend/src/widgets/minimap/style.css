@@ -1,0 +1,24 @@
+/* Minimap: a quiet circle of the neighbourhood. Streets are hairlines;
+   only the lines, three stations, home and the vehicles have color. */
+.t-minimap { margin: 0; width: min(100%, calc(var(--u) * 52)); aspect-ratio: 1; align-self: center; }
+.t-minimap svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.t-mm-ground { fill: var(--bg); }
+.t-mm-streets path { fill: none; stroke: var(--hairline); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+.t-mm-line { fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.t-mm-station { fill: var(--bg); stroke: var(--ink); stroke-width: 1.2; }
+.t-mm-name, .t-mm-min, .t-mm-north {
+  font-family: -apple-system, 'Segoe UI', 'Instrument Sans Variable', sans-serif;
+  paint-order: stroke; stroke: var(--bg); stroke-width: 3px; stroke-linejoin: round;
+}
+.t-mm-name { font-size: 7.5px; fill: var(--ink-soft); }
+.t-mm-min { font-size: 9px; font-weight: 650; fill: var(--ink); font-variant-numeric: tabular-nums; }
+.t-mm-north { font-size: 7px; font-weight: 650; fill: var(--ink-soft); letter-spacing: 0.1em; }
+.t-mm-ring { fill: none; stroke: var(--edge); stroke-width: 1; }
+.t-mm-home { fill: var(--clay); }
+.t-mm-home-glow { fill: var(--clay); opacity: 0.15; }
+.t-mm-trail { fill: none; stroke-width: 4.5; stroke-linecap: round; stroke-opacity: 0.35; }
+.t-mm-stale { opacity: 0.4; }
+
+@media (orientation: landscape) {
+  .t-minimap { width: calc(var(--u) * 38); align-self: start; margin-top: calc(var(--u) * -1); }
+}

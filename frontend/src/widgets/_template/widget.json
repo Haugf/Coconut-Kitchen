@@ -1,0 +1,18 @@
+{
+  "id": "example",
+  "name": "Sun",
+  "description": "Today's sunrise and sunset. A starting point: change it into your widget.",
+  "author": "your-github-handle",
+  "width": "fill",
+  "settings": {
+    "latitude": { "description": "Where you are, north–south", "default": 40.7044 },
+    "longitude": { "description": "Where you are, east–west", "default": -73.9018 }
+  },
+  "secrets": [],
+  "data": {
+    "sun": {
+      "url": "https://api.open-meteo.com/v1/forecast?latitude={settings.latitude}&longitude={settings.longitude}&daily=sunrise,sunset&timezone=auto&forecast_days=1",
+      "every": "1h"
+    }
+  }
+}

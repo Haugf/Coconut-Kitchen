@@ -1,0 +1,12 @@
+{
+  "id": "transit",
+  "name": "Getting around",
+  "description": "The next trains and buses from your stops, with how many minutes away each one is.",
+  "author": "Haugf",
+  "width": "fill",
+  "data": {
+    "arrivals": {
+      "url": "/api/transit"
+    }
+  }
+}

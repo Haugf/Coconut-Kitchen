@@ -1,0 +1,12 @@
+{
+  "id": "minimap",
+  "name": "Minimap",
+  "description": "A small round map around home with a dot for every train or bus heading to your stops.",
+  "author": "Haugf",
+  "width": "fit",
+  "data": {
+    "map": {
+      "url": "/api/map"
+    }
+  }
+}
