@@ -1,0 +1,40 @@
+{
+  "arrivals": {
+    "updated": "2026-10-10T08:42:00-04:00",
+    "rows": [
+      {
+        "kind": "subway",
+        "route": "L",
+        "label": "Manhattan",
+        "stopName": "Myrtle–Wyckoff",
+        "minutes": [
+          6,
+          13
+        ],
+        "ok": true
+      },
+      {
+        "kind": "subway",
+        "route": "L",
+        "label": "Canarsie",
+        "stopName": "Myrtle–Wyckoff",
+        "minutes": [
+          2,
+          10
+        ],
+        "ok": true
+      },
+      {
+        "kind": "subway",
+        "route": "M",
+        "label": "Manhattan",
+        "stopName": "Forest Av",
+        "minutes": [
+          4,
+          16
+        ],
+        "ok": true
+      }
+    ]
+  }
+}

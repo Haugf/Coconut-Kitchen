@@ -25,6 +25,7 @@ type statusBoard struct {
 	transit  *transit
 	minimap  *minimap
 	sleep    *sleeper
+	widgets  *widgetHost
 
 	mu   sync.Mutex
 	beat heartbeat
@@ -100,6 +101,10 @@ func (s *statusBoard) status(w http.ResponseWriter, r *http.Request) {
 		rows = append(rows, map[string]any{"route": row.Route, "label": row.Label, "ok": row.OK, "minutes": row.Minutes, "error": row.Error})
 	}
 	out["transit"] = rows
+
+	if s.widgets != nil {
+		out["widgets"] = s.widgets.health()
+	}
 
 	// Counts only: never the home location.
 	if s.minimap != nil {
