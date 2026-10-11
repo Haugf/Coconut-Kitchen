@@ -1,0 +1,21 @@
+{
+  "id": "tides",
+  "name": "Tides",
+  "description": "Today's tide drawn as a curve, with the next high or low and when it turns.",
+  "author": "Haugf",
+  "width": "fill",
+  "settings": {
+    "station": { "description": "NOAA tide station id (find one at tidesandcurrents.noaa.gov)", "default": "8518750" },
+    "place": { "description": "What to call the station on screen", "default": "The Battery" }
+  },
+  "data": {
+    "curve": {
+      "url": "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&application=coconut-kitchen&date=today&datum=MLLW&station={settings.station}&time_zone=lst_ldt&units=english&interval=30&format=json",
+      "every": "1h"
+    },
+    "turns": {
+      "url": "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&application=coconut-kitchen&date=today&datum=MLLW&station={settings.station}&time_zone=lst_ldt&units=english&interval=hilo&format=json",
+      "every": "1h"
+    }
+  }
+}

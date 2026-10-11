@@ -1,0 +1,17 @@
+/* Tides: the day's water level as a filled curve, like a printed tide
+   table, with now marked in clay. */
+.w-tides .w-tides-curve { display: block; width: 100%; height: calc(var(--u) * 9); margin: calc(var(--u) * 0.6) 0 calc(var(--u) * 0.4); overflow: visible; }
+.w-tides .w-tides-water { fill: var(--ink); }
+.w-tides .w-tides-base { stroke: var(--hairline); stroke-width: 1; }
+.w-tides .w-tides-now { stroke: var(--clay); stroke-width: 1; }
+.w-tides .w-tides-dot { fill: var(--clay); stroke: var(--bg); stroke-width: 1.5; }
+.w-tides .w-tides-turns { display: flex; justify-content: space-between; gap: calc(var(--u) * 1); font-size: 0.85em; font-variant-numeric: tabular-nums; }
+.w-tides .w-tides-turns span { display: flex; flex-direction: column; white-space: nowrap; }
+.w-tides .w-tides-turns b { font-weight: 400; }
+.w-tides .w-tides-turns span.is-past { color: var(--ink-grey); }
+/* At night a big light shape would light the room; keep the water dim. */
+.mirror-page.is-dim .w-tides .w-tides-water { fill: var(--ink-grey); }
+
+@media (orientation: landscape) {
+  .w-tides { border-left: 1px solid var(--hairline); padding-left: calc(var(--u) * 5); }
+}
