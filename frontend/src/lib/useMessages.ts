@@ -16,15 +16,29 @@ export function useMessages(): MirrorMessage | null {
   const [message, setMessage] = useState<MirrorMessage | null>(null)
 
   useEffect(() => {
-    const source = new EventSource('/api/events')
-    source.onmessage = (e) => {
-      try {
-        setMessage(JSON.parse(e.data) as MirrorMessage)
-      } catch {
-        /* ignore malformed events */
+    let source: EventSource | null = null
+    const connect = () => {
+      source?.close()
+      source = new EventSource('/api/events')
+      source.onmessage = (e) => {
+        try {
+          setMessage(JSON.parse(e.data) as MirrorMessage)
+        } catch {
+          /* ignore malformed events */
+        }
       }
     }
-    return () => source.close()
+    // Phones pause background tabs and can leave the stream silently dead.
+    // Reconnect on return; the server replays the current message.
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') connect()
+    }
+    connect()
+    document.addEventListener('visibilitychange', onVisible)
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible)
+      source?.close()
+    }
   }, [])
 
   useEffect(() => {

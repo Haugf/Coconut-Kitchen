@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"os/exec"
@@ -34,6 +35,13 @@ type statusBoard struct {
 }
 
 func (s *statusBoard) heartbeat(w http.ResponseWriter, r *http.Request) {
+	// Only the Pi's own browser counts. A phone or laptop viewing the page
+	// over Wi-Fi checks in too; letting it would hide a stuck kiosk from
+	// the watchdog and make mirror-status describe the wrong screen.
+	if !fromLoopback(r) {
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
 	var hb heartbeat
 	if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, 8<<10)).Decode(&hb); err != nil {
 		http.Error(w, "bad heartbeat", http.StatusBadRequest)
@@ -161,4 +169,14 @@ func (s *statusBoard) watchBrowser() {
 		_ = exec.Command("pkill", "-x", "chromium").Run()
 		_ = exec.Command("pkill", "-x", "chromium-browser").Run()
 	}
+}
+
+// fromLoopback reports whether a request came from this machine.
+func fromLoopback(r *http.Request) bool {
+	host, _, err := net.SplitHostPort(r.RemoteAddr)
+	if err != nil {
+		host = r.RemoteAddr
+	}
+	ip := net.ParseIP(host)
+	return ip != nil && ip.IsLoopback()
 }

@@ -22,6 +22,31 @@ type hub struct {
 	token string
 	mu    sync.Mutex
 	subs  map[chan Message]struct{}
+	// The most recent message, kept until it expires so a screen that
+	// connects late (a phone waking up, a browser restarting) still sees it.
+	last Message
+}
+
+// defaultTTL matches the frontend's default when a message has no ttl.
+const defaultTTL = 20
+
+// current returns the latest message with its remaining time on screen,
+// or false if there is none or it has expired.
+func (h *hub) current(now time.Time) (Message, bool) {
+	m := h.last
+	if m.Text == "" {
+		return Message{}, false
+	}
+	ttl := m.TTL
+	if ttl <= 0 {
+		ttl = defaultTTL
+	}
+	left := int(m.At.Add(time.Duration(ttl) * time.Second).Sub(now).Seconds())
+	if left <= 0 {
+		return Message{}, false
+	}
+	m.TTL = left
+	return m, true
 }
 
 func newHub(token string) *hub {
@@ -42,6 +67,9 @@ func (h *hub) stream(w http.ResponseWriter, r *http.Request) {
 	ch := make(chan Message, 8)
 	h.mu.Lock()
 	h.subs[ch] = struct{}{}
+	if m, ok := h.current(time.Now()); ok {
+		ch <- m
+	}
 	h.mu.Unlock()
 	defer func() {
 		h.mu.Lock()
@@ -90,6 +118,7 @@ func (h *hub) publish(w http.ResponseWriter, r *http.Request) {
 	m.At = time.Now()
 
 	h.mu.Lock()
+	h.last = m
 	for ch := range h.subs {
 		select {
 		case ch <- m:
