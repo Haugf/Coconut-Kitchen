@@ -49,7 +49,7 @@ backend/    Go server (one dependency: github.com/apognu/gocal)
   transit.go    subway (GTFS-rt) and bus (MTA Bus Time SIRI) arrivals
   map.go        minimap: train positions, bus GPS, OSM streets, home
   widgets.go    widget manifests, /api/widgets, cached data proxy for widgets
-  sleep.go      turns the HDMI output off overnight (wlr-randr)
+  sleep.go      puts the screen in standby overnight (wlopm)
   status.go     /api/status and the page heartbeat
 frontend/   Vite + React + TypeScript
   src/App.tsx            scene switch, sleep, live messages

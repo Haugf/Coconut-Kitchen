@@ -41,6 +41,7 @@ func main() {
 	mux.Handle("GET /api/transit", trains)
 	mux.Handle("GET /api/map", minimap)
 	go sleep.run()
+	go board.watchBrowser()
 	mux.Handle("GET /api/sleep", sleep)
 	widgets := newWidgetHost(widgetsDir(), cfg.Widgets)
 	board.widgets = widgets
