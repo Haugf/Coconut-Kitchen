@@ -1,4 +1,5 @@
-import { useWidgetData } from '../../lib/useWidgetData'
+import { useSource, type WidgetProps } from '../../lib/widgets'
+import './style.css'
 
 interface TransitRow {
   kind: 'subway' | 'bus'
@@ -35,9 +36,9 @@ function swatch(r: TransitRow): string {
   return ({ M: '#FF6319', L: '#A7A9AC' } as Record<string, string>)[r.route] ?? '#8C8A80'
 }
 
-export function Transit() {
+export default function Transit(props: WidgetProps) {
   // Arrival times move quickly; check every 30 seconds.
-  const { data } = useWidgetData<TransitData>('/api/transit', 30 * 1000)
+  const { data } = useSource<TransitData>(props, 'arrivals', 30 * 1000)
   if (!data || data.rows.length === 0) return null
 
   return (

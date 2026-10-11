@@ -1,0 +1,9 @@
+/* Styles for this widget only. Prefix classes with w-<your-id>, and use
+   the page's color tokens (var(--ink), var(--ink-soft), var(--hairline),
+   var(--clay) ...) so it works in day and night without extra rules. */
+.w-example p { color: var(--ink-soft); }
+
+@media (orientation: landscape) {
+  /* Widgets after the first sit beside it; a hairline keeps them apart. */
+  .w-example { border-left: 1px solid var(--hairline); padding-left: calc(var(--u) * 5); }
+}

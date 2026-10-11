@@ -1,4 +1,5 @@
-import { useWidgetData } from '../../lib/useWidgetData'
+import { useSource, type WidgetProps } from '../../lib/widgets'
+import './style.css'
 
 interface LatLon {
   lat: number
@@ -35,8 +36,8 @@ const colorOf = (v: { kind?: string; route: string }) =>
 const R = 92
 const REFRESH_MS = 15 * 1000
 
-export function Minimap() {
-  const { data, error } = useWidgetData<MapData>('/api/map', REFRESH_MS)
+export default function Minimap(props: WidgetProps) {
+  const { data, error } = useSource<MapData>(props, 'map', REFRESH_MS)
   if (!data) return null
 
   const c = data.center

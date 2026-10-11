@@ -29,6 +29,15 @@ echo "Installing to ~/mirror"
 mkdir -p "$HOME/mirror"
 rm -rf "$HOME/mirror/web"
 cp -r frontend/dist "$HOME/mirror/web"
+# Widget manifests: the server reads them to know each widget's settings
+# and data sources.
+rm -rf "$HOME/mirror/widgets"
+for manifest in frontend/src/widgets/*/widget.json; do
+  folder=$(basename "$(dirname "$manifest")")
+  case "$folder" in _*) continue ;; esac
+  mkdir -p "$HOME/mirror/widgets/$folder"
+  cp "$manifest" "$HOME/mirror/widgets/$folder/"
+done
 # The server is running, so a plain copy fails with "Text file busy".
 # Copy beside it and rename over it instead; the running process keeps
 # the old file until the restart below.

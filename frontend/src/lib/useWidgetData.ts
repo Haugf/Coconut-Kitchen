@@ -14,6 +14,7 @@ export function useWidgetData<T>(url: string, refreshMs: number): WidgetData<T> 
 
   useEffect(() => {
     let cancelled = false
+    if (!url) return
     const load = async () => {
       try {
         const res = await fetch(url)

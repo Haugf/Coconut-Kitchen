@@ -31,8 +31,9 @@ A single full-screen page ("terrain") on a 24" monitor, landscape at
 - the date, weather and a one-line headline about the day
 - the day drawn as a ridge from 6 am to midnight, one line per person (Fred
   solid, Ally dashed)
-- Today's events, train times, and a round minimap of trains and buses
-  heading to the configured stops
+- Today's events, then the enabled widgets in a row (by default train
+  times and a round minimap of trains and buses heading to the configured
+  stops)
 
 The day scene runs from 5 am and night from 10 pm (dark palette, dimmed).
 The screen sleeps from 1:00 to 6:30.
@@ -47,12 +48,17 @@ backend/    Go server (one dependency: github.com/apognu/gocal)
   gtfsrt.go     hand-rolled GTFS-realtime protobuf reader
   transit.go    subway (GTFS-rt) and bus (MTA Bus Time SIRI) arrivals
   map.go        minimap: train positions, bus GPS, OSM streets, home
+  widgets.go    widget manifests, /api/widgets, cached data proxy for widgets
   sleep.go      turns the HDMI output off overnight (wlr-randr)
   status.go     /api/status and the page heartbeat
 frontend/   Vite + React + TypeScript
   src/App.tsx            scene switch, sleep, live messages
   src/scenes.ts          which widgets show when
-  src/widgets/terrain/   the page: Terrain, Transit, Minimap, terrain.css
+  src/widgets/terrain/   the page: Terrain and terrain.css
+  src/widgets/<id>/      one folder per widget (widget.json, index.tsx, sample.json)
+  src/widgets/_template/ what `npm run new-widget -- <id>` copies
+  src/widgets/loader.tsx finds widget folders; hides a widget that crashes
+  scripts/               new-widget.mjs, check-widgets.mjs
   dist/                  committed build the Pi serves
 deploy/     setup-pi.sh (one-time, needs sudo), mirror-status.sh, status reporting
 install.sh  builds and installs on the Pi (runs on every update)
@@ -68,6 +74,8 @@ update.sh   the every-minute check: origin/main vs ~/mirror/.installed
 | `GET /api/transit` | `{rows[{kind,route,label,stopName,minutes[],ok}]}` |
 | `GET /api/map` | `{center, home?, radiusMeters, streets, lines, stations, vehicles[{route,lat,lon,from?,minutes,state}]}` |
 | `GET /api/sleep` | `{asleep, from, to}` |
+| `GET /api/widgets` | enabled widgets in order: `{id, name, width, settings, sources}` (never secrets) |
+| `GET /api/w/{id}/{source}` | a widget's data source, fetched and cached by the Pi |
 | `GET /api/status` | health summary (counts only) |
 | `POST /api/heartbeat` | the page checks in every minute |
 | `GET/POST /api/events` | live text messages over SSE |
@@ -84,7 +92,8 @@ OpenStreetMap, so use the mock API, which serves `frontend/dist` with
 sample data:
 
 ```
-python3 dev/mock_api.py            # http://127.0.0.1:8099
+python3 dev/mock_api.py              # http://127.0.0.1:8099
+python3 dev/mock_api.py --with <id>  # plus your widget
 ```
 
 Screenshot it at 1280x720, and at night by faking the clock (for example
@@ -137,17 +146,21 @@ Go server at one dependency. Don't add Node to the Pi.
 
 ## Adding something
 
-1. **Data:** add a source in `backend/`, wrapped in `cached[T]`, with a
-   route in `main.go`. Add its settings to `Config` with a working default,
-   and to `config.example.json`.
-2. **Display:** add it to `frontend/src/widgets/terrain/` and poll it with
-   `useWidgetData(url, ms)`. Style it with the tokens in `terrain.css` and
-   add night overrides under `.mirror-page.is-dim .terrain` if needed.
-3. **Health:** if it can fail, add it to `/api/status` and a line in
+Most new things should be a **widget**: follow WIDGETS.md. Start with
+`npm run new-widget -- <id>`. A widget never edits core files, which
+keeps pull requests small and safe to merge.
+
+Change the core only for something no widget can do: a new kind of data
+that needs real parsing (like `gtfsrt.go`), scenes, sleep, the page frame.
+Then:
+
+1. Add a source in `backend/`, wrapped in `cached[T]`, with a route in
+   `main.go`. Give its settings in `Config` a working default, and add
+   them to `config.example.json`.
+2. If it can fail, add it to `/api/status` and a line in
    `deploy/mirror-status.sh`.
-4. **Docs:** add a line to the README's "What's on the screen" table, and
-   to the settings section if it needs config.
-5. Run the checks, rebuild `frontend/dist`, commit.
+3. Add a line to the README's "What's on the screen" table.
+4. Run the checks, rebuild `frontend/dist`, commit.
 
 ## Checking the live mirror
 

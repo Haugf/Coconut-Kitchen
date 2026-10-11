@@ -42,6 +42,10 @@ func main() {
 	mux.Handle("GET /api/map", minimap)
 	go sleep.run()
 	mux.Handle("GET /api/sleep", sleep)
+	widgets := newWidgetHost(widgetsDir(), cfg.Widgets)
+	board.widgets = widgets
+	mux.HandleFunc("GET /api/widgets", widgets.list)
+	mux.HandleFunc("GET /api/w/{id}/{source}", widgets.source)
 	mux.HandleFunc("GET /api/status", board.status)
 	mux.HandleFunc("POST /api/heartbeat", board.heartbeat)
 	mux.HandleFunc("GET /api/events", hub.stream)

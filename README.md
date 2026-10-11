@@ -34,6 +34,14 @@ gantt
     Shown if rain is due :05:00, 13h
 ```
 
+## Widgets
+
+Everything under Today is a widget: a folder in `frontend/src/widgets/`
+with a `widget.json`, found automatically. Choose which ones show, and
+in what order, with the `widgets` list in `~/mirror/config.json`. To make
+one, see [WIDGETS.md](WIDGETS.md); `npm run new-widget -- <id>` starts
+you off, and you don't need a Pi to try it.
+
 ## How it fits together
 
 ```mermaid

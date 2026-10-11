@@ -5,8 +5,8 @@ import type { CalendarData, CalendarEvent, WeatherData } from './types'
 import { timedEventsOn, eventsOn, clock, belongsTo, sourcePhrase } from './day'
 import { terrainPath, dots, clayMotif, eveningIsFree, xOf, yAt, W, H, BASE, DAY_START, DAY_END } from './shape'
 import { headline, acts, partOfDay } from './voice'
-import { Transit } from './Transit'
-import { Minimap } from './Minimap'
+import { useEnabledWidgets } from '../../lib/widgets'
+import { WidgetSlot, widgetColumns } from '../loader'
 import './terrain.css'
 
 interface Item {
@@ -94,6 +94,7 @@ export function Terrain() {
   const now = useNow(60 * 1000)
   const cal = useWidgetData<CalendarData>('/api/calendar', 5 * 60 * 1000)
   const wx = useWidgetData<WeatherData>('/api/weather', 10 * 60 * 1000)
+  const widgets = useEnabledWidgets()
 
   const all = cal.data?.events ?? []
   const people = cal.data?.people ?? []
@@ -148,7 +149,7 @@ export function Terrain() {
           ))}
         </div>
       </header>
-      <div className="t-bottom">
+      <div className="t-bottom" style={{ gridTemplateColumns: widgetColumns(widgets) }}>
         <div className="t-col">
         <List
           heading="Today"
@@ -157,8 +158,9 @@ export function Terrain() {
         />
         <List heading="Tomorrow" items={tomorrowList} empty="Nothing on the calendar yet." className="t-list-tomorrow" />
         </div>
-        <Transit />
-        <Minimap />
+        {widgets.map((w) => (
+          <WidgetSlot key={w.id} widget={w} />
+        ))}
       </div>
     </div>
   )
