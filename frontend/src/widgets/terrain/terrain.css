@@ -110,7 +110,8 @@
   .t-items li:nth-child(n + 4) { display: none; }
 }
 
-/* Live messages sit over the bottom band, in the page's own voice. */
+/* Live messages sit over the bottom band, in the page's own voice.
+   Fixed, so they stay on screen when the page scrolls on a phone. */
 .mirror-page { height: 100%; position: relative; transition: opacity 2s ease; }
 /* Night: the same page, ink on black and dimmed, so it doesn't light up
    the room. */
@@ -129,7 +130,7 @@
 .mirror-page.is-dim .message-text { color: #EDEAE2; }
 .mirror-page.is-dim .message-source { color: #9C9990; }
 .mirror-page .message {
-  position: absolute;
+  position: fixed;
   left: 0;
   right: 0;
   bottom: 0;
