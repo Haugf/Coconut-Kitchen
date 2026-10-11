@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"log"
 	"net/http"
@@ -68,8 +67,11 @@ func (s *sleeper) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // changes, so turning the screen on by hand overnight sticks until the
 // next morning.
 func (s *sleeper) run() {
-	if _, err := exec.LookPath("wlr-randr"); err != nil {
-		return // not on the Pi; the page goes dark on its own instead
+	if _, err := exec.LookPath("wlopm"); err != nil {
+		// Without wlopm the page still goes black overnight; the monitor
+		// just doesn't drop into standby. (sudo apt install wlopm)
+		log.Printf("sleep: wlopm isn't installed, so overnight the page goes black but the monitor stays on")
+		return
 	}
 	first := true
 	for {
@@ -89,8 +91,11 @@ func (s *sleeper) run() {
 	}
 }
 
-// setDisplay turns the HDMI output on or off through the desktop's
-// Wayland session, which runs as the same user as this server.
+// setDisplay puts the screen into standby or wakes it, through the
+// desktop's Wayland session (same user as this server). It uses power
+// management (wlopm) rather than disabling the output: the screen stays
+// connected, so the browser window is untouched. Disabling the output
+// (wlr-randr --off) took the kiosk browser down with it.
 func setDisplay(on bool) error {
 	runtime := fmt.Sprintf("/run/user/%d", os.Getuid())
 	socks, _ := filepath.Glob(filepath.Join(runtime, "wayland-*"))
@@ -104,53 +109,14 @@ func setDisplay(on bool) error {
 	if display == "" {
 		return fmt.Errorf("no desktop session to talk to yet")
 	}
-	env := append(os.Environ(), "XDG_RUNTIME_DIR="+runtime, "WAYLAND_DISPLAY="+display)
-
-	list := exec.Command("wlr-randr")
-	list.Env = env
-	out, err := list.Output()
-	if err != nil {
-		return fmt.Errorf("wlr-randr: %w", err)
-	}
-	output := ""
-	for _, line := range strings.Split(string(out), "\n") {
-		if strings.HasPrefix(line, "HDMI") {
-			output = strings.Fields(line)[0]
-			break
-		}
-	}
-	if output == "" {
-		return fmt.Errorf("no HDMI screen found")
-	}
-
-	args := []string{"--output", output, "--off"}
+	state := "--off"
 	if on {
-		args = []string{"--output", output, "--on"}
-		// Coming back on, use the saved mode; the default one shimmers.
-		if mode := displayMode(); mode != "" {
-			args = append(args, "--mode", mode)
-		}
+		state = "--on"
 	}
-	cmd := exec.Command("wlr-randr", args...)
-	cmd.Env = env
+	cmd := exec.Command("wlopm", state, "*")
+	cmd.Env = append(os.Environ(), "XDG_RUNTIME_DIR="+runtime, "WAYLAND_DISPLAY="+display)
 	if b, err := cmd.CombinedOutput(); err != nil {
-		return fmt.Errorf("wlr-randr %s: %v %s", strings.Join(args, " "), err, strings.TrimSpace(string(b)))
+		return fmt.Errorf("wlopm %s: %v %s", state, err, strings.TrimSpace(string(b)))
 	}
 	return nil
-}
-
-// displayMode reads MODE from ~/mirror/display.env (the server runs there).
-func displayMode() string {
-	f, err := os.Open("display.env")
-	if err != nil {
-		return ""
-	}
-	defer f.Close()
-	sc := bufio.NewScanner(f)
-	for sc.Scan() {
-		if v, ok := strings.CutPrefix(strings.TrimSpace(sc.Text()), "MODE="); ok {
-			return strings.Trim(v, `"'`)
-		}
-	}
-	return ""
 }

@@ -3,8 +3,10 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"net/http"
 	"os"
+	"os/exec"
 	"strings"
 	"sync"
 	"time"
@@ -130,4 +132,33 @@ func scriptSrc(html string) string {
 		return rest[:k]
 	}
 	return ""
+}
+
+// watchBrowser restarts the kiosk browser if the page stops checking in
+// while the screen should be showing it. kiosk.sh relaunches the browser
+// as soon as the old one is gone. It waits after each try, so a problem it
+// can't fix doesn't turn into a restart loop.
+func (s *statusBoard) watchBrowser() {
+	if _, err := exec.LookPath("pkill"); err != nil {
+		return
+	}
+	const quiet = 5 * time.Minute
+	var lastTry time.Time
+	for {
+		time.Sleep(time.Minute)
+		s.mu.Lock()
+		last := s.beat.At
+		s.mu.Unlock()
+		if last.IsZero() {
+			last = s.started
+		}
+		awake := s.sleep == nil || !s.sleep.asleep(time.Now())
+		if !awake || time.Since(last) < quiet || time.Since(lastTry) < 15*time.Minute {
+			continue
+		}
+		lastTry = time.Now()
+		log.Printf("watchdog: the page hasn't checked in for %s; restarting the browser", time.Since(last).Round(time.Minute))
+		_ = exec.Command("pkill", "-x", "chromium").Run()
+		_ = exec.Command("pkill", "-x", "chromium-browser").Run()
+	}
 }

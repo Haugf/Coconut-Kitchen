@@ -23,8 +23,10 @@ mirror config            edit config.json, then restart
 EOF
 }
 
-# Run wlr-randr inside the desktop session, which SSH doesn't see.
-randr() {
+# Put the screen in standby or wake it, inside the desktop session (which
+# SSH doesn't see). wlopm keeps the screen connected, so the browser
+# carries on underneath.
+power() {
   export XDG_RUNTIME_DIR="/run/user/$(id -u)"
   local sock
   sock=$(ls "$XDG_RUNTIME_DIR"/wayland-? 2>/dev/null | head -1 || true)
@@ -32,17 +34,11 @@ randr() {
     echo "The desktop isn't running, so the screen can't be switched." >&2
     exit 1
   fi
-  WAYLAND_DISPLAY=$(basename "$sock") wlr-randr "$@"
-}
-
-hdmi() {
-  local out
-  out=$(randr | awk '/^HDMI/ {print $1; exit}')
-  if [ -z "$out" ]; then
-    echo "No HDMI screen found. Is the monitor plugged in?" >&2
+  if ! command -v wlopm >/dev/null; then
+    echo "wlopm isn't installed. Install it once with:  sudo apt install -y wlopm" >&2
     exit 1
   fi
-  echo "$out"
+  WAYLAND_DISPLAY=$(basename "$sock") wlopm "$1" '*'
 }
 
 restart() {
@@ -75,19 +71,12 @@ case "$cmd" in
     ;;
 
   off)
-    randr --output "$(hdmi)" --off
+    power --off
     echo "Screen off. 'mirror on' brings it back (or the schedule does in the morning)."
     ;;
 
   on)
-    mode=""
-    [ -f "$DIR/display.env" ] && mode=$(sed -n 's/^MODE=//p' "$DIR/display.env" | tr -d "\"'")
-    out=$(hdmi)
-    if [ -n "$mode" ]; then
-      randr --output "$out" --on --mode "$mode"
-    else
-      randr --output "$out" --on
-    fi
+    power --on
     echo "Screen on."
     ;;
 
