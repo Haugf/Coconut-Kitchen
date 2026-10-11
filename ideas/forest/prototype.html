@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Forest prototype</title>
+<style>
+  body { margin: 0; background: #FAF9F5; color: #2E2C27; font-family: -apple-system, 'Segoe UI', sans-serif; display: flex; justify-content: center; }
+  main { width: min(720px, 100% - 32px); padding: 24px 0; }
+  canvas { width: 100%; height: auto; image-rendering: pixelated; image-rendering: crisp-edges; display: block; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  button { font: inherit; font-size: 15px; padding: 8px 14px; background: transparent; color: inherit; border: 1px solid #DCD7C9; cursor: pointer; }
+  button[aria-pressed="true"] { background: #F0EEE6; border-color: #6B6A63; }
+  p { color: #6B6A63; font-size: 15px; }
+</style>
+</head>
+<body>
+<main>
+  <canvas id="fc" width="160" height="100" aria-label="A pixel forest with a giant tree"></canvas>
+  <div class="row">
+    <button data-k="fox" aria-pressed="false">Fred's fox</button>
+    <button data-k="rab" aria-pressed="false">Ally's rabbit</button>
+    <button data-k="frog" aria-pressed="false">A guest's frog</button>
+  </div>
+  <p id="who">Nobody's home. The forest is quiet.</p>
+</main>
+<script>
+const c = document.getElementById('fc'), x = c.getContext('2d');
+x.imageSmoothingEnabled = false;
+
+// Placeholder animals until the real designs arrive. One character per
+// pixel; '.' is transparent. Drawn facing left.
+const S = {
+  fox:  { p: { o: '#E07B39', w: '#F5F0E6', k: '#1d1a17' }, m: ['o.o.......', 'ooo.......', 'kooooooo..', '.ooooooooo', '.wwwwwoo.w', '.o.o..o.o.'] },
+  rab:  { p: { g: '#DCD6CA', e: '#B8B0A3', k: '#1d1a17', w: '#FFFFFF' }, m: ['.ee.......', '.ee.......', 'gggg......', 'gkgggggg..', 'gggggggggw', '.g.g..g.g.'] },
+  frog: { p: { g: '#5FA34A', y: '#C9DE7A', k: '#1d1a17' }, m: ['gkg..gkg', 'gggggggg', 'gyyyyyyg', 'g.g..g.g'] },
+};
+const names = { fox: 'Fred', rab: 'Ally', frog: 'A guest' };
+const GROUND = 88, animals = {};
+let leaves = [], t = 0;
+
+function pix(px, py, col) { x.fillStyle = col; x.fillRect(px, py, 1, 1); }
+function disc(cx, cy, r, col) {
+  x.fillStyle = col;
+  for (let yy = -r; yy <= r; yy++) { const w = Math.floor(Math.sqrt(r * r - yy * yy)); x.fillRect(cx - w, cy + yy, w * 2 + 1, 1); }
+}
+
+function scene() {
+  x.fillStyle = '#BFD9E6'; x.fillRect(0, 0, 160, 100);
+  x.fillStyle = '#D3E6EE'; x.fillRect(0, 0, 160, 30);
+  disc(20, 96, 40, '#7FAE6A'); disc(140, 98, 38, '#7FAE6A');
+  // The giant tree
+  x.fillStyle = '#6E4B32'; x.fillRect(72, 38, 16, 52); x.fillRect(68, 84, 24, 6); x.fillRect(64, 88, 32, 2);
+  x.fillStyle = '#5A3C27'; x.fillRect(78, 50, 3, 30);
+  disc(80, 30, 26, '#2F6B3A'); disc(58, 42, 16, '#2F6B3A'); disc(102, 42, 16, '#2F6B3A');
+  disc(76, 24, 16, '#3E8A47'); disc(96, 32, 10, '#3E8A47'); disc(62, 38, 9, '#3E8A47');
+  for (let i = 0; i < 9; i++) pix(60 + ((i * 37) % 44), 18 + ((i * 23) % 30), '#6DBA5E');
+  // Ground
+  x.fillStyle = '#4F8F3F'; x.fillRect(0, 90, 160, 10);
+  x.fillStyle = '#5FA34A'; x.fillRect(0, 90, 160, 2);
+  for (let i = 0; i < 160; i += 7) pix(i + (i % 3), 89, '#5FA34A');
+}
+
+function sprite(k, px, py, flip) {
+  const s = S[k], m = s.m, h = m.length;
+  for (let r = 0; r < h; r++) for (let q = 0; q < m[r].length; q++) {
+    const ch = m[r][q]; if (ch === '.') continue;
+    const qx = flip ? m[r].length - 1 - q : q;
+    pix(Math.round(px) + qx, Math.round(py) + r - h, s.p[ch]);
+  }
+}
+
+function pick(a) { a.tx = 6 + Math.random() * 138; a.wait = 40 + Math.random() * 120; }
+
+function frame() {
+  t++; scene();
+  if (Math.random() < 0.02) leaves.push({ x: 50 + Math.random() * 60, y: 20, v: 0.2 + Math.random() * 0.2 });
+  leaves = leaves.filter(l => { l.y += l.v; l.x += Math.sin((l.y + t) / 8) * 0.3; pix(l.x | 0, l.y | 0, '#8CC37A'); return l.y < 90; });
+  for (const k in animals) {
+    const a = animals[k];
+    if (a.wait > 0 && !a.leaving) a.wait--;
+    else {
+      const d = a.tx - a.x;
+      if (Math.abs(d) < 0.6) { if (a.leaving) { delete animals[k]; status(); continue; } pick(a); }
+      else { a.x += Math.sign(d) * a.sp; a.flip = d > 0; }
+    }
+    const hop = (a.wait > 0 && !a.leaving) ? 0 : Math.abs(Math.sin(t / 3 + a.ph)) * 1.5;
+    sprite(k, a.x, GROUND + a.dy - hop, a.flip);
+  }
+  requestAnimationFrame(frame);
+}
+
+function status() {
+  const here = Object.keys(animals).filter(k => !animals[k].leaving).map(k => names[k]);
+  document.getElementById('who').textContent = here.length
+    ? here.join(' and ') + (here.length > 1 ? ' are' : ' is') + ' home.'
+    : "Nobody's home. The forest is quiet.";
+}
+
+// Arriving animals run in from an edge; leaving ones walk off the nearest edge.
+document.querySelectorAll('.row button').forEach(b => b.onclick = () => {
+  const k = b.dataset.k, on = b.getAttribute('aria-pressed') !== 'true';
+  b.setAttribute('aria-pressed', on);
+  if (on) {
+    const fromLeft = Math.random() < 0.5;
+    animals[k] = { x: fromLeft ? -12 : 166, sp: k === 'frog' ? 0.35 : 0.5, dy: k === 'frog' ? 1 : 0, ph: Math.random() * 6, wait: 0,
+      tx: fromLeft ? 30 + Math.random() * 30 : 100 + Math.random() * 30, leaving: false };
+  } else if (animals[k]) {
+    const a = animals[k]; a.leaving = true; a.tx = a.x < 80 ? -14 : 170; a.wait = 0;
+  }
+  status();
+});
+
+frame();
+</script>
+</body>
+</html>
