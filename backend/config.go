@@ -20,6 +20,9 @@ type Config struct {
 	Map MapConfig `json:"map"`
 	// Optional; the screen sleeps 1:00 to 6:30 unless set.
 	Sleep *SleepConfig `json:"sleep"`
+	// Optional; the kitchen page draws The Battery's tide unless set.
+	// An empty station turns the tide off.
+	Tides *TidesConfig `json:"tides"`
 	// The widgets under Today, in order, with their settings and secrets.
 	// Leave it out for the defaults (train times, then the minimap).
 	Widgets []WidgetConfig `json:"widgets"`

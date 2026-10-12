@@ -68,6 +68,10 @@
     },
     "radiusMeters": 1300
   },
+  "tides": {
+    "station": "8518750",
+    "place": "The Battery"
+  },
   "sleep": {
     "from": "01:00",
     "to": "06:30"

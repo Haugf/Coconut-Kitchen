@@ -3,6 +3,7 @@ import { Clock } from './clock/Clock'
 import { Weather } from './weather/Weather'
 import { Calendar } from './calendar/Calendar'
 import { Terrain } from './terrain/Terrain'
+import { Kitchen } from './kitchen/Kitchen'
 
 /**
  * Every feature on the mirror is a widget registered here.
@@ -14,4 +15,5 @@ export const registry: Record<string, WidgetDef> = {
   weather: { id: 'weather', component: Weather, size: 'block' },
   calendar: { id: 'calendar', component: Calendar, size: 'block' },
   terrain: { id: 'terrain', component: Terrain, size: 'page' },
+  kitchen: { id: 'kitchen', component: Kitchen, size: 'page' },
 }

@@ -31,14 +31,8 @@ export function yAt(hour: number, events: DayEvent[]): number {
   return BASE - rise(hour, events)
 }
 
-/** One smooth stroke from edge to edge (Catmull-Rom through sampled points). */
-export function terrainPath(events: DayEvent[]): string {
-  const n = 96
-  const pts: [number, number][] = []
-  for (let i = 0; i <= n; i++) {
-    const h = DAY_START + ((DAY_END - DAY_START) * i) / n
-    pts.push([xOf(h), yAt(h, events)])
-  }
+/** A smooth stroke through points (Catmull-Rom as cubic Béziers). */
+export function smooth(pts: [number, number][]): string {
   let d = `M${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`
   for (let i = 0; i < pts.length - 1; i++) {
     const p0 = pts[Math.max(i - 1, 0)]
@@ -52,6 +46,17 @@ export function terrainPath(events: DayEvent[]): string {
     d += `C${c1x.toFixed(1)} ${c1y.toFixed(1)} ${c2x.toFixed(1)} ${c2y.toFixed(1)} ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`
   }
   return d
+}
+
+/** One smooth stroke from edge to edge. */
+export function terrainPath(events: DayEvent[]): string {
+  const n = 96
+  const pts: [number, number][] = []
+  for (let i = 0; i <= n; i++) {
+    const h = DAY_START + ((DAY_END - DAY_START) * i) / n
+    pts.push([xOf(h), yAt(h, events)])
+  }
+  return smooth(pts)
 }
 
 export interface Dot {

@@ -56,6 +56,18 @@ CORE = {
     "/api/sleep": {"asleep": False, "from": "01:00", "to": "06:30"},
 }
 
+# The Battery's real predictions for 2026-10-11, moved to today.
+TIDE = [2.574, 1.994, 1.452, 0.952, 0.515, 0.181, 0.005, 0.04, 0.309, 0.796, 1.449, 2.193, 2.957, 3.685, 4.338, 4.893,
+        5.33, 5.632, 5.781, 5.76, 5.56, 5.189, 4.676, 4.069, 3.42, 2.775, 2.161, 1.589, 1.065, 0.61, 0.267, 0.092,
+        0.131, 0.4, 0.872, 1.487, 2.167, 2.844, 3.466, 4.005, 4.444, 4.773, 4.98, 5.052, 4.973, 4.74, 4.361, 3.866, 3.3]
+midnight = now.replace(hour=0, minute=0, second=0, microsecond=0)
+CORE["/api/tides"] = {
+    "place": "The Battery",
+    "points": [{"t": (midnight + datetime.timedelta(minutes=30 * i)).isoformat(), "v": v} for i, v in enumerate(TIDE)],
+    "turns": [{"t": at(h, m), "v": v, "type": k} for h, m, v, k in
+              [(3, 11, -0.009, "L"), (9, 11, 5.794, "H"), (15, 40, 0.08, "L"), (21, 30, 5.052, "H")]],
+}
+
 
 class Handler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *a, **k):

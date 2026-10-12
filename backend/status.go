@@ -28,6 +28,7 @@ type statusBoard struct {
 	transit  *transit
 	minimap  *minimap
 	sleep    *sleeper
+	tides    *cached[Tides]
 	widgets  *widgetHost
 
 	mu   sync.Mutex
@@ -104,6 +105,11 @@ func (s *statusBoard) status(w http.ResponseWriter, r *http.Request) {
 
 	_, _ = s.weather.get(ctx)
 	out["weather"] = s.weather.health()
+
+	if s.tides != nil {
+		td, _ := s.tides.get(ctx)
+		out["tides"] = map[string]any{"health": s.tides.health(), "points": len(td.Points)}
+	}
 
 	tr := s.transit.snapshot(ctx)
 	rows := []map[string]any{}

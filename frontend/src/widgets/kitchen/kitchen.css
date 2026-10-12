@@ -1,0 +1,108 @@
+/*
+  Coconut Kitchen. The terrain page's structure in a warmer room: coconut
+  cream, husk-brown ink, toasted-coconut accent, and lagoon only for the
+  tide. Widgets restyle themselves through the same tokens.
+*/
+.terrain.kitchen {
+  --bg: #F5EEDF;
+  --wash: #F5EEDF;
+  --ink: #33261B;
+  --ink-soft: #6E5E4C;
+  --ink-grey: #A6957F;
+  --hairline: #E2D5BE;
+  --edge: #E2D5BE;
+  --clay: #A8642F;
+  --lagoon: #2C7A7F;
+  --lagoon-ink: #24676B;
+
+  font-family: 'Figtree Variable', -apple-system, 'Segoe UI', sans-serif;
+  padding: calc(var(--u) * 6) var(--pad-x) calc(var(--u) * 2.5);
+  gap: calc(var(--u) * 3);
+}
+@media (orientation: landscape) {
+  .terrain.kitchen { --pad-x: calc(var(--u) * 10); }
+}
+
+/* Night: dark husk, dimmed with the rest of the page. */
+.mirror-page.is-dim .terrain.kitchen {
+  --bg: #110E0B;
+  --wash: #110E0B;
+  --ink: #E6DBC8;
+  --ink-soft: #A8998A;
+  --ink-grey: #5E5246;
+  --hairline: #2E271F;
+  --edge: #2E271F;
+  --clay: #D98E55;
+  --lagoon: #4FA3A6;
+  --lagoon-ink: #6F9C9E;
+}
+
+.k-top { display: flex; flex-direction: column; gap: calc(var(--u) * 2.4); }
+.k-meta { display: flex; justify-content: space-between; align-items: center; gap: calc(var(--u) * 3); }
+.k-mark {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--u) * 1.3);
+  font-family: 'Young Serif', Georgia, serif;
+  font-size: calc(var(--u) * 2.8);
+  color: var(--clay);
+  white-space: nowrap;
+}
+.k-mark-icon { width: 1.3em; height: 1.3em; }
+.terrain.kitchen .k-headline {
+  font-family: 'Young Serif', Georgia, serif;
+  font-weight: 400;
+  font-size: calc(var(--u) * 7);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  max-width: none;
+  margin-top: 0 !important;
+}
+
+/* The lists and widgets, side by side in landscape. Columns are set
+   inline: Today, Tomorrow or the latest message, then each widget. */
+.k-middle {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: grid;
+  column-gap: calc(var(--u) * 5);
+  padding-top: calc(var(--u) * 1.5);
+}
+.k-said, .k-tomorrow { border-left: 1px solid var(--hairline); padding-left: calc(var(--u) * 5); }
+.k-from { color: var(--clay); font-weight: 650; font-size: 0.9em; }
+.k-words { font-family: 'Young Serif', Georgia, serif; font-size: calc(var(--u) * 4.6); line-height: 1.15; }
+
+/* Portrait: everything in one column, the day strip at the foot. */
+@media (orientation: portrait) {
+  .k-meta { flex-direction: column-reverse; align-items: flex-start; gap: calc(var(--u) * 1.5); }
+  .k-middle { display: flex; flex-direction: column; gap: calc(var(--u) * 5); }
+  .k-said, .k-tomorrow { border-left: 0; padding-left: 0; }
+}
+
+/* The day strip: calendar line in front, the tide behind on the same clock. */
+.k-strip { width: 100%; height: auto; flex: none; overflow: visible; }
+.k-tide-fill { fill: var(--lagoon); fill-opacity: 0.09; }
+.k-tide-line { stroke: var(--lagoon); stroke-opacity: 0.4; stroke-width: 1.5; }
+.k-now { stroke: var(--clay); stroke-width: 1.5; stroke-dasharray: 2 5; }
+.k-now-dot { fill: var(--clay); stroke: var(--bg); stroke-width: 2.5; }
+.k-turn, .k-tick {
+  font-family: 'Figtree Variable', -apple-system, sans-serif;
+  font-size: 14px;
+  paint-order: stroke;
+  stroke: var(--bg);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+.k-turn { fill: var(--lagoon-ink); }
+.k-turn.is-past { fill: var(--ink-grey); }
+.k-turn.is-next { font-weight: 700; }
+.k-tick { fill: var(--ink-grey); }
+/* The strip is drawn in its own units; on a narrower screen they shrink,
+   so the labels are set larger to stay readable. */
+@media (orientation: portrait) {
+  .k-turn, .k-tick { font-size: 22px; }
+}
+
+/* Messages show in their own column here, not as a bar over the page. */
+.mirror-page:has(.kitchen) > .message { display: none; }

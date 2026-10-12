@@ -13,9 +13,12 @@ export interface Scene {
 }
 
 export const scenes: Scene[] = [
-  { name: 'day', from: 5, widgets: ['terrain'] },
-  { name: 'night', from: 22, widgets: ['terrain'], dim: true },
+  { name: 'day', from: 5, widgets: ['kitchen'] },
+  { name: 'night', from: 22, widgets: ['kitchen'], dim: true },
 ]
+
+// The terrain page, before the mirror moved to the kitchen. Swap 'kitchen'
+// for 'terrain' above to bring it back.
 
 // The earlier dark layout, kept for when the mirror glass goes on:
 //   { name: 'morning', from: 5, widgets: ['clock', 'weather', 'calendar'] },

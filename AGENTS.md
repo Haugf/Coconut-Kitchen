@@ -25,15 +25,20 @@ restarts. So `main` is protected:
 
 ## What it is
 
-A single full-screen page ("terrain") on a 24" monitor, landscape at
-1280x720 @ 50Hz (the cable shimmers at 1080p). It shows:
+A single full-screen page ("kitchen", Coconut Kitchen) on a 24" monitor,
+landscape at 1280x720 @ 50Hz (the cable shimmers at 1080p). It shows:
 
-- the date, weather and a one-line headline about the day
-- the day drawn as a ridge from 6 am to midnight, one line per person (Fred
-  solid, Ally dashed)
-- Today's events, then the enabled widgets in a row (by default train
-  times and a round minimap of trains and buses heading to the configured
-  stops)
+- the date, weather, a "Coconut Kitchen" mark and a one-line headline
+- Today's events, then the latest live message or tomorrow's events, then
+  the enabled widgets in a row (by default train times and a round minimap
+  of trains and buses heading to the configured stops)
+- along the bottom, the day drawn as a line from 6 am to midnight, one per
+  person (Fred solid, Ally dashed), with the tide behind it on the same clock
+
+The kitchen page reuses the terrain page's logic (`terrain/day.ts`,
+`shape.ts`, `voice.ts`, `lists.tsx`) and restyles everything, widgets
+included, by redefining the same tokens. The terrain page stays available
+in `scenes.ts`.
 
 The day scene runs from 5 am and night from 10 pm (dark palette, dimmed).
 The screen sleeps from 1:00 to 6:30.
@@ -44,6 +49,7 @@ backend/    Go server (one dependency: github.com/apognu/gocal)
   config.go     config.json shape
   cache.go      cached[T]: TTL + last-good fallback + health()
   calendar.go   iCal feeds per person, merged
+  tides.go      NOAA tide predictions for today and tomorrow
   weather.go    Open-Meteo
   gtfsrt.go     hand-rolled GTFS-realtime protobuf reader
   transit.go    subway (GTFS-rt) and bus (MTA Bus Time SIRI) arrivals
@@ -54,7 +60,8 @@ backend/    Go server (one dependency: github.com/apognu/gocal)
 frontend/   Vite + React + TypeScript
   src/App.tsx            scene switch, sleep, live messages
   src/scenes.ts          which widgets show when
-  src/widgets/terrain/   the page: Terrain and terrain.css
+  src/widgets/kitchen/   the page: Kitchen, kitchen.css, tide.ts
+  src/widgets/terrain/   the earlier page, plus the parts both pages share
   src/widgets/<id>/      one folder per widget (widget.json, index.tsx, sample.json)
   src/widgets/_template/ what `npm run new-widget -- <id>` copies
   src/widgets/loader.tsx finds widget folders; hides a widget that crashes
@@ -71,6 +78,7 @@ update.sh   the every-minute check: origin/main vs ~/mirror/.installed
 |---|---|
 | `GET /api/weather` | current and daily weather |
 | `GET /api/calendar` | `{people, events[{title,start,end,allDay,who}], failed}` |
+| `GET /api/tides` | `{place, points[{t,v}], turns[{t,v,type}]}`, today and tomorrow |
 | `GET /api/transit` | `{rows[{kind,route,label,stopName,minutes[],ok}]}` |
 | `GET /api/map` | `{center, home?, radiusMeters, streets, lines, stations, vehicles[{route,lat,lon,from?,minutes,state}]}` |
 | `GET /api/sleep` | `{asleep, from, to}` |
@@ -110,11 +118,13 @@ clips or overlaps, in both palettes.
 - Logs name a calendar by host only, never its secret URL. The Bus Time key
   is scrubbed from errors.
 
-**Design.** The page follows a terrain style guide:
-- Two bands (a sand wash on top, ivory below) meeting at a 1px edge, with
-  no cards, shadows or radii.
-- A closed palette in `terrain.css`, with clay (`--clay`) as the only accent.
-- Fraunces for the headline, a sans for everything else.
+**Design.** The kitchen page:
+- One coconut-cream ground, hairline column rules, no cards, shadows or
+  radii.
+- A closed palette at the top of `kitchen.css`: husk-brown ink, toasted
+  coconut (`--clay`) as the one accent, lagoon only for the tide.
+- Young Serif for the headline, the mark and messages; Figtree for
+  everything else.
 - An observational voice ("A climb to Dinner at 7, then the day opens up.").
 
 Transit colors are the MTA's: M `#FF6319`, L `#A7A9AC`, buses `#2F6BFF`.
