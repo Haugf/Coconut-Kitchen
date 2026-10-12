@@ -58,6 +58,7 @@ func main() {
 	mux.HandleFunc("GET /api/w/{id}/{source}", widgets.source)
 	mux.HandleFunc("GET /api/status", board.status)
 	mux.HandleFunc("POST /api/heartbeat", board.heartbeat)
+	newSettingsAPI(*cfgPath, cfg, hub, calendar).routes(mux)
 	mux.HandleFunc("GET /api/events", hub.stream)
 	mux.HandleFunc("POST /api/events", hub.publish)
 	mux.Handle("/", spaHandler(cfg.StaticDir))
