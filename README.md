@@ -219,6 +219,21 @@ deploy/     setup-pi.sh, mirror-status.sh, push-status.sh, report-setup.sh
 bootstrap.sh, install.sh, update.sh
 ```
 
+## Settings from your phone
+
+On the home Wi-Fi, open **http://mirror.local:8080/settings** (or the Pi's IP)
+on any phone. From there you can:
+
+- put a message on the mirror, from whoever is sending it
+- check each person's calendar and add or remove a calendar link (the page
+  shows only which site a link points to, never the secret address)
+- switch between Coconut Kitchen and Terrain
+- turn the screen off or on now, and set the sleep hours
+
+Saving a change rewrites `config.json` (keeping everything else in it) and
+restarts the server, so the screen catches up within a few seconds. The page
+only answers on the home network.
+
 ## Live messages
 
 Anything on the home network can put text on the mirror:

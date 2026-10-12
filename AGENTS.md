@@ -59,9 +59,11 @@ backend/    Go server (one dependency: github.com/apognu/gocal)
   widgets.go    widget manifests, /api/widgets, cached data proxy for widgets
   sleep.go      puts the screen in standby overnight (wlopm)
   status.go     /api/status and the page heartbeat
+  settings.go   the phone settings page's API (home network only)
 frontend/   Vite + React + TypeScript
   src/App.tsx            scene switch, sleep, live messages
   src/scenes.ts          which widgets show when
+  src/settings/          the phone page at /settings
   src/widgets/kitchen/   the page: Kitchen, kitchen.css, tide.ts
   src/widgets/terrain/   the earlier page, plus the parts both pages share
   src/widgets/<id>/      one folder per widget (widget.json, index.tsx, sample.json)
@@ -88,6 +90,8 @@ update.sh   the every-minute check: origin/main vs ~/mirror/.installed
 | `GET /api/widgets` | enabled widgets in order: `{id, name, width, settings, sources}` (never secrets) |
 | `GET /api/w/{id}/{source}` | a widget's data source, fetched and cached by the Pi |
 | `GET /api/status` | health summary (counts only) |
+| `GET /api/settings` | the phone settings page's view: people with link hosts and event counts, style, sleep (never a full calendar address) |
+| `POST /api/settings/{calendar,style,sleep,say,screen}` | changes from the settings page; home network only. The first three rewrite config.json and restart the server |
 | `POST /api/heartbeat` | the page checks in every minute |
 | `GET/POST /api/events` | live text messages over SSE |
 
@@ -118,7 +122,8 @@ clips or overlaps, in both palettes.
   or home coordinates. They live only in `~/mirror/config.json` on the Pi.
 - `/api/status` and the `pi-status` branch report counts and health only,
   never event titles, addresses, locations or keys.
-- Logs name a calendar by host only, never its secret URL. The Bus Time key
+- Logs and the settings page name a calendar by host only, never its
+  secret URL. The Bus Time key
   is scrubbed from errors.
 
 **Design.** The kitchen page:
