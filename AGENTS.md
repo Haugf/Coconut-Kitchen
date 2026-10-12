@@ -37,8 +37,10 @@ landscape at 1280x720 @ 50Hz (the cable shimmers at 1080p). It shows:
 
 The kitchen page reuses the terrain page's logic (`terrain/day.ts`,
 `shape.ts`, `voice.ts`, `lists.tsx`) and restyles everything, widgets
-included, by redefining the same tokens. The terrain page stays available
-in `scenes.ts`.
+included, by redefining the same tokens. Both pages stay: `"style"` in
+config.json picks one (`mirror style kitchen|terrain`), served at
+`/api/style`; scenes ask for `'page'` and App resolves it. Change one page
+without breaking the other.
 
 The day scene runs from 5 am and night from 10 pm (dark palette, dimmed).
 The screen sleeps from 1:00 to 6:30.
@@ -82,6 +84,7 @@ update.sh   the every-minute check: origin/main vs ~/mirror/.installed
 | `GET /api/transit` | `{rows[{kind,route,label,stopName,minutes[],ok}]}` |
 | `GET /api/map` | `{center, home?, radiusMeters, streets, lines, stations, vehicles[{route,lat,lon,from?,minutes,state}]}` |
 | `GET /api/sleep` | `{asleep, from, to}` |
+| `GET /api/style` | `{style}`: `kitchen` or `terrain` |
 | `GET /api/widgets` | enabled widgets in order: `{id, name, width, settings, sources}` (never secrets) |
 | `GET /api/w/{id}/{source}` | a widget's data source, fetched and cached by the Pi |
 | `GET /api/status` | health summary (counts only) |

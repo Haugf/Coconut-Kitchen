@@ -19,8 +19,10 @@ tell you it's healthy without anyone walking over to look.
 | Minimap | A small round map around home: the M and L, three stations, and a dot for every train or bus heading to your stops, with its minutes. A hollow mark means it hasn't left the start of the line yet | Same feeds, streets from OpenStreetMap | 15 s |
 | Night mode | Same page, dark husk palette, dimmer | Clock | 10 pm to 5 am |
 
-The earlier terrain page (the day as a ridge in a top band, with three acts)
-is still there: swap `'kitchen'` for `'terrain'` in `frontend/src/scenes.ts`.
+The first design, the terrain page (the day as a ridge in a top band, with
+three acts), is still there. Switch between the two from the Pi with
+`mirror style terrain` and `mirror style kitchen`; the screen follows within a
+minute.
 | Sleep | Screen off (monitor in standby); the Pi keeps running and updating | Clock | 1:00 to 6:30 am |
 
 ```mermaid
@@ -143,6 +145,7 @@ Everyday chores, from any SSH session on the Pi:
 | See or set sleep hours | `mirror sleep`, `mirror sleep 00:30 07:00`, `mirror sleep never` |
 | Put a message on screen | `mirror say "Laundry is done" 15` |
 | Centre the minimap on home | `mirror home "your address"` |
+| Switch page style | `mirror style terrain`, `mirror style kitchen` (plain `mirror style` shows which is on) |
 | Update now instead of waiting | `mirror update` |
 | Restart, follow the log | `mirror restart`, `mirror logs` |
 | Edit settings safely | `mirror config` (restarts only if the JSON is valid) |

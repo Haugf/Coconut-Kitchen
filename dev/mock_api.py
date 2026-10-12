@@ -24,6 +24,7 @@ ap = argparse.ArgumentParser()
 ap.add_argument("--with", dest="extra", action="append", default=[], help="add a widget after the defaults")
 ap.add_argument("--only", action="append", default=[], help="show only these widgets")
 ap.add_argument("--port", type=int, default=8099)
+ap.add_argument("--style", default="kitchen", choices=["kitchen", "terrain"], help="which page to show")
 args = ap.parse_args()
 
 
@@ -54,6 +55,7 @@ CORE = {
         {"title": "Laundry", "start": at(9), "end": at(10), "allDay": False, "who": ["Fred"]},
         {"title": "Dinner", "start": at(19), "end": at(21), "allDay": False, "who": ["Fred", "Ally"]}]},
     "/api/sleep": {"asleep": False, "from": "01:00", "to": "06:30"},
+    "/api/style": {"style": args.style},
 }
 
 # The Battery's real predictions for 2026-10-11, moved to today.

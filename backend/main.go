@@ -49,6 +49,9 @@ func main() {
 	go sleep.run()
 	go board.watchBrowser()
 	mux.Handle("GET /api/sleep", sleep)
+	mux.HandleFunc("GET /api/style", func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(w, http.StatusOK, map[string]string{"style": cfg.Style})
+	})
 	widgets := newWidgetHost(widgetsDir(), cfg.Widgets)
 	board.widgets = widgets
 	mux.HandleFunc("GET /api/widgets", widgets.list)
