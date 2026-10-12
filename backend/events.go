@@ -116,8 +116,14 @@ func (h *hub) publish(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	m.At = time.Now()
+	h.send(m)
+	w.WriteHeader(http.StatusAccepted)
+}
 
+// send shows a message on every screen and keeps it for late arrivals.
+func (h *hub) send(m Message) {
 	h.mu.Lock()
+	defer h.mu.Unlock()
 	h.last = m
 	for ch := range h.subs {
 		select {
@@ -125,6 +131,4 @@ func (h *hub) publish(w http.ResponseWriter, r *http.Request) {
 		default: // slow client; drop rather than block
 		}
 	}
-	h.mu.Unlock()
-	w.WriteHeader(http.StatusAccepted)
 }

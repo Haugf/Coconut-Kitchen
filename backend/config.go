@@ -14,9 +14,12 @@ type Config struct {
 	EventsToken string `json:"eventsToken"`
 	// Which page the mirror shows: "kitchen" (Coconut Kitchen) or
 	// "terrain" (the first design). Set it with `mirror style`.
-	Style    string         `json:"style"`
-	Weather  WeatherConfig  `json:"weather"`
-	Calendar CalendarConfig `json:"calendar"`
+	Style string `json:"style"`
+	// The PIN for the phone settings page. Until one is set the page stays
+	// locked. Set it on the Pi with `mirror pin`; never commit it.
+	SettingsPin string         `json:"settingsPin"`
+	Weather     WeatherConfig  `json:"weather"`
+	Calendar    CalendarConfig `json:"calendar"`
 	// Optional; without it the mirror shows the default Ridgewood trains.
 	Transit *TransitConfig `json:"transit"`
 	// Optional; the minimap centres on Forest Av until home is set.
