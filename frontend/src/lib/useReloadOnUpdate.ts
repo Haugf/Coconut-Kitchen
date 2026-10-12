@@ -16,7 +16,7 @@ export function useReloadOnUpdate(intervalMs = 60 * 1000) {
       const seen = {
         scene: document.querySelector('main')?.getAttribute('data-scene') ?? null,
         headline: Boolean(document.querySelector('.t-headline')?.textContent?.trim()),
-        calendarConnected: !document.querySelector('.t-acts[hidden]'),
+        calendarConnected: !document.querySelector('.t-acts[hidden], [data-calendar-missing]'),
         transitRows: document.querySelectorAll('.t-rows li').length,
         width: window.innerWidth,
         height: window.innerHeight,

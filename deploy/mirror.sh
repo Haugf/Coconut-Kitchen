@@ -16,6 +16,8 @@ mirror sleep 00:30 07:00 set them (24-hour times)
 mirror sleep never       keep the screen on all night
 mirror say "text" [min]  put a message on the screen (default 10 minutes)
 mirror home "address"    centre the minimap on this address
+mirror style             show which page style is on
+mirror style terrain     switch to the first design (or: kitchen)
 mirror update            install the latest from GitHub now
 mirror restart           restart the mirror server
 mirror logs              follow the server log (Ctrl-C to stop)
@@ -109,6 +111,19 @@ case "$cmd" in
     curl -fsS -X POST "$API/api/events" -H 'Content-Type: application/json' \
       ${token:+-H "Authorization: Bearer $token"} -d "$body" >/dev/null
     echo "On the screen for $minutes minutes."
+    ;;
+
+  style)
+    if [ $# -eq 0 ]; then
+      python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("style") or "kitchen")' "$CONFIG"
+    elif [ "$1" = "kitchen" ] || [ "$1" = "terrain" ]; then
+      edit_config 'c["style"] = sys.argv[1]' "$1"
+      echo "Switching to $1. The screen changes within a minute."
+      restart
+    else
+      echo "Usage: mirror style kitchen   or   mirror style terrain" >&2
+      exit 1
+    fi
     ;;
 
   home)

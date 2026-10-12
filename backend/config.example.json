@@ -2,6 +2,7 @@
   "addr": ":8080",
   "staticDir": "../frontend/dist",
   "eventsToken": "",
+  "style": "kitchen",
   "weather": {
     "latitude": 40.7044,
     "longitude": -73.9018,
@@ -67,6 +68,10 @@
       "address": ""
     },
     "radiusMeters": 1300
+  },
+  "tides": {
+    "station": "8518750",
+    "place": "The Battery"
   },
   "sleep": {
     "from": "01:00",

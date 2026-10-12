@@ -12,9 +12,11 @@ export interface Scene {
   dim?: boolean
 }
 
+// 'page' is whichever style is chosen on the Pi with `mirror style`:
+// 'kitchen' (Coconut Kitchen) or 'terrain' (the first design).
 export const scenes: Scene[] = [
-  { name: 'day', from: 5, widgets: ['terrain'] },
-  { name: 'night', from: 22, widgets: ['terrain'], dim: true },
+  { name: 'day', from: 5, widgets: ['page'] },
+  { name: 'night', from: 22, widgets: ['page'], dim: true },
 ]
 
 // The earlier dark layout, kept for when the mirror glass goes on:

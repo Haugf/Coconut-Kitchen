@@ -11,15 +11,21 @@ type Config struct {
 	StaticDir string `json:"staticDir"`
 	// Optional. When set, POST /api/events requires
 	// "Authorization: Bearer <token>".
-	EventsToken string         `json:"eventsToken"`
-	Weather     WeatherConfig  `json:"weather"`
-	Calendar    CalendarConfig `json:"calendar"`
+	EventsToken string `json:"eventsToken"`
+	// Which page the mirror shows: "kitchen" (Coconut Kitchen) or
+	// "terrain" (the first design). Set it with `mirror style`.
+	Style    string         `json:"style"`
+	Weather  WeatherConfig  `json:"weather"`
+	Calendar CalendarConfig `json:"calendar"`
 	// Optional; without it the mirror shows the default Ridgewood trains.
 	Transit *TransitConfig `json:"transit"`
 	// Optional; the minimap centres on Forest Av until home is set.
 	Map MapConfig `json:"map"`
 	// Optional; the screen sleeps 1:00 to 6:30 unless set.
 	Sleep *SleepConfig `json:"sleep"`
+	// Optional; the kitchen page draws The Battery's tide unless set.
+	// An empty station turns the tide off.
+	Tides *TidesConfig `json:"tides"`
 	// The widgets under Today, in order, with their settings and secrets.
 	// Leave it out for the defaults (train times, then the minimap).
 	Widgets []WidgetConfig `json:"widgets"`
@@ -68,6 +74,7 @@ func (l *stringList) UnmarshalJSON(b []byte) error {
 func loadConfig(path string) (*Config, error) {
 	cfg := &Config{
 		Addr:      ":8080",
+		Style:     "kitchen",
 		StaticDir: "../frontend/dist",
 		Weather:   WeatherConfig{Latitude: 40.7128, Longitude: -74.0060, Units: "fahrenheit"},
 		Calendar:  CalendarConfig{DaysAhead: 7, MaxEvents: 30},

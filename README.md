@@ -1,8 +1,8 @@
 # Coconut Kitchen
 
 A magic mirror for Fred and Ally. A 24" monitor, a Raspberry Pi 4, and one quiet
-page: the day drawn as terrain, what's on both calendars, the weather, and when
-the next trains leave. It runs on its own, updates itself from GitHub, and can
+page in the kitchen: the day drawn as a line with the tide behind it, what's on
+both calendars, the weather, and when the next trains leave. It runs on its own, updates itself from GitHub, and can
 tell you it's healthy without anyone walking over to look.
 
 ## What's on the screen
@@ -11,12 +11,18 @@ tell you it's healthy without anyone walking over to look.
 |---|---|---|---|
 | Date line | Time, weekday, date, weather | Open-Meteo (no key) | 10 min |
 | Headline | One observational sentence about the day | Built from the calendar | with calendar |
-| Terrain | The day as a landscape: Fred solid, Ally dashed, 6 am to midnight | Calendar events | with calendar |
-| Three acts | Morning, afternoon, evening in a few words | Calendar events | with calendar |
-| Today / Tomorrow | Numbered lists, with whose calendar each is on | Google (Fred) + iCloud (Ally) | 5 min |
+| Day strip | Along the bottom, 6 am to midnight: the day as a line (Fred solid, Ally dashed), a clay mark at now | Calendar events | with calendar |
+| Tide | Behind the day strip on the same clock: the water level, with the day's highs and lows | NOAA predictions (no key) | 1 h |
+| Today | Numbered list, with whose calendar each is on | Google (Fred) + iCloud (Ally) | 5 min |
+| Tomorrow / In the kitchen | The latest `mirror say` message while it lasts, otherwise tomorrow's events (left out when there are none) | Live messages, calendar | live |
 | Getting around | L both ways at Myrtle–Wyckoff, M to Manhattan at Forest Av, B13 both ways at Gates/Fairview | MTA GTFS-realtime, MTA Bus Time | 30 s |
 | Minimap | A small round map around home: the M and L, three stations, and a dot for every train or bus heading to your stops, with its minutes. A hollow mark means it hasn't left the start of the line yet | Same feeds, streets from OpenStreetMap | 15 s |
-| Night mode | Same page, dark palette, dimmer | Clock | 10 pm to 5 am |
+| Night mode | Same page, dark husk palette, dimmer | Clock | 10 pm to 5 am |
+
+The first design, the terrain page (the day as a ridge in a top band, with
+three acts), is still there. Switch between the two from the Pi with
+`mirror style terrain` and `mirror style kitchen`; the screen follows within a
+minute.
 | Sleep | Screen off (monitor in standby); the Pi keeps running and updating | Clock | 1:00 to 6:30 am |
 
 ```mermaid
@@ -26,9 +32,9 @@ gantt
     axisFormat %H:%M
     section Scene
     Night (dark, dim)   :00:00, 5h
-    Day (light terrain) :05:00, 17h
+    Day (light)         :05:00, 17h
     Night (dark, dim)   :22:00, 2h
-    section Terrain axis
+    section Day strip
     Drawn hours          :06:00, 18h
     section Rain note
     Shown if rain is due :05:00, 13h
@@ -139,6 +145,7 @@ Everyday chores, from any SSH session on the Pi:
 | See or set sleep hours | `mirror sleep`, `mirror sleep 00:30 07:00`, `mirror sleep never` |
 | Put a message on screen | `mirror say "Laundry is done" 15` |
 | Centre the minimap on home | `mirror home "your address"` |
+| Switch page style | `mirror style terrain`, `mirror style kitchen` (plain `mirror style` shows which is on) |
 | Update now instead of waiting | `mirror update` |
 | Restart, follow the log | `mirror restart`, `mirror logs` |
 | Edit settings safely | `mirror config` (restarts only if the JSON is valid) |
@@ -197,6 +204,7 @@ Never committed. Treat calendar links and keys like passwords.
 
 - **Fred's calendar:** Google Calendar on the web > Settings > the calendar > "Secret address in iCal format".
 - **Ally's calendar:** iPhone Calendar > Calendars > (i) next to the calendar > Public Calendar > Share Link.
+- **Tide:** `"tides": {"station": "8518750", "place": "The Battery"}` is the default. Any NOAA tide station id works (search tidesandcurrents.noaa.gov); `"station": ""` turns the tide off.
 - **Sleep hours:** `"sleep": {"from": "01:00", "to": "06:30"}`. Set both to `""` to keep the screen on all night.
 - **Minimap:** put your address under `map.home.address` and restart the server. The Pi looks it up once and keeps it in `~/mirror/map-home.json`. Without it the map centres on Forest Av. Trains are placed between stations from their arrival times (the subway feed has no GPS); buses are real GPS once the Bus Time key is in.
 - **B13:** get a free key at register.developer.obanyc.com, then look up the two stop codes at Gates Av / Fairview Av on bustime.mta.info. The subway rows work with no key.
@@ -204,8 +212,9 @@ Never committed. Treat calendar links and keys like passwords.
 ## Repo layout
 
 ```
-backend/    Go server: calendar, weather, transit (hand-rolled GTFS-rt parser), status
-frontend/   Vite + React + TS. The terrain page lives in src/widgets/terrain/
+backend/    Go server: calendar, weather, tides, transit (hand-rolled GTFS-rt parser), status
+frontend/   Vite + React + TS. The kitchen page lives in src/widgets/kitchen/,
+            the terrain page and the parts they share in src/widgets/terrain/
 deploy/     setup-pi.sh, mirror-status.sh, push-status.sh, report-setup.sh
 bootstrap.sh, install.sh, update.sh
 ```

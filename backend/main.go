@@ -34,15 +34,24 @@ func main() {
 	trains := newTransit(transitCfg)
 	minimap := newMinimap(cfg.Map, trains)
 	sleep := newSleeper(cfg.Sleep)
-	board := &statusBoard{started: time.Now(), calendar: calendar, weather: weather, transit: trains, minimap: minimap, sleep: sleep}
+	tidesCfg := defaultTides()
+	if cfg.Tides != nil {
+		tidesCfg = *cfg.Tides
+	}
+	tides := newTidesSource(tidesCfg)
+	board := &statusBoard{started: time.Now(), calendar: calendar, weather: weather, transit: trains, minimap: minimap, sleep: sleep, tides: tides}
 
 	mux.Handle("GET /api/weather", serveCached(weather))
 	mux.Handle("GET /api/calendar", serveCached(calendar))
+	mux.Handle("GET /api/tides", serveCached(tides))
 	mux.Handle("GET /api/transit", trains)
 	mux.Handle("GET /api/map", minimap)
 	go sleep.run()
 	go board.watchBrowser()
 	mux.Handle("GET /api/sleep", sleep)
+	mux.HandleFunc("GET /api/style", func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(w, http.StatusOK, map[string]string{"style": cfg.Style})
+	})
 	widgets := newWidgetHost(widgetsDir(), cfg.Widgets)
 	board.widgets = widgets
 	mux.HandleFunc("GET /api/widgets", widgets.list)
