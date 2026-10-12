@@ -145,6 +145,7 @@ Everyday chores, from any SSH session on the Pi:
 | See or set sleep hours | `mirror sleep`, `mirror sleep 00:30 07:00`, `mirror sleep never` |
 | Put a message on screen | `mirror say "Laundry is done" 15` |
 | Centre the minimap on home | `mirror home "your address"` |
+| Set the settings page PIN | `mirror pin ABCD` (plain `mirror pin` says whether one is set) |
 | Switch page style | `mirror style terrain`, `mirror style kitchen` (plain `mirror style` shows which is on) |
 | Update now instead of waiting | `mirror update` |
 | Restart, follow the log | `mirror restart`, `mirror logs` |
@@ -233,6 +234,13 @@ on any phone. From there you can:
 Saving a change rewrites `config.json` (keeping everything else in it) and
 restarts the server, so the screen catches up within a few seconds. The page
 only answers on the home network.
+
+It's locked with a PIN, kept only in `config.json` on the Pi (the repo is
+public, so it never goes in the code). Set it with `mirror pin ABCD`; letters
+or numbers, case doesn't matter. Each phone remembers it for a month,
+changing the PIN signs every phone out, and five wrong tries lock the page
+for a minute. Until a PIN is set, the page stays locked and says how to set
+one.
 
 ## Live messages
 

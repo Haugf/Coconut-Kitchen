@@ -3,6 +3,7 @@
   "staticDir": "../frontend/dist",
   "eventsToken": "",
   "style": "kitchen",
+  "settingsPin": "",
   "weather": {
     "latitude": 40.7044,
     "longitude": -73.9018,

@@ -14,6 +14,7 @@ import (
 const testConfig = `{
   "addr": ":8080",
   "eventsToken": "keep-me",
+  "settingsPin": "1234",
   "calendar": {
     "people": [
       {"name": "Fred", "icsUrls": ["https://calendar.google.com/calendar/ical/SECRET-FRED/basic.ics"]},
@@ -39,6 +40,7 @@ func newTestSettings(t *testing.T) (*settingsAPI, *http.ServeMux, string, *int) 
 	cal := &cached[CalendarResponse]{fetch: func(context.Context) (CalendarResponse, error) {
 		return CalendarResponse{People: []string{"Fred", "Ally"}, Events: []Event{{Title: "x", Who: []string{"Fred"}}}}, nil
 	}}
+	wrongPinDelay = 0
 	s := newSettingsAPI(path, cfg, newHub(""), cal)
 	restarts := 0
 	s.restart = func() { restarts++ }
@@ -47,9 +49,17 @@ func newTestSettings(t *testing.T) (*settingsAPI, *http.ServeMux, string, *int) 
 	return s, mux, path, &restarts
 }
 
+// call sends a request from a phone that has entered the PIN.
 func call(mux *http.ServeMux, method, path, body, from string) *httptest.ResponseRecorder {
+	return callWith(mux, method, path, body, from, pinToken("1234"))
+}
+
+func callWith(mux *http.ServeMux, method, path, body, from, cookie string) *httptest.ResponseRecorder {
 	r := httptest.NewRequest(method, path, strings.NewReader(body))
 	r.RemoteAddr = from
+	if cookie != "" {
+		r.AddCookie(&http.Cookie{Name: pinCookie, Value: cookie})
+	}
 	w := httptest.NewRecorder()
 	mux.ServeHTTP(w, r)
 	return w
@@ -69,7 +79,7 @@ func TestSettingsNeverShowSecrets(t *testing.T) {
 	_, mux, _, _ := newTestSettings(t)
 	w := call(mux, "GET", "/api/settings", "", "127.0.0.1:5000")
 	body := w.Body.String()
-	if strings.Contains(body, "SECRET") || strings.Contains(body, "keep-me") {
+	if strings.Contains(body, "SECRET") || strings.Contains(body, "keep-me") || strings.Contains(body, "1234") {
 		t.Fatalf("settings leaked a secret: %s", body)
 	}
 	var got struct {
@@ -134,5 +144,64 @@ func TestSettingsStyleAndSleep(t *testing.T) {
 	}
 	if cfg.Style != "terrain" || cfg.Sleep == nil || cfg.Sleep.From != "" {
 		t.Fatalf("style %q sleep %+v", cfg.Style, cfg.Sleep)
+	}
+}
+
+func TestSettingsNeedThePin(t *testing.T) {
+	s, mux, _, _ := newTestSettings(t)
+	home := "192.168.1.20:5000"
+	if w := callWith(mux, "GET", "/api/settings", "", home, ""); w.Code != http.StatusUnauthorized || !strings.Contains(w.Body.String(), `"pinSet":true`) {
+		t.Fatalf("no cookie: %d %s", w.Code, w.Body)
+	}
+	if w := callWith(mux, "POST", "/api/settings/say", `{"text":"hi"}`, home, "forged"); w.Code != http.StatusUnauthorized {
+		t.Fatalf("forged cookie: %d", w.Code)
+	}
+	if w := callWith(mux, "POST", "/api/settings/unlock", `{"pin":"0000"}`, home, ""); w.Code != http.StatusUnauthorized {
+		t.Fatalf("wrong pin: %d", w.Code)
+	}
+	w := callWith(mux, "POST", "/api/settings/unlock", `{"pin":" 1234 "}`, home, "")
+	if w.Code != http.StatusOK {
+		t.Fatalf("right pin: %d %s", w.Code, w.Body)
+	}
+	got := w.Result().Cookies()
+	if len(got) != 1 || got[0].Value != pinToken("1234") || !got[0].HttpOnly {
+		t.Fatalf("cookie = %+v", got)
+	}
+	if w := callWith(mux, "GET", "/api/settings", "", home, got[0].Value); w.Code != http.StatusOK {
+		t.Fatalf("with cookie: %d", w.Code)
+	}
+	// A new PIN signs every phone out.
+	s.cfg.SettingsPin = "5678"
+	if w := callWith(mux, "GET", "/api/settings", "", home, got[0].Value); w.Code != http.StatusUnauthorized {
+		t.Fatalf("old cookie after PIN change: %d", w.Code)
+	}
+}
+
+func TestSettingsPinIgnoresCase(t *testing.T) {
+	s, mux, _, _ := newTestSettings(t)
+	s.cfg.SettingsPin = "AbCd"
+	if w := callWith(mux, "POST", "/api/settings/unlock", `{"pin":"abcd"}`, "127.0.0.1:1", ""); w.Code != http.StatusOK {
+		t.Fatalf("lower case: %d", w.Code)
+	}
+}
+
+func TestSettingsLockOutAfterWrongPins(t *testing.T) {
+	_, mux, _, _ := newTestSettings(t)
+	for i := 0; i < maxWrongPin; i++ {
+		callWith(mux, "POST", "/api/settings/unlock", `{"pin":"0000"}`, "127.0.0.1:1", "")
+	}
+	if w := callWith(mux, "POST", "/api/settings/unlock", `{"pin":"1234"}`, "127.0.0.1:1", ""); w.Code != http.StatusTooManyRequests {
+		t.Fatalf("after %d wrong tries the right PIN should wait; got %d", maxWrongPin, w.Code)
+	}
+}
+
+func TestSettingsLockedWithoutAPin(t *testing.T) {
+	s, mux, _, _ := newTestSettings(t)
+	s.cfg.SettingsPin = ""
+	if w := call(mux, "GET", "/api/settings", "", "127.0.0.1:1"); w.Code != http.StatusUnauthorized || !strings.Contains(w.Body.String(), `"pinSet":false`) {
+		t.Fatalf("no PIN set: %d %s", w.Code, w.Body)
+	}
+	if w := callWith(mux, "POST", "/api/settings/unlock", `{"pin":""}`, "127.0.0.1:1", ""); w.Code != http.StatusConflict {
+		t.Fatalf("unlock with no PIN set: %d", w.Code)
 	}
 }

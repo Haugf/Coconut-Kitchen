@@ -91,7 +91,8 @@ update.sh   the every-minute check: origin/main vs ~/mirror/.installed
 | `GET /api/w/{id}/{source}` | a widget's data source, fetched and cached by the Pi |
 | `GET /api/status` | health summary (counts only) |
 | `GET /api/settings` | the phone settings page's view: people with link hosts and event counts, style, sleep (never a full calendar address) |
-| `POST /api/settings/{calendar,style,sleep,say,screen}` | changes from the settings page; home network only. The first three rewrite config.json and restart the server |
+| `POST /api/settings/unlock`, `/lock` | the PIN: sets or clears a cookie (30 days). Without it every other settings route answers 401 |
+| `POST /api/settings/{calendar,style,sleep,say,screen}` | changes from the settings page; home network and PIN. The first three rewrite config.json and restart the server |
 | `POST /api/heartbeat` | the page checks in every minute |
 | `GET/POST /api/events` | live text messages over SSE |
 
@@ -118,8 +119,8 @@ clips or overlaps, in both palettes.
 ## Rules of the house
 
 **Privacy. The repo is public.**
-- Never commit `config.json`, calendar addresses, API keys, a home address
-  or home coordinates. They live only in `~/mirror/config.json` on the Pi.
+- Never commit `config.json`, calendar addresses, API keys, the settings
+  PIN, a home address or home coordinates. They live only in `~/mirror/config.json` on the Pi.
 - `/api/status` and the `pi-status` branch report counts and health only,
   never event titles, addresses, locations or keys.
 - Logs and the settings page name a calendar by host only, never its

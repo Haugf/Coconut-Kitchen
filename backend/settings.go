@@ -2,6 +2,9 @@ package main
 
 import (
 	"context"
+	"crypto/sha256"
+	"crypto/subtle"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"log"
@@ -28,13 +31,29 @@ type settingsAPI struct {
 	mu       sync.Mutex
 	// restart is os.Exit in production; tests replace it.
 	restart func()
+
+	// Wrong PINs: a pause each, and a minute's lockout after a few, so a
+	// short PIN can't be guessed by trying them all.
+	pinMu       sync.Mutex
+	wrongPins   int
+	lockedUntil time.Time
 }
+
+// wrongPinDelay is a variable so tests don't wait.
+var wrongPinDelay = time.Second
+
+const (
+	pinCookie   = "mirror_settings"
+	maxWrongPin = 5
+)
 
 func newSettingsAPI(path string, cfg *Config, h *hub, cal *cached[CalendarResponse]) *settingsAPI {
 	return &settingsAPI{path: path, cfg: cfg, hub: h, calendar: cal, restart: func() { os.Exit(1) }}
 }
 
 func (s *settingsAPI) routes(mux *http.ServeMux) {
+	mux.HandleFunc("POST /api/settings/unlock", s.homeOnly(s.unlock))
+	mux.HandleFunc("POST /api/settings/lock", s.homeOnly(s.lock))
 	mux.HandleFunc("GET /api/settings", s.local(s.get))
 	mux.HandleFunc("POST /api/settings/calendar", s.local(s.editCalendar))
 	mux.HandleFunc("POST /api/settings/style", s.local(s.setStyle))
@@ -43,8 +62,8 @@ func (s *settingsAPI) routes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /api/settings/screen", s.local(s.screen))
 }
 
-// local refuses anything that doesn't come from the home network.
-func (s *settingsAPI) local(next http.HandlerFunc) http.HandlerFunc {
+// homeOnly refuses anything that doesn't come from the home network.
+func (s *settingsAPI) homeOnly(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if !fromHomeNetwork(r) {
 			http.Error(w, "settings are only available on the home network", http.StatusForbidden)
@@ -52,6 +71,84 @@ func (s *settingsAPI) local(next http.HandlerFunc) http.HandlerFunc {
 		}
 		next(w, r)
 	}
+}
+
+// local also needs the PIN: a phone that entered it carries a cookie.
+func (s *settingsAPI) local(next http.HandlerFunc) http.HandlerFunc {
+	return s.homeOnly(func(w http.ResponseWriter, r *http.Request) {
+		if !s.unlocked(r) {
+			writeJSON(w, http.StatusUnauthorized, map[string]any{"locked": true, "pinSet": s.pin() != ""})
+			return
+		}
+		next(w, r)
+	})
+}
+
+func (s *settingsAPI) pin() string { return strings.TrimSpace(s.cfg.SettingsPin) }
+
+// pinToken is what the cookie holds. It changes when the PIN does, so a
+// new PIN signs every phone out. Letters aren't case-sensitive.
+func pinToken(pin string) string {
+	sum := sha256.Sum256([]byte("coconut-kitchen-settings:" + strings.ToLower(pin)))
+	return hex.EncodeToString(sum[:])
+}
+
+func (s *settingsAPI) unlocked(r *http.Request) bool {
+	pin := s.pin()
+	if pin == "" {
+		return false
+	}
+	c, err := r.Cookie(pinCookie)
+	return err == nil && subtle.ConstantTimeCompare([]byte(c.Value), []byte(pinToken(pin))) == 1
+}
+
+func (s *settingsAPI) unlock(w http.ResponseWriter, r *http.Request) {
+	var req struct {
+		Pin string `json:"pin"`
+	}
+	if !decode(w, r, &req) {
+		return
+	}
+	pin := s.pin()
+	if pin == "" {
+		http.Error(w, "No PIN is set yet. On the Pi, run: mirror pin <your PIN>", http.StatusConflict)
+		return
+	}
+	s.pinMu.Lock()
+	waiting := time.Now().Before(s.lockedUntil)
+	s.pinMu.Unlock()
+	if waiting {
+		http.Error(w, "Too many tries. Wait a minute and try again.", http.StatusTooManyRequests)
+		return
+	}
+
+	given := strings.ToLower(strings.TrimSpace(req.Pin))
+	if subtle.ConstantTimeCompare([]byte(given), []byte(strings.ToLower(pin))) != 1 {
+		time.Sleep(wrongPinDelay)
+		s.pinMu.Lock()
+		s.wrongPins++
+		if s.wrongPins >= maxWrongPin {
+			s.wrongPins = 0
+			s.lockedUntil = time.Now().Add(time.Minute)
+		}
+		s.pinMu.Unlock()
+		http.Error(w, "That’s not the PIN.", http.StatusUnauthorized)
+		return
+	}
+	s.pinMu.Lock()
+	s.wrongPins = 0
+	s.pinMu.Unlock()
+	http.SetCookie(w, &http.Cookie{
+		Name: pinCookie, Value: pinToken(pin), Path: "/",
+		MaxAge: 30 * 24 * 3600, HttpOnly: true, SameSite: http.SameSiteStrictMode,
+	})
+	writeJSON(w, http.StatusOK, map[string]any{"ok": true})
+}
+
+// lock forgets the PIN on this phone.
+func (s *settingsAPI) lock(w http.ResponseWriter, r *http.Request) {
+	http.SetCookie(w, &http.Cookie{Name: pinCookie, Value: "", Path: "/", MaxAge: -1, HttpOnly: true, SameSite: http.SameSiteStrictMode})
+	writeJSON(w, http.StatusOK, map[string]any{"ok": true})
 }
 
 func fromHomeNetwork(r *http.Request) bool {

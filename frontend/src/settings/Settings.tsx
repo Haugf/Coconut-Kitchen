@@ -53,6 +53,7 @@ function status(p: Person): string {
 
 export default function Settings() {
   const [data, setData] = useState<SettingsData | null>(null)
+  const [locked, setLocked] = useState<{ pinSet: boolean } | null>(null)
   const [loadError, setLoadError] = useState('')
   const [note, setNote] = useState('')
   const [busy, setBusy] = useState(false)
@@ -67,8 +68,15 @@ export default function Settings() {
   async function load() {
     try {
       const res = await fetch('/api/settings', { cache: 'no-store' })
+      if (res.status === 401) {
+        const why = (await res.json()) as { pinSet: boolean }
+        setLocked({ pinSet: why.pinSet })
+        setData(null)
+        return
+      }
       if (!res.ok) throw new Error((await res.text()).trim() || res.statusText)
       const d = (await res.json()) as SettingsData
+      setLocked(null)
       setData(d)
       setLoadError('')
       setSleepFrom(d.sleep.from)
@@ -89,7 +97,7 @@ export default function Settings() {
     for (let i = 0; i < 30; i++) {
       try {
         const res = await fetch('/api/settings', { cache: 'no-store' })
-        if (res.ok) return true
+        if (res.ok || res.status === 401) return true
       } catch {
         /* still restarting */
       }
@@ -103,6 +111,10 @@ export default function Settings() {
     setNote('')
     try {
       const res = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+      if (res.status === 401) {
+        await load()
+        return false
+      }
       if (!res.ok) {
         setNote((await res.text()).trim() || 'That didn’t work.')
         return false
@@ -123,6 +135,18 @@ export default function Settings() {
     } finally {
       setBusy(false)
     }
+  }
+
+  if (locked) {
+    return (
+      <PinScreen
+        pinSet={locked.pinSet}
+        onUnlocked={() => {
+          setLocked(null)
+          void load()
+        }}
+      />
+    )
   }
 
   if (!data) {
@@ -324,9 +348,109 @@ export default function Settings() {
         </form>
       </section>
 
+      <section className="s-section">
+        <button
+          type="button"
+          className="s-button s-quiet"
+          onClick={async () => {
+            await fetch('/api/settings/lock', { method: 'POST' }).catch(() => {})
+            setNote('')
+            await load()
+          }}
+        >
+          Lock settings on this phone
+        </button>
+      </section>
+
       <p className="s-note" role="status" aria-live="polite">
         {note}
       </p>
+    </main>
+  )
+}
+
+function PinScreen({ pinSet, onUnlocked }: { pinSet: boolean; onUnlocked: () => void }) {
+  const [pin, setPin] = useState('')
+  const [error, setError] = useState('')
+  const [busy, setBusy] = useState(false)
+
+  if (!pinSet) {
+    return (
+      <main className="settings">
+        <Header />
+        <section className="s-section">
+          <h2>Set a PIN first</h2>
+          <p className="s-soft">
+            Settings stay locked until the mirror has a PIN. On the Pi, run <code>mirror pin</code> followed by the PIN you want, then
+            reload this page.
+          </p>
+        </section>
+      </main>
+    )
+  }
+
+  return (
+    <main className="settings">
+      <Header />
+      <form
+        className="s-section s-stack"
+        onSubmit={async (e) => {
+          e.preventDefault()
+          if (!pin.trim()) {
+            setError('Enter the PIN first.')
+            return
+          }
+          setBusy(true)
+          setError('')
+          try {
+            const res = await fetch('/api/settings/unlock', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ pin }),
+            })
+            if (res.ok) {
+              onUnlocked()
+              return
+            }
+            setError((await res.text()).trim() || 'That didn’t work.')
+            setPin('')
+          } catch {
+            setError('The mirror didn’t answer. Are you on the home Wi-Fi?')
+          } finally {
+            setBusy(false)
+          }
+        }}
+      >
+        <h2>Enter the PIN</h2>
+        <p className="s-soft">This phone will remember it for a month.</p>
+        <label className="s-label" htmlFor="pin">
+          PIN
+        </label>
+        <input
+          id="pin"
+          className="s-input s-pin"
+          type="password"
+          autoCapitalize="characters"
+          autoComplete="off"
+          autoCorrect="off"
+          spellCheck={false}
+          value={pin}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? 'pin-error' : undefined}
+          onChange={(e) => {
+            setPin(e.target.value)
+            setError('')
+          }}
+        />
+        {error && (
+          <p id="pin-error" className="s-warn" role="alert">
+            {error}
+          </p>
+        )}
+        <button className="s-button s-primary" disabled={busy}>
+          Unlock
+        </button>
+      </form>
     </main>
   )
 }

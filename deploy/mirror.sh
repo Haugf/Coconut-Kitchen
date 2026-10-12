@@ -18,6 +18,8 @@ mirror say "text" [min]  put a message on the screen (default 10 minutes)
 mirror home "address"    centre the minimap on this address
 mirror style             show which page style is on
 mirror style terrain     switch to the first design (or: kitchen)
+mirror pin               is there a PIN for the phone settings page?
+mirror pin ABCD          set it (letters or numbers, case doesn't matter)
 mirror update            install the latest from GitHub now
 mirror restart           restart the mirror server
 mirror logs              follow the server log (Ctrl-C to stop)
@@ -122,6 +124,19 @@ case "$cmd" in
       restart
     else
       echo "Usage: mirror style kitchen   or   mirror style terrain" >&2
+      exit 1
+    fi
+    ;;
+
+  pin)
+    if [ $# -eq 0 ]; then
+      python3 -c 'import json,sys; p=(json.load(open(sys.argv[1])).get("settingsPin") or "").strip(); print("A PIN is set for the settings page." if p else "No PIN yet: the settings page stays locked. Set one with: mirror pin ABCD")' "$CONFIG"
+    elif [[ "$1" =~ ^[A-Za-z0-9]{4,12}$ ]]; then
+      edit_config 'c["settingsPin"] = sys.argv[1]' "$1"
+      echo "PIN set. Phones that unlocked with an old PIN will need the new one."
+      restart
+    else
+      echo "Usage: mirror pin ABCD   (4 to 12 letters or numbers)" >&2
       exit 1
     fi
     ;;
