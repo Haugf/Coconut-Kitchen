@@ -3,3 +3,5 @@ node_modules/
 backend/config.json
 .DS_Store
 mirror-server
+backend/google.json
+backend/venv/

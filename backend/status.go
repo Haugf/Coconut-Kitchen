@@ -31,6 +31,7 @@ type statusBoard struct {
 	tides    *cached[Tides]
 	widgets  *widgetHost
 	speaker  *caster
+	timers   *googleTimers
 
 	mu   sync.Mutex
 	beat heartbeat
@@ -126,6 +127,9 @@ func (s *statusBoard) status(w http.ResponseWriter, r *http.Request) {
 	// Whether the speaker is reachable and playing, never what.
 	if s.speaker != nil {
 		out["speaker"] = s.speaker.health()
+	}
+	if s.timers != nil {
+		out["timers"] = s.timers.health()
 	}
 
 	// Counts only: never the home location.

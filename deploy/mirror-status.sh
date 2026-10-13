@@ -67,6 +67,10 @@ if sp is not None:
     check(sp.get("connected"), "Google speaker",
           (f'{sp.get("speaker")}' + (f' ({sp.get("model")})' if sp.get("model") else "") + (f', {sp.get("playing")}' if sp.get("playing") else ""))
           if sp.get("connected") else sp.get("error", "looking"))
+tm = st.get("timers") or {}
+if tm.get("enabled"):
+    check(tm.get("ok"), "Google timers",
+          f'{tm.get("timers", 0)} set' if tm.get("ok") else tm.get("error", "starting"))
 seen = page.get("seen") or {}
 if st.get("asleep"):
     check(True, "Screen asleep", f'sleeps {st.get("sleepHours", "")}')

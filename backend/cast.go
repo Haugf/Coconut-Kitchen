@@ -310,6 +310,20 @@ func (c *caster) snapshot(now time.Time) NowPlaying {
 	return out
 }
 
+// address is the connected speaker's name and IP, for the timers.
+func (c *caster) address() (name, host string, ok bool) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	if !c.connected {
+		return "", "", false
+	}
+	host, _, err := net.SplitHostPort(c.device.Addr)
+	if err != nil {
+		return "", "", false
+	}
+	return c.device.Name, host, true
+}
+
 func (c *caster) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, c.snapshot(time.Now()))
 }
