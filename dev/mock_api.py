@@ -25,6 +25,7 @@ ap.add_argument("--with", dest="extra", action="append", default=[], help="add a
 ap.add_argument("--only", action="append", default=[], help="show only these widgets")
 ap.add_argument("--port", type=int, default=8099)
 ap.add_argument("--style", default="kitchen", choices=["kitchen", "terrain"], help="which page to show")
+ap.add_argument("--playing", choices=["song", "radio", "paused"], help="the Google speaker is playing something")
 args = ap.parse_args()
 
 
@@ -57,6 +58,18 @@ CORE = {
     "/api/sleep": {"asleep": False, "from": "01:00", "to": "06:30"},
     "/api/style": {"style": args.style},
 }
+
+# The Google speaker: nothing playing unless --playing.
+PLAYING = {
+    "song": {"state": "playing", "app": "Spotify", "title": "Harvest Moon", "subtitle": "Neil Young",
+             "duration": 303, "position": 74},
+    "radio": {"state": "playing", "app": "TuneIn Radio", "title": "WNYC 93.9 FM",
+              "subtitle": "All Things Considered", "live": True},
+    "paused": {"state": "paused", "app": "Spotify", "title": "Harvest Moon", "subtitle": "Neil Young",
+               "duration": 303, "position": 74},
+}
+CORE["/api/cast"] = {"speaker": "Kitchen speaker", "connected": True, "at": now.isoformat(),
+                     **PLAYING.get(args.playing, {})}
 
 # The Battery's real predictions for 2026-10-11, moved to today.
 TIDE = [2.574, 1.994, 1.452, 0.952, 0.515, 0.181, 0.005, 0.04, 0.309, 0.796, 1.449, 2.193, 2.957, 3.685, 4.338, 4.893,

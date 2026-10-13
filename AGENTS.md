@@ -29,7 +29,8 @@ A single full-screen page ("kitchen", Coconut Kitchen) on a 24" monitor,
 landscape at 1280x720 @ 50Hz (the cable shimmers at 1080p). It shows:
 
 - the date, weather, a "Coconut Kitchen" mark and a one-line headline
-- Today's events, then the latest live message or tomorrow's events, then
+- Today's events, then the latest live message, what the Google speaker is
+  playing, or tomorrow's events, then
   the enabled widgets in a row (by default train times and a round minimap
   of trains and buses heading to the configured stops)
 - along the bottom, the day drawn as a line from 6 am to midnight, one per
@@ -57,6 +58,8 @@ backend/    Go server (one dependency: github.com/apognu/gocal)
   transit.go    subway (GTFS-rt) and bus (MTA Bus Time SIRI) arrivals
   map.go        minimap: train positions, bus GPS, OSM streets, home
   widgets.go    widget manifests, /api/widgets, cached data proxy for widgets
+  cast.go       the Google speaker over Cast: what's playing, saying messages
+  mdns.go       finds Cast speakers on the home network by name
   sleep.go      puts the screen in standby overnight (wlopm)
   status.go     /api/status and the page heartbeat
   settings.go   the phone settings page's API (home network only)
@@ -85,6 +88,7 @@ update.sh   the every-minute check: origin/main vs ~/mirror/.installed
 | `GET /api/tides` | `{place, points[{t,v}], turns[{t,v,type}]}`, today and tomorrow |
 | `GET /api/transit` | `{rows[{kind,route,label,stopName,minutes[],ok}]}` |
 | `GET /api/map` | `{center, home?, radiusMeters, streets, lines, stations, vehicles[{route,lat,lon,from?,minutes,state}]}` |
+| `GET /api/cast` | the Google speaker: `{speaker, connected, state?, app?, title?, subtitle?, live?, duration?, position?, at}` (never its address) |
 | `GET /api/sleep` | `{asleep, from, to}` |
 | `GET /api/style` | `{style}`: `kitchen` or `terrain` |
 | `GET /api/widgets` | enabled widgets in order: `{id, name, width, settings, sources}` (never secrets) |

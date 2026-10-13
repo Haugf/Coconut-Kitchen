@@ -24,7 +24,8 @@ Today drawn as a line, the tide behind it, the next trains, and notes from your 
 - **The day as a shape.** Your calendar is drawn as a line from 6 am to midnight, one per person, so you can see a busy evening before you read a word. A plain sentence on top says it in words: *"A climb to Dinner at 7, then the day opens up."*
 - **The tide on the same clock.** NOAA predictions sit behind the day line, with the highs and lows marked.
 - **Trains on a map.** The next L and M from your stops, plus a small round map with a dot for every train heading your way.
-- **Messages from your phone.** `mirror say "Rice is done"`, or the phone page, puts a note on the screen for as long as you choose.
+- **Messages from your phone.** `mirror say "Rice is done"`, or the phone page, puts a note on the screen for as long as you choose, and can say it out loud on your Google speaker.
+- **Your Google speaker, on screen.** What it's playing (a song, or the station when it's radio) shows in the kitchen, found on the home network with no setup.
 - **A settings page, behind a PIN.** Anyone at home can fix their calendar link, switch the look, or set sleep hours from their phone.
 - **Two designs, one switch.** Coconut Kitchen and Terrain, swapped with `mirror style`.
 - **Looks after itself.** It updates from GitHub within about two minutes of a merge, keeps the last good data when a source fails, sleeps overnight, and reports its own health.
@@ -73,8 +74,8 @@ Today drawn as a line, the tide behind it, the next trains, and notes from your 
 | Page | **79 KB** of JavaScript and **5 KB** of CSS, gzipped; fonts are bundled, nothing loads from the internet |
 | On the Pi | Chromium in kiosk mode and the Go server. No Node, no Electron, no database |
 | Merge to wall | About **2 minutes**: the Pi checks GitHub every minute and rebuilds itself |
-| Tests | **22** Go tests: tide and transit parsing, sleep, messages, widgets, settings and the PIN |
-| Data sources | Google and iCloud calendars, Open-Meteo, NOAA tides, MTA subway and bus feeds, OpenStreetMap. Only the bus feed needs a key |
+| Tests | **30** Go tests: tide and transit parsing, sleep, messages, widgets, settings and the PIN, and the Google speaker against a fake one |
+| Data sources | Google and iCloud calendars, Open-Meteo, NOAA tides, MTA subway and bus feeds, OpenStreetMap, your Google speaker on the home network. Only the bus feed needs a key |
 
 ```mermaid
 pie showData title Code by area
@@ -126,7 +127,7 @@ python3 ../dev/mock_api.py --style terrain
 | Day strip | Along the bottom, 6 am to midnight: the day as a line (Fred solid, Ally dashed), a clay mark at now | Calendar events | with calendar |
 | Tide | Behind the day strip on the same clock: the water level, with the day's highs and lows | NOAA predictions (no key) | 1 h |
 | Today | Numbered list, with whose calendar each is on | Google (Fred) + iCloud (Ally) | 5 min |
-| Tomorrow / In the kitchen | The latest message while it lasts, otherwise tomorrow's events (left out when there are none) | Live messages, calendar | live |
+| Tomorrow / In the kitchen / On Kitchen speaker | The latest message while it lasts, else what the Google speaker is playing (song or station, artist, how far along), else tomorrow's events (left out when there are none) | Live messages, the speaker over Cast, calendar | live / 5 s |
 | Getting around | L both ways at Myrtle–Wyckoff, M to Manhattan at Forest Av, B13 both ways at Gates/Fairview | MTA GTFS-realtime, MTA Bus Time | 30 s |
 | Minimap | A small round map: the M and L, three stations, and a dot for every train or bus heading to your stops, with its minutes. A hollow mark means it hasn't left the start of the line yet | Same feeds, streets from OpenStreetMap | 15 s |
 | Night mode | Same page, darker and dimmer | Clock | 10 pm to 5 am |
@@ -308,6 +309,7 @@ Everything lives in `~/mirror/config.json` on the Pi. It's never committed: trea
 - **Google calendar:** Google Calendar on the web › Settings › the calendar › "Secret address in iCal format".
 - **iCloud calendar:** iPhone Calendar › Calendars › (i) next to the calendar your events go in › Public Calendar › Share Link. Calendars stored "On My iPhone" can't be shared.
 - **Tide:** any NOAA tide station id works (search tidesandcurrents.noaa.gov); `"station": ""` turns it off.
+- **Google speaker:** the Pi finds Google speakers on the home network by itself. `"cast": {"name": "Kitchen speaker"}` picks one by its name in the Google Home app (without it, the first that answers); `"host"` pins an address if discovery doesn't work on your network; `"off": true` turns it off. Spoken messages use Google Translate's voice, so their text goes to Google, and saying one stops whatever the speaker was playing.
 - **Sleep hours:** `"sleep": {"from": "01:00", "to": "06:30"}`; set both to `""` to stay on all night.
 - **Minimap:** put your address under `map.home.address`. The Pi looks it up once and keeps it in `~/mirror/map-home.json`. Trains are placed between stations from their arrival times (the subway feed has no GPS); buses are real GPS once the Bus Time key is in.
 - **B13:** a free key from register.developer.obanyc.com, plus the two stop codes from bustime.mta.info. The subway rows need no key.
@@ -321,6 +323,8 @@ curl -X POST http://mirror.local:8080/api/events \
   -H 'Content-Type: application/json' \
   -d '{"text":"Laundry is done","source":"Home","ttl":30}'
 ```
+
+Add `"speak": true` to say it out loud on the Google speaker too.
 
 Set `eventsToken` in `config.json` to require `Authorization: Bearer <token>`.
 
@@ -341,7 +345,7 @@ The Pi runs whatever is on `main`, so `main` only takes pull requests, and only 
 
 ```
 backend/    Go server: calendar, weather, tides, transit (hand-rolled GTFS-rt parser),
-            settings API, status
+            the Google speaker (Cast, mDNS), settings API, status
 frontend/   Vite + React + TypeScript
             src/widgets/kitchen/   the Coconut Kitchen page
             src/widgets/terrain/   the Terrain page and the parts both share

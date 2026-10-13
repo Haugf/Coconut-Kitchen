@@ -22,6 +22,8 @@ interface SettingsData {
   style: string
   sleep: { from: string; to: string }
   screenControl: boolean
+  // The Google speaker messages can be said on; empty when none is found.
+  speaker?: string
 }
 
 const MINUTES = [5, 10, 30, 60]
@@ -61,6 +63,7 @@ export default function Settings() {
   const [text, setText] = useState('')
   const [from, setFrom] = useState(remembered('mirror-from'))
   const [minutes, setMinutes] = useState(10)
+  const [speak, setSpeak] = useState(remembered('mirror-speak') !== 'no')
   const [links, setLinks] = useState<Record<string, string>>({})
   const [sleepFrom, setSleepFrom] = useState('')
   const [sleepTo, setSleepTo] = useState('')
@@ -173,7 +176,9 @@ export default function Settings() {
               return
             }
             remember('mirror-from', from)
-            if (await post('/api/settings/say', { text, from, minutes }, 'On the mirror.')) setText('')
+            const aloud = speak && !!data.speaker
+            if (data.speaker) remember('mirror-speak', speak ? 'yes' : 'no')
+            if (await post('/api/settings/say', { text, from, minutes, speak: aloud }, aloud ? `On the mirror and ${data.speaker}.` : 'On the mirror.')) setText('')
           }}
         >
           <label className="s-label" htmlFor="say-text">Message</label>
@@ -197,8 +202,17 @@ export default function Settings() {
               </button>
             ))}
           </fieldset>
+          {data.speaker && (
+            <label className="s-check">
+              <input type="checkbox" checked={speak} onChange={(e) => setSpeak(e.target.checked)} />
+              <span>
+                Say it out loud on {data.speaker}
+                <small className="s-soft">Stops whatever it’s playing.</small>
+              </span>
+            </label>
+          )}
           <button className="s-button s-primary" disabled={busy}>
-            Show on the mirror
+            {speak && data.speaker ? 'Show and say it' : 'Show on the mirror'}
           </button>
         </form>
       </section>
