@@ -80,6 +80,12 @@ html:has(.settings), body:has(.settings), body:has(.settings) #root { height: au
 .s-chip[aria-pressed='true'] { background: var(--ink); border-color: var(--ink); color: #FFF8EC; opacity: 1; }
 .s-chip-wide { flex: 1 1 0; padding-left: 8px; padding-right: 8px; white-space: nowrap; }
 
+.s-check { display: flex; align-items: flex-start; gap: 12px; min-height: 48px; padding: 4px 0; cursor: pointer; }
+.s-check input { width: 24px; height: 24px; margin: 1px 0 0; accent-color: var(--clay); flex: none; }
+.s-check span { display: flex; flex-direction: column; font-weight: 500; }
+.s-check small { font-size: 15px; font-weight: 400; }
+.s-check:has(input:focus-visible) { outline: 3px solid #2C7A7F; outline-offset: 2px; }
+
 .s-person { display: flex; flex-direction: column; gap: 8px; padding: 6px 0 14px; }
 .s-person + .s-person { border-top: 1px dashed var(--hairline); padding-top: 18px; }
 .s-links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }

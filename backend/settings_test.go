@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"testing"
 )
 
@@ -43,7 +44,8 @@ func newTestSettings(t *testing.T) (*settingsAPI, *http.ServeMux, string, *int) 
 	wrongPinDelay = 0
 	s := newSettingsAPI(path, cfg, newHub(""), cal)
 	restarts := 0
-	s.restart = func() { restarts++ }
+	var restartMu sync.Mutex // finish restarts from its own goroutine
+	s.restart = func() { restartMu.Lock(); restarts++; restartMu.Unlock() }
 	mux := http.NewServeMux()
 	s.routes(mux)
 	return s, mux, path, &restarts

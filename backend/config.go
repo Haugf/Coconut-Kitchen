@@ -29,6 +29,9 @@ type Config struct {
 	// Optional; the kitchen page draws The Battery's tide unless set.
 	// An empty station turns the tide off.
 	Tides *TidesConfig `json:"tides"`
+	// Optional; the mirror looks for a Google speaker on the home network
+	// and shows what it's playing. Name it to pick one.
+	Cast *CastConfig `json:"cast"`
 	// The widgets under Today, in order, with their settings and secrets.
 	// Leave it out for the defaults (train times, then the minimap).
 	Widgets []WidgetConfig `json:"widgets"`

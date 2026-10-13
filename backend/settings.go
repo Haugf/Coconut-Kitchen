@@ -28,7 +28,9 @@ type settingsAPI struct {
 	cfg      *Config
 	hub      *hub
 	calendar *cached[CalendarResponse]
-	mu       sync.Mutex
+	// The Google speaker, if the mirror found one; nil when it's off.
+	speaker *caster
+	mu      sync.Mutex
 	// restart is os.Exit in production; tests replace it.
 	restart func()
 
@@ -214,7 +216,20 @@ func (s *settingsAPI) get(w http.ResponseWriter, r *http.Request) {
 		"style":         s.cfg.Style,
 		"sleep":         sleep,
 		"screenControl": wlopmErr == nil,
+		"speaker":       s.speakerName(),
 	})
+}
+
+// speakerName is the speaker messages can be said on, or "" if none is
+// connected.
+func (s *settingsAPI) speakerName() string {
+	if s.speaker == nil {
+		return ""
+	}
+	if np := s.speaker.snapshot(time.Now()); np.Connected {
+		return np.Speaker
+	}
+	return ""
 }
 
 func (s *settingsAPI) editCalendar(w http.ResponseWriter, r *http.Request) {
@@ -305,6 +320,7 @@ func (s *settingsAPI) say(w http.ResponseWriter, r *http.Request) {
 		Text    string `json:"text"`
 		From    string `json:"from"`
 		Minutes int    `json:"minutes"`
+		Speak   bool   `json:"speak"`
 	}
 	if !decode(w, r, &req) {
 		return
@@ -318,7 +334,7 @@ func (s *settingsAPI) say(w http.ResponseWriter, r *http.Request) {
 	if minutes <= 0 || minutes > 24*60 {
 		minutes = 10
 	}
-	s.hub.send(Message{Text: text, Source: strings.TrimSpace(req.From), TTL: minutes * 60, At: time.Now()})
+	s.hub.send(Message{Text: text, Source: strings.TrimSpace(req.From), TTL: minutes * 60, At: time.Now(), Speak: req.Speak})
 	writeJSON(w, http.StatusOK, map[string]any{"ok": true})
 }
 

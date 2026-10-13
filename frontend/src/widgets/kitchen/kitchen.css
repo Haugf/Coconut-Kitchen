@@ -69,15 +69,25 @@
   column-gap: calc(var(--u) * 5);
   padding-top: calc(var(--u) * 1.5);
 }
-.k-said, .k-tomorrow { border-left: 1px solid var(--hairline); padding-left: calc(var(--u) * 5); }
+.k-said, .k-tomorrow, .k-playing { border-left: 1px solid var(--hairline); padding-left: calc(var(--u) * 5); }
 .k-from { color: var(--clay); font-weight: 650; font-size: 0.9em; }
 .k-words { font-family: 'Young Serif', Georgia, serif; font-size: calc(var(--u) * 4.6); line-height: 1.15; }
+
+/* What the speaker is playing: the song in the serif, a hairline for
+   how far along it is. */
+.k-playing { gap: calc(var(--u) * 1.4); }
+.k-song { font-family: 'Young Serif', Georgia, serif; font-size: calc(var(--u) * 3.2); line-height: 1.15; overflow-wrap: anywhere; }
+.k-artist { color: var(--ink-soft); font-size: calc(var(--u) * 2.6); }
+.k-progress { display: flex; align-items: center; gap: calc(var(--u) * 1.6); }
+.k-bar { flex: 1; height: 2px; background: var(--hairline); position: relative; }
+.k-bar > span { position: absolute; inset: 0 auto 0 0; background: var(--clay); transition: width 1s linear; }
+.k-time { color: var(--ink-grey); font-size: calc(var(--u) * 2.1); font-variant-numeric: tabular-nums; white-space: nowrap; }
 
 /* Portrait: everything in one column, the day strip at the foot. */
 @media (orientation: portrait) {
   .k-meta { flex-direction: column-reverse; align-items: flex-start; gap: calc(var(--u) * 1.5); }
   .k-middle { display: flex; flex-direction: column; gap: calc(var(--u) * 5); }
-  .k-said, .k-tomorrow { border-left: 0; padding-left: 0; }
+  .k-said, .k-tomorrow, .k-playing { border-left: 0; padding-left: 0; }
 }
 
 /* The day strip: calendar line in front, the tide behind on the same clock. */

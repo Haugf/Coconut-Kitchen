@@ -62,6 +62,11 @@ mp = st.get("map") or {}
 check(mp.get("streets", 0) > 0, "Minimap",
       f'{mp.get("streets", 0)} streets, {mp.get("vehicles", 0)} trains and buses'
       + ("" if mp.get("homeSet") else ", home not set (centred on Forest Av)"))
+sp = st.get("speaker")
+if sp is not None:
+    check(sp.get("connected"), "Google speaker",
+          (f'{sp.get("speaker")}' + (f' ({sp.get("model")})' if sp.get("model") else "") + (f', {sp.get("playing")}' if sp.get("playing") else ""))
+          if sp.get("connected") else sp.get("error", "looking"))
 seen = page.get("seen") or {}
 if st.get("asleep"):
     check(True, "Screen asleep", f'sleeps {st.get("sleepHours", "")}')

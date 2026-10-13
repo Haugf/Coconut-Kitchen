@@ -1,8 +1,10 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 	"sync"
@@ -12,10 +14,12 @@ import (
 // Message is anything that should appear on the mirror right now:
 // an assistant reply, a doorbell ring, a timer finishing.
 type Message struct {
-	Text   string    `json:"text"`
-	Source string    `json:"source,omitempty"`
-	TTL    int       `json:"ttl,omitempty"` // seconds on screen, default 20
-	At     time.Time `json:"at"`
+	Text   string `json:"text"`
+	Source string `json:"source,omitempty"`
+	TTL    int    `json:"ttl,omitempty"` // seconds on screen, default 20
+	// Also say it out loud on the Google speaker, if there is one.
+	Speak bool      `json:"speak,omitempty"`
+	At    time.Time `json:"at"`
 }
 
 type hub struct {
@@ -25,6 +29,12 @@ type hub struct {
 	// The most recent message, kept until it expires so a screen that
 	// connects late (a phone waking up, a browser restarting) still sees it.
 	last Message
+	// The Google speaker, for messages sent with "speak": true.
+	speaker speaker
+}
+
+type speaker interface {
+	say(ctx context.Context, text string) error
 }
 
 // defaultTTL matches the frontend's default when a message has no ttl.
@@ -122,6 +132,15 @@ func (h *hub) publish(w http.ResponseWriter, r *http.Request) {
 
 // send shows a message on every screen and keeps it for late arrivals.
 func (h *hub) send(m Message) {
+	if m.Speak && h.speaker != nil {
+		go func(sp speaker, text string) {
+			ctx, cancel := context.WithTimeout(context.Background(), 40*time.Second)
+			defer cancel()
+			if err := sp.say(ctx, text); err != nil {
+				log.Printf("speaker: couldn't say the message: %v", err)
+			}
+		}(h.speaker, spoken(m))
+	}
 	h.mu.Lock()
 	defer h.mu.Unlock()
 	h.last = m
@@ -131,4 +150,12 @@ func (h *hub) send(m Message) {
 		default: // slow client; drop rather than block
 		}
 	}
+}
+
+// spoken is how a message sounds: "Ally says: dinner's ready".
+func spoken(m Message) string {
+	if src := strings.TrimSpace(m.Source); src != "" {
+		return src + " says: " + m.Text
+	}
+	return m.Text
 }

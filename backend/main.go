@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"log"
 	"net/http"
@@ -39,12 +40,29 @@ func main() {
 		tidesCfg = *cfg.Tides
 	}
 	tides := newTidesSource(tidesCfg)
-	board := &statusBoard{started: time.Now(), calendar: calendar, weather: weather, transit: trains, minimap: minimap, sleep: sleep, tides: tides}
+	castCfg := defaultCast()
+	if cfg.Cast != nil {
+		castCfg = *cfg.Cast
+	}
+	var speakerSrc *caster
+	if !castCfg.Off {
+		speakerSrc = newCaster(castCfg)
+		hub.speaker = speakerSrc
+		go speakerSrc.run(context.Background())
+	}
+	board := &statusBoard{started: time.Now(), calendar: calendar, weather: weather, transit: trains, minimap: minimap, sleep: sleep, tides: tides, speaker: speakerSrc}
 
 	mux.Handle("GET /api/weather", serveCached(weather))
 	mux.Handle("GET /api/calendar", serveCached(calendar))
 	mux.Handle("GET /api/tides", serveCached(tides))
 	mux.Handle("GET /api/transit", trains)
+	if speakerSrc != nil {
+		mux.Handle("GET /api/cast", speakerSrc)
+	} else {
+		mux.HandleFunc("GET /api/cast", func(w http.ResponseWriter, r *http.Request) {
+			writeJSON(w, http.StatusOK, NowPlaying{At: time.Now()})
+		})
+	}
 	mux.Handle("GET /api/map", minimap)
 	go sleep.run()
 	go board.watchBrowser()
@@ -58,7 +76,9 @@ func main() {
 	mux.HandleFunc("GET /api/w/{id}/{source}", widgets.source)
 	mux.HandleFunc("GET /api/status", board.status)
 	mux.HandleFunc("POST /api/heartbeat", board.heartbeat)
-	newSettingsAPI(*cfgPath, cfg, hub, calendar).routes(mux)
+	settings := newSettingsAPI(*cfgPath, cfg, hub, calendar)
+	settings.speaker = speakerSrc
+	settings.routes(mux)
 	mux.HandleFunc("GET /api/events", hub.stream)
 	mux.HandleFunc("POST /api/events", hub.publish)
 	mux.Handle("/", spaHandler(cfg.StaticDir))
