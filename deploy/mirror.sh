@@ -20,6 +20,8 @@ mirror style             show which page style is on
 mirror style terrain     switch to the first design (or: kitchen)
 mirror pin               is there a PIN for the phone settings page?
 mirror pin ABCD          set it (letters or numbers, case doesn't matter)
+mirror cursor off        hide the mouse pointer on the screen (after a reboot)
+mirror cursor on         bring it back
 mirror update            install the latest from GitHub now
 mirror restart           restart the mirror server
 mirror logs              follow the server log (Ctrl-C to stop)
@@ -150,6 +152,48 @@ case "$cmd" in
     rm -f "$DIR/map-home.json" "$DIR/map-streets.json"
     echo "Home set. The map looks it up when the server restarts."
     restart
+    ;;
+
+  cursor)
+    # The page hides the pointer, but Chromium only applies that once the
+    # mouse moves, so after a restart the arrow sits on the screen. A blank
+    # cursor theme for the desktop hides it from the start. No root needed.
+    env_file="$HOME/.config/labwc/environment"
+    case "${1:-}" in
+      off)
+        python3 - "$HOME/.icons/mirror-blank" <<'PY'
+import os, struct, sys
+d = os.path.join(sys.argv[1], "cursors")
+os.makedirs(d, exist_ok=True)
+# One fully transparent 1x1 Xcursor image.
+image = struct.pack("<9I", 36, 0xFFFD0002, 24, 1, 1, 1, 0, 0, 0) + struct.pack("<I", 0)
+data = b"Xcur" + struct.pack("<3I", 16, 0x10000, 1) + struct.pack("<3I", 0xFFFD0002, 24, 28) + image
+with open(os.path.join(d, "default"), "wb") as f:
+    f.write(data)
+for name in ["left_ptr", "arrow", "top_left_arrow", "text", "xterm", "pointer", "hand1", "hand2",
+             "watch", "wait", "progress", "left_ptr_watch", "crosshair", "grab", "grabbing",
+             "move", "not-allowed", "help", "col-resize", "row-resize"]:
+    link = os.path.join(d, name)
+    if not os.path.lexists(link):
+        os.symlink("default", link)
+with open(os.path.join(sys.argv[1], "index.theme"), "w") as f:
+    f.write("[Icon Theme]\nName=mirror-blank\n")
+PY
+        mkdir -p "$(dirname "$env_file")"
+        touch "$env_file"
+        sed -i '/^XCURSOR_THEME=/d' "$env_file"
+        echo "XCURSOR_THEME=mirror-blank" >> "$env_file"
+        echo "The pointer will be hidden after the next reboot (sudo reboot)."
+        ;;
+      on)
+        [ -f "$env_file" ] && sed -i '/^XCURSOR_THEME=mirror-blank$/d' "$env_file"
+        echo "The pointer comes back after the next reboot (sudo reboot)."
+        ;;
+      *)
+        echo "Usage: mirror cursor off   or   mirror cursor on" >&2
+        exit 1
+        ;;
+    esac
     ;;
 
   update)

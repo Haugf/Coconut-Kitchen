@@ -24,6 +24,15 @@ export function dateLine(now: Date, weather: WeatherData | null): string {
   return parts.join(' · ')
 }
 
+// "7:59 PM" today, "tomorrow at 7:59 PM", "Thursday at 7:59 PM": an event
+// that runs past midnight shouldn't read as if it ended hours ago.
+function untilWhen(end: Date, now: Date): string {
+  const days = Math.round((new Date(end).setHours(0, 0, 0, 0) - new Date(now).setHours(0, 0, 0, 0)) / 86400000)
+  if (days <= 0) return clock(end)
+  if (days === 1) return `tomorrow at ${clock(end)}`
+  return `${end.toLocaleDateString('en-US', { weekday: 'long' })} at ${clock(end)}`
+}
+
 export function todayItems(events: CalendarEvent[], people: string[], weather: WeatherData | null, now: Date): Item[] {
   const items: Item[] = []
   for (const e of eventsOn(events, now)) {
@@ -36,7 +45,7 @@ export function todayItems(events: CalendarEvent[], people: string[], weather: W
       const happening = start <= now && end && now < end
       items.push({
         title: happening ? `${e.title}, now` : `${e.title} at ${clock(start)}`,
-        before: end ? `Until ${clock(end)}, ` : '',
+        before: end ? `Until ${untilWhen(end, now)}, ` : '',
         source: sourcePhrase(e.who, people),
         after: '.',
       })
