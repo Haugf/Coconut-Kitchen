@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96" role="img" aria-label="Coconut Kitchen">
+  <circle cx="48" cy="48" r="44" fill="#F5EEDF" stroke="#A8642F" stroke-width="5"/>
+  <circle cx="35" cy="39" r="6" fill="#A8642F"/>
+  <circle cx="61" cy="39" r="6" fill="#A8642F"/>
+  <circle cx="48" cy="61" r="6" fill="#A8642F"/>
+</svg>
