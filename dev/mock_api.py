@@ -25,6 +25,7 @@ ap.add_argument("--with", dest="extra", action="append", default=[], help="add a
 ap.add_argument("--only", action="append", default=[], help="show only these widgets")
 ap.add_argument("--port", type=int, default=8099)
 ap.add_argument("--style", default="kitchen", choices=["kitchen", "terrain"], help="which page to show")
+ap.add_argument("--timers", choices=["one", "two", "ringing", "paused"], help="timers set on the Google speaker")
 ap.add_argument("--playing", choices=["song", "radio", "paused"], help="the Google speaker is playing something")
 args = ap.parse_args()
 
@@ -70,6 +71,20 @@ PLAYING = {
 }
 CORE["/api/cast"] = {"speaker": "Kitchen speaker", "connected": True, "at": now.isoformat(),
                      **PLAYING.get(args.playing, {})}
+
+# Timers set by voice on the speaker: none unless --timers.
+def in_(minutes):
+    return (now + datetime.timedelta(minutes=minutes)).isoformat()
+
+
+TIMERS = {
+    "one": [{"label": "pasta", "state": "running", "fireAt": in_(6.7), "duration": 540}],
+    "two": [{"label": "pasta", "state": "running", "fireAt": in_(6.7), "duration": 540},
+            {"label": "", "state": "running", "fireAt": in_(24), "duration": 1800}],
+    "ringing": [{"label": "eggs", "state": "ringing", "fireAt": in_(0), "duration": 420}],
+    "paused": [{"label": "bread", "state": "paused", "duration": 2700, "left": 1290}],
+}
+CORE["/api/timers"] = {"enabled": True, "timers": TIMERS.get(args.timers, []), "at": now.isoformat()}
 
 # The Battery's real predictions for 2026-10-11, moved to today.
 TIDE = [2.574, 1.994, 1.452, 0.952, 0.515, 0.181, 0.005, 0.04, 0.309, 0.796, 1.449, 2.193, 2.957, 3.685, 4.338, 4.893,

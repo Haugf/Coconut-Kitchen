@@ -25,7 +25,7 @@ Today drawn as a line, the tide behind it, the next trains, and notes from your 
 - **The tide on the same clock.** NOAA predictions sit behind the day line, with the highs and lows marked.
 - **Trains on a map.** The next L and M from your stops, plus a small round map with a dot for every train heading your way.
 - **Messages from your phone.** `mirror say "Rice is done"`, or the phone page, puts a note on the screen for as long as you choose, and can say it out loud on your Google speaker.
-- **Your Google speaker, on screen.** What it's playing (a song, or the station when it's radio) shows in the kitchen, found on the home network with no setup.
+- **Your Google speaker, on screen.** What it's playing (a song, or the station when it's radio), and the timers you set by voice, counting down in the kitchen.
 - **A settings page, behind a PIN.** Anyone at home can fix their calendar link, switch the look, or set sleep hours from their phone.
 - **Two designs, one switch.** Coconut Kitchen and Terrain, swapped with `mirror style`.
 - **Looks after itself.** It updates from GitHub within about two minutes of a merge, keeps the last good data when a source fails, sleeps overnight, and reports its own health.
@@ -74,7 +74,7 @@ Today drawn as a line, the tide behind it, the next trains, and notes from your 
 | Page | **79 KB** of JavaScript and **5 KB** of CSS, gzipped; fonts are bundled, nothing loads from the internet |
 | On the Pi | Chromium in kiosk mode and the Go server. No Node, no Electron, no database |
 | Merge to wall | About **2 minutes**: the Pi checks GitHub every minute and rebuilds itself |
-| Tests | **30** Go tests: tide and transit parsing, sleep, messages, widgets, settings and the PIN, and the Google speaker against a fake one |
+| Tests | **35** Go tests: tide and transit parsing, sleep, messages, widgets, settings and the PIN, and the Google speaker and its timers against fakes |
 | Data sources | Google and iCloud calendars, Open-Meteo, NOAA tides, MTA subway and bus feeds, OpenStreetMap, your Google speaker on the home network. Only the bus feed needs a key |
 
 ```mermaid
@@ -127,6 +127,7 @@ python3 ../dev/mock_api.py --style terrain
 | Day strip | Along the bottom, 6 am to midnight: the day as a line (Fred solid, Ally dashed), a clay mark at now | Calendar events | with calendar |
 | Tide | Behind the day strip on the same clock: the water level, with the day's highs and lows | NOAA predictions (no key) | 1 h |
 | Today | Numbered list, with whose calendar each is on | Google (Fred) + iCloud (Ally) | 5 min |
+| Timers | Timers set by voice ("Hey Google, set a pasta timer"): a big countdown with a hairline running down, "Done" when it rings. Off until you run `mirror google` | The speaker's local API | 3 s |
 | Tomorrow / In the kitchen / On Kitchen speaker | The latest message while it lasts, else what the Google speaker is playing (song or station, artist, how far along), else tomorrow's events (left out when there are none) | Live messages, the speaker over Cast, calendar | live / 5 s |
 | Getting around | L both ways at Myrtle–Wyckoff, M to Manhattan at Forest Av, B13 both ways at Gates/Fairview | MTA GTFS-realtime, MTA Bus Time | 30 s |
 | Minimap | A small round map: the M and L, three stations, and a dot for every train or bus heading to your stops, with its minutes. A hollow mark means it hasn't left the start of the line yet | Same feeds, streets from OpenStreetMap | 15 s |
@@ -310,6 +311,7 @@ Everything lives in `~/mirror/config.json` on the Pi. It's never committed: trea
 - **iCloud calendar:** iPhone Calendar › Calendars › (i) next to the calendar your events go in › Public Calendar › Share Link. Calendars stored "On My iPhone" can't be shared.
 - **Tide:** any NOAA tide station id works (search tidesandcurrents.noaa.gov); `"station": ""` turns it off.
 - **Google speaker:** the Pi finds Google speakers on the home network by itself. `"cast": {"name": "Kitchen speaker"}` picks one by its name in the Google Home app (without it, the first that answers); `"host"` pins an address if discovery doesn't work on your network; `"off": true` turns it off. Spoken messages use Google Translate's voice, so their text goes to Google, and saying one stops whatever the speaker was playing.
+- **Google timers:** run `mirror google` on the Pi once. It installs a small helper (glocaltokens, in `~/mirror/venv`) and walks you through a one-time Google sign-in. The token it saves in `~/mirror/google.json` can act as your Google account, so keep the Pi private; `mirror google off` deletes it. This route is unofficial and Google can change it.
 - **Sleep hours:** `"sleep": {"from": "01:00", "to": "06:30"}`; set both to `""` to stay on all night.
 - **Minimap:** put your address under `map.home.address`. The Pi looks it up once and keeps it in `~/mirror/map-home.json`. Trains are placed between stations from their arrival times (the subway feed has no GPS); buses are real GPS once the Bus Time key is in.
 - **B13:** a free key from register.developer.obanyc.com, plus the two stop codes from bustime.mta.info. The subway rows need no key.

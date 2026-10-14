@@ -12,6 +12,7 @@ import { terrainPath, dots, xOf, yAt, BASE, DAY_START, DAY_END } from '../terrai
 import { headline, partOfDay } from '../terrain/voice'
 import { tideShape, type TideData } from './tide'
 import { Playing, useNowPlaying } from './Playing'
+import { Timers, useTimers } from './Timers'
 import '../terrain/terrain.css'
 import './kitchen.css'
 
@@ -57,6 +58,7 @@ export function Kitchen() {
   const widgets = useEnabledWidgets()
   const message = useMessages()
   const playing = useNowPlaying()
+  const timers = useTimers()
 
   const all = cal.data?.events ?? []
   const people = cal.data?.people ?? []
@@ -69,12 +71,14 @@ export function Kitchen() {
   const tide = tideShape(tides.data, now)
   const tomorrow = tomorrowItems(all, people, now)
   // The second column holds the latest message, else what the speaker is
-  // playing, else tomorrow. With none, it steps aside for the widgets.
+  // playing, else tomorrow, with any running timers on top. With none of
+  // these, it steps aside for the widgets.
   const side = message ? 'message' : playing ? 'playing' : tomorrow.length > 0 ? 'tomorrow' : null
+  const hasSide = side !== null || timers.length > 0
 
   const columns = [
     'minmax(0, 1.1fr)',
-    ...(side ? ['minmax(0, 1fr)'] : []),
+    ...(hasSide ? ['minmax(0, 1fr)'] : []),
     // A filling widget (train times) keeps enough room for a row on one
     // line; the lists give way first.
     ...widgets.map((w) => (w.width === 'fit' ? 'auto' : 'minmax(calc(var(--u) * 42), 1fr)')),
@@ -103,15 +107,20 @@ export function Kitchen() {
             empty={cal.data ? `Nothing needs you ${partOfDay(now)}.` : 'Add calendar addresses to config.json on the Pi to fill this in.'}
           />
         </div>
-        {side === 'message' && message && (
-          <section className="t-list k-said">
-            <h2 className="t-heading">In the kitchen</h2>
-            {message.source && <p className="k-from">From {message.source}</p>}
-            <p className="k-words">{message.text}</p>
-          </section>
+        {hasSide && (
+          <div className="k-side">
+            {timers.length > 0 && <Timers timers={timers} />}
+            {side === 'message' && message && (
+              <section className="t-list k-said">
+                <h2 className="t-heading">In the kitchen</h2>
+                {message.source && <p className="k-from">From {message.source}</p>}
+                <p className="k-words">{message.text}</p>
+              </section>
+            )}
+            {side === 'playing' && playing && <Playing np={playing} />}
+            {side === 'tomorrow' && <List heading="Tomorrow" items={tomorrow} empty="" className="k-tomorrow" />}
+          </div>
         )}
-        {side === 'playing' && playing && <Playing np={playing} />}
-        {side === 'tomorrow' && <List heading="Tomorrow" items={tomorrow} empty="" className="k-tomorrow" />}
         {widgets.map((w) => (
           <WidgetSlot key={w.id} widget={w} />
         ))}

@@ -50,7 +50,13 @@ func main() {
 		hub.speaker = speakerSrc
 		go speakerSrc.run(context.Background())
 	}
-	board := &statusBoard{started: time.Now(), calendar: calendar, weather: weather, transit: trains, minimap: minimap, sleep: sleep, tides: tides, speaker: speakerSrc}
+	// Google's timers need the speaker; `mirror google` turns them on.
+	var timers *googleTimers
+	if speakerSrc != nil {
+		timers = newGoogleTimers(speakerSrc)
+		go timers.run(context.Background())
+	}
+	board := &statusBoard{started: time.Now(), calendar: calendar, weather: weather, transit: trains, minimap: minimap, sleep: sleep, tides: tides, speaker: speakerSrc, timers: timers}
 
 	mux.Handle("GET /api/weather", serveCached(weather))
 	mux.Handle("GET /api/calendar", serveCached(calendar))
@@ -61,6 +67,13 @@ func main() {
 	} else {
 		mux.HandleFunc("GET /api/cast", func(w http.ResponseWriter, r *http.Request) {
 			writeJSON(w, http.StatusOK, NowPlaying{At: time.Now()})
+		})
+	}
+	if timers != nil {
+		mux.Handle("GET /api/timers", timers)
+	} else {
+		mux.HandleFunc("GET /api/timers", func(w http.ResponseWriter, r *http.Request) {
+			writeJSON(w, http.StatusOK, TimersResponse{Timers: []Timer{}, At: time.Now()})
 		})
 	}
 	mux.Handle("GET /api/map", minimap)

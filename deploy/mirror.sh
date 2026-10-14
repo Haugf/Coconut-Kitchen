@@ -20,6 +20,8 @@ mirror style             show which page style is on
 mirror style terrain     switch to the first design (or: kitchen)
 mirror pin               is there a PIN for the phone settings page?
 mirror pin ABCD          set it (letters or numbers, case doesn't matter)
+mirror google            show your Google speaker's timers (one-time sign-in)
+mirror google off        sign out; timers stop showing
 mirror cursor off        hide the mouse pointer on the screen (after a reboot)
 mirror cursor on         bring it back
 mirror update            install the latest from GitHub now
@@ -151,6 +153,72 @@ case "$cmd" in
     edit_config 'c.setdefault("map", {})["home"] = {"address": sys.argv[1]}' "$1"
     rm -f "$DIR/map-home.json" "$DIR/map-streets.json"
     echo "Home set. The map looks it up when the server restarts."
+    restart
+    ;;
+
+  google)
+    # Timers set by voice live in Google; the speaker hands them to the Pi
+    # only with a token from the Google account. This saves a sign-in for
+    # that in google.json (only this user can read it) and installs the
+    # helper that turns it into speaker tokens (glocaltokens, in a venv).
+    auth="$DIR/google.json"
+    if [ "${1:-}" = "off" ]; then
+      rm -f "$auth"
+      echo "Signed out of Google. Timers stop showing on the mirror."
+      restart
+      exit 0
+    fi
+    cat <<'EOF'
+This shows the timers you set by voice ("Hey Google, set a pasta timer")
+on the mirror.
+
+The Pi keeps a Google sign-in token in ~/mirror/google.json. That token can
+act as your Google account, so keep the Pi private. Undo it any time with
+`mirror google off`; changing your Google password also cancels it.
+
+Installing the helper (a minute or two the first time)...
+EOF
+    if [ ! -x "$DIR/venv/bin/python" ]; then
+      python3 -m venv "$DIR/venv" || { echo "Couldn't make a Python venv. Install it once with:  sudo apt install -y python3-venv" >&2; exit 1; }
+    fi
+    "$DIR/venv/bin/pip" install -q --upgrade glocaltokens
+    cat <<'EOF'
+
+Now, on your Mac (a private window is easiest):
+  1. Open https://accounts.google.com/EmbeddedSetup and sign in.
+  2. Click "I agree". The page may spin forever; that's fine.
+  3. Open the developer tools (Cmd-Option-I) › Application › Cookies ›
+     https://accounts.google.com, and copy the value of "oauth_token"
+     (it starts with oauth2_4/).
+
+EOF
+    read -rp "Google account email: " email
+    read -rsp "oauth_token (hidden as you paste): " oauth_token
+    echo
+    ( umask 077
+      "$DIR/venv/bin/python" - "$auth" "$email" "$oauth_token" <<'PY'
+import json, os, secrets, sys
+import gpsoauth
+path, email, token = sys.argv[1], sys.argv[2].strip(), sys.argv[3].strip()
+android_id = secrets.token_hex(8)
+try:
+    r = gpsoauth.exchange_token(email, token, android_id)
+except Exception as e:
+    sys.exit("Couldn't reach Google: %s" % type(e).__name__)
+master = r.get("Token", "")
+if not master.startswith("aas_et/"):
+    sys.exit("Google didn't accept that (%s). Get a fresh oauth_token and try again; each one works once." % (r.get("Error") or "no token"))
+tmp = path + ".new"
+with open(tmp, "w") as f:
+    json.dump({"email": email, "masterToken": master, "androidId": android_id}, f)
+os.replace(tmp, path)
+from glocaltokens.client import GLocalAuthenticationTokens
+devices = GLocalAuthenticationTokens(username=email, master_token=master, android_id=android_id).get_google_devices(disable_discovery=True)
+names = [d.device_name for d in devices if d.local_auth_token]
+print("Signed in. Speakers on this account: " + (", ".join(names) or "none found"))
+PY
+    ) || exit 1
+    echo "Restarting the mirror; a timer shows up a few seconds after you set it."
     restart
     ;;
 
