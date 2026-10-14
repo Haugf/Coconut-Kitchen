@@ -131,7 +131,7 @@ python3 ../dev/mock_api.py --style terrain
 | Tomorrow / In the kitchen / On Kitchen speaker | The latest message while it lasts, else what the Google speaker is playing (song or station, artist, how far along), else tomorrow's events (left out when there are none) | Live messages, the speaker over Cast, calendar | live / 5 s |
 | Getting around | L both ways at Myrtle–Wyckoff, M to Manhattan at Forest Av, B13 both ways at Gates/Fairview | MTA GTFS-realtime, MTA Bus Time | 30 s |
 | Minimap | A small round map: the M and L, three stations, and a dot for every train or bus heading to your stops, with its minutes. A hollow mark means it hasn't left the start of the line yet | Same feeds, streets from OpenStreetMap | 15 s |
-| Night mode | Same page, darker and dimmer | Clock | 10 pm to 5 am |
+| Night mode | Same page, darker and dimmer, fading over a minute and a half; it also fades in when the screen wakes | Clock | 10 pm to 5 am |
 | Sleep | Screen off (monitor in standby); the Pi keeps running and updating | Clock | 1:00 to 6:30 am |
 
 ```mermaid
@@ -141,7 +141,7 @@ gantt
     axisFormat %H:%M
     section Scene
     Night (dark, dim)   :00:00, 5h
-    Day (light)         :05:00, 17h
+    Day (husk)          :05:00, 17h
     Night (dark, dim)   :22:00, 2h
     section Day strip
     Drawn hours          :06:00, 18h

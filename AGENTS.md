@@ -135,10 +135,12 @@ clips or overlaps, in both palettes.
   is scrubbed from errors.
 
 **Design.** The kitchen page:
-- One coconut-cream ground, hairline column rules, no cards, shadows or
-  radii.
-- A closed palette at the top of `kitchen.css`: husk-brown ink, toasted
-  coconut (`--clay`) as the one accent, lagoon only for the tide.
+- One dark husk-brown ground all day (a light ground lit up the kitchen
+  too much), hairline column rules, no cards, shadows or radii.
+- A closed palette at the top of `kitchen.css`: coconut-cream ink, toasted
+  coconut (`--clay`) as the one accent, lagoon only for the tide. The
+  tokens are registered with `@property` so day and night fade into each
+  other; keep new tokens registered too.
 - Young Serif for the headline, the mark and messages; Figtree for
   everything else.
 - An observational voice ("A climb to Dinner at 7, then the day opens up.").
