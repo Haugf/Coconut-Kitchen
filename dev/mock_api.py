@@ -25,6 +25,7 @@ ap.add_argument("--with", dest="extra", action="append", default=[], help="add a
 ap.add_argument("--only", action="append", default=[], help="show only these widgets")
 ap.add_argument("--port", type=int, default=8099)
 ap.add_argument("--style", default="kitchen", choices=["kitchen", "terrain"], help="which page to show")
+ap.add_argument("--weather", choices=["clear", "drizzle", "rain", "storm"], default="clear", help="what it's doing outside")
 ap.add_argument("--timers", choices=["one", "two", "ringing", "paused"], help="timers set on the Google speaker")
 ap.add_argument("--playing", choices=["song", "radio", "paused"], help="the Google speaker is playing something")
 args = ap.parse_args()
@@ -51,7 +52,7 @@ def at(h, m=0):
 
 
 CORE = {
-    "/api/weather": {"temp": 58, "feelsLike": 56, "code": 1, "units": "fahrenheit",
+    "/api/weather": {"temp": 58, "feelsLike": 56, "code": {"clear": 1, "drizzle": 53, "rain": 63, "storm": 95}[args.weather], "units": "fahrenheit",
                      "days": [{"date": now.date().isoformat(), "high": 64, "low": 51, "code": 1, "rainChance": 5}]},
     "/api/calendar": {"people": ["Fred", "Ally"], "events": [
         {"title": "Laundry", "start": at(9), "end": at(10), "allDay": False, "who": ["Fred"]},

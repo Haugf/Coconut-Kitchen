@@ -141,6 +141,10 @@ clips or overlaps, in both palettes.
   coconut (`--clay`) as the one accent, lagoon only for the tide. The
   tokens are registered with `@property` so day and night fade into each
   other; keep new tokens registered too.
+- While it's raining (Open-Meteo's current weather code), `Rain.tsx`
+  draws a rainy window behind the page. The lake is painted once in
+  code, so there's no photo to license; only a few drops move, at 20
+  frames a second, to keep the Pi cool.
 - Young Serif for the headline, the mark and messages; Figtree for
   everything else.
 - An observational voice ("A climb to Dinner at 7, then the day opens up.").

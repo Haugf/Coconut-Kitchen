@@ -13,6 +13,9 @@ import { headline, partOfDay } from '../terrain/voice'
 import { tideShape, type TideData } from './tide'
 import { Playing, useNowPlaying } from './Playing'
 import { Timers, useTimers } from './Timers'
+import { Rain } from './Rain'
+import { rainAmount } from './rain'
+import { sceneFor } from '../../scenes'
 import '../terrain/terrain.css'
 import './kitchen.css'
 
@@ -75,6 +78,10 @@ export function Kitchen() {
   // these, it steps aside for the widgets.
   const side = message ? 'message' : playing ? 'playing' : tomorrow.length > 0 ? 'tomorrow' : null
   const hasSide = side !== null || timers.length > 0
+  // Rain on the window, only while it's raining. ?rain=1 (or 0.4 to 1)
+  // in the address tries it on a dry day.
+  const tryRain = new URLSearchParams(window.location.search).get('rain')
+  const rain = tryRain ? Math.min(1, Math.max(0.2, Number(tryRain) || 1)) : rainAmount(wx.data?.code)
 
   const columns = [
     'minmax(0, 1.1fr)',
@@ -85,7 +92,8 @@ export function Kitchen() {
   ].join(' ')
 
   return (
-    <div className="terrain kitchen" data-calendar-missing={cal.data ? undefined : ''}>
+    <div className={rain > 0 ? 'terrain kitchen is-raining' : 'terrain kitchen'} data-calendar-missing={cal.data ? undefined : ''}>
+      {rain > 0 && <Rain amount={rain} night={Boolean(sceneFor(now).dim)} />}
       <header className="k-top">
         <div className="k-meta">
           <p className="t-date">{dateLine(now, wx.data)}</p>

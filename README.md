@@ -131,6 +131,7 @@ python3 ../dev/mock_api.py --style terrain
 | Tomorrow / In the kitchen / On Kitchen speaker | The latest message while it lasts, else what the Google speaker is playing (song or station, artist, how far along), else tomorrow's events (left out when there are none) | Live messages, the speaker over Cast, calendar | live / 5 s |
 | Getting around | L both ways at Myrtle–Wyckoff, M to Manhattan at Forest Av, B13 both ways at Gates/Fairview | MTA GTFS-realtime, MTA Bus Time | 30 s |
 | Minimap | A small round map: the M and L, three stations, and a dot for every train or bus heading to your stops, with its minutes. A hollow mark means it hasn't left the start of the line yet | Same feeds, streets from OpenStreetMap | 15 s |
+| Rain on the window | While it's raining outside, the page sits behind a rainy window: a blurred river through the glass, drops on it, a few running down. Heavier rain, more drops. Off when it's dry; `?rain=1` in the address tries it | Open-Meteo's current weather | 10 min |
 | Night mode | Same page, darker and dimmer, fading over a minute and a half; it also fades in when the screen wakes | Clock | 10 pm to 5 am |
 | Sleep | Screen off (monitor in standby); the Pi keeps running and updating | Clock | 1:00 to 6:30 am |
 

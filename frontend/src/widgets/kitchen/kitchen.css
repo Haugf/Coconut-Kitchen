@@ -54,6 +54,20 @@
   --lagoon-ink: #6F9C9E;
 }
 
+/* Rain on the window: drawn behind everything while it's raining. The
+   wash is the page's own ground, heaviest where the words are (left, and
+   the day strip) and lightest at the top right where the lake shows. */
+.terrain.kitchen.is-raining { background: transparent; position: relative; }
+.terrain.kitchen.is-raining > :not(.k-rain) { position: relative; z-index: 1; }
+.k-rain { position: fixed; inset: 0; z-index: 0; background: var(--bg); animation: k-wake 8s ease-out; }
+.k-rain > * { position: absolute; inset: 0; width: 100%; height: 100%; }
+.k-rain > canvas:first-child { object-fit: cover; }
+.k-rain-wash {
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--bg) 82%, transparent) 0%, color-mix(in srgb, var(--bg) 62%, transparent) 45%, color-mix(in srgb, var(--bg) 30%, transparent) 100%),
+    linear-gradient(0deg, color-mix(in srgb, var(--bg) 75%, transparent) 0%, transparent 34%);
+}
+
 /* Waking up: the Pi turns the screen on at the end of the sleep hours and
    the page comes back from black. Fade it in rather than snapping on.
    One animation for day and night (it fades up to whatever opacity the
