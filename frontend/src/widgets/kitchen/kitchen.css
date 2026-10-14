@@ -1,29 +1,46 @@
 /*
-  Coconut Kitchen. The terrain page's structure in a warmer room: coconut
-  cream, husk-brown ink, toasted-coconut accent, and lagoon only for the
-  tide. Widgets restyle themselves through the same tokens.
+  Coconut Kitchen. The terrain page's structure in a warmer room: husk
+  brown ground, coconut-cream ink, toasted coconut as the one accent, and
+  lagoon only for the tide. It's dark all day because a light screen lit
+  up the kitchen; night is darker still and dimmed. Widgets restyle
+  themselves through the same tokens.
 */
+
+/* The tokens are registered as colors so the switch between day and night
+   fades over a minute and a half instead of jumping. */
+@property --bg { syntax: '<color>'; inherits: true; initial-value: #2B221B; }
+@property --wash { syntax: '<color>'; inherits: true; initial-value: #2B221B; }
+@property --ink { syntax: '<color>'; inherits: true; initial-value: #EBDFCB; }
+@property --ink-soft { syntax: '<color>'; inherits: true; initial-value: #B6A693; }
+@property --ink-grey { syntax: '<color>'; inherits: true; initial-value: #7D6E5F; }
+@property --hairline { syntax: '<color>'; inherits: true; initial-value: #40352B; }
+@property --edge { syntax: '<color>'; inherits: true; initial-value: #40352B; }
+@property --clay { syntax: '<color>'; inherits: true; initial-value: #DC965C; }
+@property --lagoon { syntax: '<color>'; inherits: true; initial-value: #5FAFB2; }
+@property --lagoon-ink { syntax: '<color>'; inherits: true; initial-value: #7FBFC1; }
+
 .terrain.kitchen {
-  --bg: #F5EEDF;
-  --wash: #F5EEDF;
-  --ink: #33261B;
-  --ink-soft: #6E5E4C;
-  --ink-grey: #A6957F;
-  --hairline: #E2D5BE;
-  --edge: #E2D5BE;
-  --clay: #A8642F;
-  --lagoon: #2C7A7F;
-  --lagoon-ink: #24676B;
+  --bg: #2B221B;
+  --wash: #2B221B;
+  --ink: #EBDFCB;
+  --ink-soft: #B6A693;
+  --ink-grey: #7D6E5F;
+  --hairline: #40352B;
+  --edge: #40352B;
+  --clay: #DC965C;
+  --lagoon: #5FAFB2;
+  --lagoon-ink: #7FBFC1;
 
   font-family: 'Figtree Variable', -apple-system, 'Segoe UI', sans-serif;
   padding: calc(var(--u) * 6) var(--pad-x) calc(var(--u) * 2.5);
   gap: calc(var(--u) * 3);
+  transition: --bg 90s, --wash 90s, --ink 90s, --ink-soft 90s, --ink-grey 90s, --hairline 90s, --edge 90s, --clay 90s, --lagoon 90s, --lagoon-ink 90s;
 }
 @media (orientation: landscape) {
   .terrain.kitchen { --pad-x: calc(var(--u) * 10); }
 }
 
-/* Night: dark husk, dimmed with the rest of the page. */
+/* Night: darker husk, dimmed with the rest of the page. */
 .mirror-page.is-dim .terrain.kitchen {
   --bg: #110E0B;
   --wash: #110E0B;
@@ -36,6 +53,13 @@
   --lagoon: #4FA3A6;
   --lagoon-ink: #6F9C9E;
 }
+
+/* Waking up: the Pi turns the screen on at the end of the sleep hours and
+   the page comes back from black. Fade it in rather than snapping on.
+   One animation for day and night (it fades up to whatever opacity the
+   page has), so switching scenes doesn't restart it. */
+@keyframes k-wake { from { opacity: 0; } }
+.mirror-page:has(.kitchen) { animation: k-wake 20s ease-out; }
 
 .k-top { display: flex; flex-direction: column; gap: calc(var(--u) * 2.4); }
 .k-meta { display: flex; justify-content: space-between; align-items: center; gap: calc(var(--u) * 3); }
