@@ -27,7 +27,7 @@ Today drawn as a line, the tide behind it, the next trains, and notes from your 
 - **Messages from your phone.** `mirror say "Rice is done"`, or the phone page, puts a note on the screen for as long as you choose, and can say it out loud on your Google speaker.
 - **Your Google speaker, on screen.** What it's playing (a song, or the station when it's radio), and the timers you set by voice, counting down in the kitchen.
 - **A settings page, behind a PIN.** Anyone at home can fix their calendar link, switch the look, or set sleep hours from their phone.
-- **Two designs, one switch.** Coconut Kitchen and Terrain, swapped with `mirror style`.
+- **Three looks, one switch.** Coconut Kitchen, Terrain, and the Haunted Coconut for Halloween parties, swapped with `mirror style` or from the phone.
 - **Looks after itself.** It updates from GitHub within about two minutes of a merge, keeps the last good data when a source fails, sleeps overnight, and reports its own health.
 
 ## Screenshots
@@ -152,6 +152,8 @@ gantt
 
 The first design, **Terrain** (the day as a ridge in a top band, with three acts), is still there. Switch with `mirror style terrain` and `mirror style kitchen`; the screen follows within a minute.
 
+For parties there's **the Haunted Coconut** (`mirror style haunted`): a dark, ornate room with gilt corners, the moon's phase, a countdown to midnight, what the speaker is playing, timers, the last trains home, and a haunted house on its hill along the bottom, with soft lightning every 20 to 60 seconds (`?calm` in the address turns it off). It never shows the calendar, and while it's on, the calendar's address on the mirror answers only the Pi itself, so guests on the Wi-Fi see nothing about anyone's week. `?style=haunted` previews it on a laptop without changing the mirror.
+
 ## Settings from your phone
 
 On the home Wi-Fi, open **http://mirror.local:8080/settings** (or the Pi's IP). You can:
@@ -247,7 +249,7 @@ Everyday chores, from any SSH session on the Pi:
 | Screen off / on now | `mirror off`, `mirror on` |
 | See or set sleep hours | `mirror sleep`, `mirror sleep 00:30 07:00`, `mirror sleep never` |
 | Put a message on screen | `mirror say "Laundry is done" 15` |
-| Switch page style | `mirror style terrain`, `mirror style kitchen` (plain `mirror style` shows which is on) |
+| Switch page style | `mirror style terrain`, `mirror style kitchen`, `mirror style haunted` (plain `mirror style` shows which is on) |
 | Set the settings page PIN | `mirror pin ABCD` (plain `mirror pin` says whether one is set) |
 | Centre the minimap on home | `mirror home "your address"` |
 | Update now instead of waiting | `mirror update` |
