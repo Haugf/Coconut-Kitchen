@@ -59,7 +59,7 @@ func main() {
 	board := &statusBoard{started: time.Now(), calendar: calendar, weather: weather, transit: trains, minimap: minimap, sleep: sleep, tides: tides, speaker: speakerSrc, timers: timers}
 
 	mux.Handle("GET /api/weather", serveCached(weather))
-	mux.Handle("GET /api/calendar", serveCached(calendar))
+	mux.Handle("GET /api/calendar", partyPrivate(cfg, serveCached(calendar)))
 	mux.Handle("GET /api/tides", serveCached(tides))
 	mux.Handle("GET /api/transit", trains)
 	if speakerSrc != nil {
@@ -117,5 +117,18 @@ func spaHandler(dir string) http.Handler {
 			return
 		}
 		files.ServeHTTP(w, r)
+	})
+}
+
+// partyPrivate keeps the calendar off the network while the haunted
+// party page is on: guests share the Wi-Fi, and that page never shows
+// the calendar anyway. The Pi itself can still ask.
+func partyPrivate(cfg *Config, next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if cfg.Style == "haunted" && !fromLoopback(r) {
+			http.Error(w, "The calendar is private during the party.", http.StatusForbidden)
+			return
+		}
+		next.ServeHTTP(w, r)
 	})
 }

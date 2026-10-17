@@ -29,13 +29,13 @@ function clock(s: number): string {
   return `${m}:${String(Math.floor(s % 60)).padStart(2, '0')}`
 }
 
-export function Playing({ np }: { np: NowPlaying }) {
+export function Playing({ np, heading }: { np: NowPlaying; heading?: string }) {
   const now = useNow(1000)
   let pos = np.position ?? 0
   if (np.state === 'playing') pos += Math.max(0, (now.getTime() - Date.parse(np.at)) / 1000)
   const dur = np.duration ?? 0
   if (dur > 0) pos = Math.min(pos, dur)
-  const where = np.speaker ? `On ${np.speaker}` : 'Playing'
+  const where = heading ?? (np.speaker ? `On ${np.speaker}` : 'Playing')
 
   return (
     <section className="t-list k-playing" aria-label={`${where}: ${np.title}`}>

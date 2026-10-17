@@ -12,8 +12,9 @@ type Config struct {
 	// Optional. When set, POST /api/events requires
 	// "Authorization: Bearer <token>".
 	EventsToken string `json:"eventsToken"`
-	// Which page the mirror shows: "kitchen" (Coconut Kitchen) or
-	// "terrain" (the first design). Set it with `mirror style`.
+	// Which page the mirror shows: "kitchen" (Coconut Kitchen),
+	// "terrain" (the first design) or "haunted" (the Halloween party
+	// page, which never shows the calendar). Set it with `mirror style`.
 	Style string `json:"style"`
 	// The PIN for the phone settings page. Until one is set the page stays
 	// locked. Set it on the Pi with `mirror pin`; never commit it.

@@ -1,0 +1,156 @@
+/*
+  The Haunted Coconut: a dark, ornate room for a Halloween party. Near-
+  black plum walls with a faint damask, gilt scrollwork in the corners,
+  parchment ink, pumpkin as the accent, and a spectral violet for the
+  moon. Lightning flashes are two soft pulses, at most every 20 seconds.
+*/
+/* The same colors day and night (the shared night rule would otherwise
+   turn this page grey). */
+.terrain.haunted,
+.mirror-page.is-dim .terrain.haunted {
+  --bg: #0E0A10;
+  --wash: #0E0A10;
+  --ink: #EADFC8;
+  --ink-soft: #AE9F88;
+  --ink-grey: #6E6255;
+  --hairline: #2B2129;
+  --edge: #2B2129;
+  --clay: #E8812F;
+  --lagoon: #8C6BC4;
+  --lagoon-ink: #A98ED8;
+  --gilt: #A07E45;
+}
+.terrain.haunted {
+  position: relative;
+  overflow: hidden;
+  font-family: 'IM Fell English', Georgia, serif;
+  padding: calc(var(--u) * 6) var(--pad-x) 0;
+  gap: calc(var(--u) * 3);
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 40%, rgba(122, 70, 40, 0.16), transparent 70%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='160' viewBox='0 0 120 160'%3E%3Cg fill='%23A07E45' fill-opacity='0.055'%3E%3Cpath d='M60 18C66 38 80 42 80 58C80 70 70 74 64 68C68 82 66 94 60 102C54 94 52 82 56 68C50 74 40 70 40 58C40 42 54 38 60 18Z'/%3E%3Cpath d='M60 102C70 112 86 110 90 98C84 104 72 104 60 102ZM60 102C50 112 34 110 30 98C36 104 48 104 60 102Z'/%3E%3Cpath d='M0 138l6-8 6 8-6 8zM120 138l-6-8-6 8 6 8z M54 138l6-8 6 8-6 8z'/%3E%3C/g%3E%3C/svg%3E"),
+    var(--bg);
+  background-size: auto, 120px 160px, auto;
+}
+@media (orientation: landscape) {
+  .terrain.haunted { --pad-x: calc(var(--u) * 10); }
+}
+/* It's a party: no night-time dimming on this page, and messages show in
+   their own column rather than a bar. */
+.mirror-page.is-dim:has(.haunted) { opacity: 1; }
+.mirror-page:has(.haunted) > .message { display: none; }
+.terrain.haunted > :not(.h-flash):not(.h-flourish):not(.h-grounds) { position: relative; z-index: 1; }
+
+.h-top { display: flex; flex-direction: column; gap: calc(var(--u) * 2); }
+.h-meta { display: flex; justify-content: space-between; align-items: baseline; gap: calc(var(--u) * 3); }
+.terrain.haunted .t-date { font-style: italic; letter-spacing: 0.01em; }
+.h-mark {
+  display: inline-flex; align-items: center; gap: calc(var(--u) * 1.2);
+  font-family: 'UnifrakturMaguntia', 'IM Fell English', serif;
+  font-size: calc(var(--u) * 3.6); color: var(--clay); white-space: nowrap;
+  text-shadow: 0 0 calc(var(--u) * 2) rgba(232, 129, 47, 0.45);
+}
+.h-mark svg { width: 0.85em; height: 0.85em; }
+.h-headline {
+  font-family: 'IM Fell English', Georgia, serif; font-weight: 400;
+  font-size: calc(var(--u) * 6.6); line-height: 1.04; margin: 0; max-width: 34ch;
+  text-shadow: 0 0 calc(var(--u) * 3) rgba(232, 160, 80, 0.18);
+  animation: h-candle 7s ease-in-out infinite;
+}
+/* A candle's slow unsteadiness in the headline's glow. */
+@keyframes h-candle {
+  0%, 100% { text-shadow: 0 0 calc(var(--u) * 3) rgba(232, 160, 80, 0.18); }
+  40% { text-shadow: 0 0 calc(var(--u) * 3.6) rgba(232, 160, 80, 0.26); }
+  55% { text-shadow: 0 0 calc(var(--u) * 2.4) rgba(232, 160, 80, 0.12); }
+}
+
+.h-middle {
+  flex: 1; min-height: 0; overflow: hidden; display: grid;
+  column-gap: calc(var(--u) * 5); padding-top: calc(var(--u) * 1);
+  /* keep the words above the hill and the house */
+  padding-bottom: calc(100vw / 6 * 0.55);
+}
+.terrain.haunted .t-heading { font-family: 'IM Fell English', Georgia, serif; font-weight: 400; font-style: italic; font-size: calc(var(--u) * 3); color: var(--ink-soft); }
+.terrain.haunted .t-list, .terrain.haunted .t-transit { font-family: 'Figtree Variable', -apple-system, sans-serif; }
+.h-side { border-left: 1px solid var(--hairline); padding-left: calc(var(--u) * 5); display: flex; flex-direction: column; gap: calc(var(--u) * 4); min-width: 0; }
+
+/* The transit widget's heading, in the house's words. */
+.terrain.haunted .t-transit .t-heading { font-size: 0; }
+.terrain.haunted .t-transit .t-heading::after { content: 'The last trains home'; font-size: calc(var(--u) * 3); }
+
+.h-moonrow { display: flex; align-items: center; gap: calc(var(--u) * 2.4); }
+.h-moon { width: calc(var(--u) * 13); height: calc(var(--u) * 13); flex: none; overflow: visible; }
+.h-moon-halo { fill: url(#h-halo); }
+.h-moon-dark { fill: #1C1722; stroke: #2E2636; stroke-width: 1; }
+.h-moon-lit { fill: #E9E2CF; }
+.h-moon-name { font-family: 'IM Fell English', Georgia, serif; font-size: calc(var(--u) * 3.4); line-height: 1.1; }
+.h-countdown { margin-top: calc(var(--u) * 2); display: flex; flex-direction: column; gap: calc(var(--u) * 0.6); }
+.h-count { font-family: 'IM Fell English', Georgia, serif; font-size: calc(var(--u) * 6.4); line-height: 1; font-variant-numeric: tabular-nums; color: var(--clay); }
+.terrain.haunted .k-song, .terrain.haunted .k-count, .h-words { font-family: 'IM Fell English', Georgia, serif; }
+.h-words { font-size: calc(var(--u) * 4.4); line-height: 1.15; }
+.terrain.haunted .k-count { color: var(--clay); }
+
+/* Gilt scrollwork in the four corners. */
+.h-flourish { position: absolute; width: calc(var(--u) * 10); height: calc(var(--u) * 10); z-index: 0; pointer-events: none; }
+.h-flourish path { fill: none; stroke: var(--gilt); stroke-width: 1.6; stroke-linecap: round; opacity: 0.7; }
+.h-flourish .is-fill { fill: var(--gilt); stroke: none; opacity: 0.7; }
+.h-flourish.is-tl { left: calc(var(--u) * 1); top: calc(var(--u) * 1); transform: rotate(90deg); }
+.h-flourish.is-tr { right: calc(var(--u) * 1); top: calc(var(--u) * 1); transform: rotate(180deg); }
+.h-flourish.is-bl { left: calc(var(--u) * 1); bottom: calc(var(--u) * 1); }
+.h-flourish.is-br { right: calc(var(--u) * 1); bottom: calc(var(--u) * 1); transform: scaleX(-1); }
+
+/* The grounds along the bottom. */
+/* Drawn behind the bottom of the columns: its upper part is open sky. */
+.h-grounds { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: auto; aspect-ratio: 6; display: block; z-index: 0; pointer-events: none; }
+.h-hill, .h-house, .h-tree path, .h-stone, .h-fence, .h-bat { fill: #050307; }
+.h-branch { fill: none !important; stroke: #050307; stroke-width: 3; stroke-linecap: round; }
+.h-win { fill: #F0A63E; animation: h-flicker 3.2s steps(1) infinite; }
+.h-win.is-slow { animation-duration: 5.3s; animation-delay: -1.7s; }
+.h-win.is-dark { fill: #120D10; animation: none; }
+.h-win.is-door { fill: #B8692A; animation-duration: 4.1s; }
+@keyframes h-flicker {
+  0%, 100% { opacity: 0.95; }
+  12% { opacity: 0.7; }
+  14% { opacity: 0.92; }
+  47% { opacity: 0.82; }
+  63% { opacity: 1; }
+  80% { opacity: 0.76; }
+}
+.h-houseglow { animation: h-glow 6s ease-in-out infinite alternate; }
+@keyframes h-glow { from { opacity: 0.55; } to { opacity: 0.85; } }
+.h-bat { animation: h-bat 42s linear infinite; }
+@keyframes h-bat {
+  0% { transform: translate(-400px, 30px); }
+  25% { transform: translate(-100px, 0); }
+  50% { transform: translate(200px, 20px); }
+  75% { transform: translate(500px, -6px); }
+  100% { transform: translate(800px, 26px); }
+}
+
+/* Lightning: the sky behind the grounds lights, a bolt comes down, and
+   the whole room flashes twice, softly. */
+.h-bolt { fill: none; stroke: #F4F2FF; stroke-width: 3; stroke-linejoin: bevel; opacity: 0; filter: drop-shadow(0 0 6px #C9CFFF); animation: h-bolt 1.4s ease-out; }
+.h-flash { position: absolute; inset: 0; z-index: 2; pointer-events: none; background: radial-gradient(ellipse 90% 80% at 50% 90%, rgba(205, 212, 255, 0.55), rgba(160, 170, 230, 0.16) 75%); opacity: 0; animation: h-flash 1.4s ease-out; }
+@keyframes h-flash {
+  0% { opacity: 0; }
+  4% { opacity: 0.45; }
+  9% { opacity: 0.05; }
+  15% { opacity: 0.3; }
+  40% { opacity: 0.05; }
+  100% { opacity: 0; }
+}
+@keyframes h-bolt {
+  0% { opacity: 0; }
+  4% { opacity: 1; }
+  9% { opacity: 0.1; }
+  15% { opacity: 1; }
+  30% { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+/* Portrait: one column, the grounds at the foot. */
+@media (orientation: portrait) {
+  .h-meta { flex-direction: column-reverse; align-items: flex-start; gap: calc(var(--u) * 1.5); }
+  .h-middle { display: flex; flex-direction: column; gap: calc(var(--u) * 5); }
+  .h-side { border-left: 0; padding-left: 0; }
+}

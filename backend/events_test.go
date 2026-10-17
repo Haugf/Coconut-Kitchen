@@ -1,6 +1,7 @@
 package main
 
 import (
+	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
@@ -46,5 +47,28 @@ func TestFromLoopback(t *testing.T) {
 		if got := fromLoopback(r); got != want {
 			t.Errorf("%s: got %v, want %v", addr, got, want)
 		}
+	}
+}
+
+func TestCalendarPrivateDuringParty(t *testing.T) {
+	ok := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(http.StatusOK) })
+	cfg := &Config{Style: "haunted"}
+	h := partyPrivate(cfg, ok)
+	for addr, want := range map[string]int{"192.168.68.20:5000": http.StatusForbidden, "127.0.0.1:5000": http.StatusOK} {
+		r := httptest.NewRequest("GET", "/api/calendar", nil)
+		r.RemoteAddr = addr
+		rec := httptest.NewRecorder()
+		h.ServeHTTP(rec, r)
+		if rec.Code != want {
+			t.Errorf("%s during the party: %d, want %d", addr, rec.Code, want)
+		}
+	}
+	cfg.Style = "kitchen"
+	r := httptest.NewRequest("GET", "/api/calendar", nil)
+	r.RemoteAddr = "192.168.68.20:5000"
+	rec := httptest.NewRecorder()
+	h.ServeHTTP(rec, r)
+	if rec.Code != http.StatusOK {
+		t.Errorf("kitchen style from the network: %d", rec.Code)
 	}
 }

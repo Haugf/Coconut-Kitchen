@@ -17,7 +17,7 @@ mirror sleep never       keep the screen on all night
 mirror say "text" [min]  put a message on the screen (default 10 minutes)
 mirror home "address"    centre the minimap on this address
 mirror style             show which page style is on
-mirror style terrain     switch to the first design (or: kitchen)
+mirror style terrain     switch to the first design (or: kitchen, haunted)
 mirror pin               is there a PIN for the phone settings page?
 mirror pin ABCD          set it (letters or numbers, case doesn't matter)
 mirror google            show your Google speaker's timers (one-time sign-in)
@@ -122,12 +122,12 @@ case "$cmd" in
   style)
     if [ $# -eq 0 ]; then
       python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("style") or "kitchen")' "$CONFIG"
-    elif [ "$1" = "kitchen" ] || [ "$1" = "terrain" ]; then
+    elif [ "$1" = "kitchen" ] || [ "$1" = "terrain" ] || [ "$1" = "haunted" ]; then
       edit_config 'c["style"] = sys.argv[1]' "$1"
       echo "Switching to $1. The screen changes within a minute."
       restart
     else
-      echo "Usage: mirror style kitchen   or   mirror style terrain" >&2
+      echo "Usage: mirror style kitchen   (or terrain, or haunted for a party)" >&2
       exit 1
     fi
     ;;

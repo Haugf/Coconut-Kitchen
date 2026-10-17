@@ -27,7 +27,10 @@ export default function App() {
   if (scene.widgets.includes('page') && !style.data && !style.error) {
     return <main className="mirror-page" data-scene={scene.name} />
   }
-  const chosen = registry[style.data?.style ?? '']
+  // ?style=haunted in the address previews another page on this screen
+  // only (a laptop, say) without changing the mirror.
+  const preview = new URLSearchParams(window.location.search).get('style')
+  const chosen = registry[preview ?? style.data?.style ?? '']
   const pick = (id: string) => (id === 'page' ? (chosen?.size === 'page' ? chosen : registry.kitchen) : registry[id])
 
   // A page widget owns the whole screen.
