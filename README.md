@@ -152,7 +152,7 @@ gantt
 
 The first design, **Terrain** (the day as a ridge in a top band, with three acts), is still there. Switch with `mirror style terrain` and `mirror style kitchen`; the screen follows within a minute.
 
-For parties there's **the Haunted Coconut** (`mirror style haunted`): a dark, ornate room with gilt corners, the moon's phase, a countdown to midnight, what the speaker is playing, timers, the last trains home, and a haunted house on its hill along the bottom, with soft lightning every 20 to 60 seconds (`?calm` in the address turns it off). It never shows the calendar, and while it's on, the calendar's address on the mirror answers only the Pi itself, so guests on the Wi-Fi see nothing about anyone's week. `?style=haunted` previews it on a laptop without changing the mirror.
+For parties there's **the Haunted Coconut** (`mirror style haunted`): a starry night sky with gilt corners, the moon's phase, a countdown to midnight, what the speaker is playing, timers, the last trains home, and a small church on its hill along the bottom, with soft lightning every 20 to 60 seconds (`?calm` in the address turns it off). It never shows the calendar, and while it's on, the calendar's address on the mirror answers only the Pi itself, so guests on the Wi-Fi see nothing about anyone's week. `?style=haunted` previews it on a laptop without changing the mirror.
 
 ## Settings from your phone
 
