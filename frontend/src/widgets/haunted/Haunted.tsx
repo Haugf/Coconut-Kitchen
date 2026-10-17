@@ -14,6 +14,7 @@ import { Timers, useTimers } from '../kitchen/Timers'
 import { rainAmount } from '../kitchen/rain'
 import { moonOn, moonPath, minutesToMidnight, hauntedLine } from './night'
 import { Grounds } from './Grounds'
+import { Stars } from './Stars'
 import '../terrain/terrain.css'
 import './haunted.css'
 
@@ -111,6 +112,7 @@ export function Haunted() {
 
   return (
     <div className="terrain haunted">
+      <Stars />
       <Flourish corner="tl" />
       <Flourish corner="tr" />
       <Flourish corner="bl" />

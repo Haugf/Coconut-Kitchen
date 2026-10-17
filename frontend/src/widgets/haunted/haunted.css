@@ -1,6 +1,6 @@
 /*
-  The Haunted Coconut: a dark, ornate room for a Halloween party. Near-
-  black plum walls with a faint damask, gilt scrollwork in the corners,
+  The Haunted Coconut: a dark, ornate page for a Halloween party. A
+  starry night sky, gilt scrollwork in the corners,
   parchment ink, pumpkin as the accent, and a spectral violet for the
   moon. Lightning flashes are two soft pulses, at most every 20 seconds.
 */
@@ -26,11 +26,8 @@
   font-family: 'IM Fell English', Georgia, serif;
   padding: calc(var(--u) * 6) var(--pad-x) 0;
   gap: calc(var(--u) * 3);
-  background:
-    radial-gradient(ellipse 70% 60% at 50% 40%, rgba(122, 70, 40, 0.16), transparent 70%),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='160' viewBox='0 0 120 160'%3E%3Cg fill='%23A07E45' fill-opacity='0.055'%3E%3Cpath d='M60 18C66 38 80 42 80 58C80 70 70 74 64 68C68 82 66 94 60 102C54 94 52 82 56 68C50 74 40 70 40 58C40 42 54 38 60 18Z'/%3E%3Cpath d='M60 102C70 112 86 110 90 98C84 104 72 104 60 102ZM60 102C50 112 34 110 30 98C36 104 48 104 60 102Z'/%3E%3Cpath d='M0 138l6-8 6 8-6 8zM120 138l-6-8-6 8 6 8z M54 138l6-8 6 8-6 8z'/%3E%3C/g%3E%3C/svg%3E"),
-    var(--bg);
-  background-size: auto, 120px 160px, auto;
+  /* the starry sky is drawn by Stars.tsx behind everything */
+  background: #05040B;
 }
 @media (orientation: landscape) {
   .terrain.haunted { --pad-x: calc(var(--u) * 10); }
@@ -39,7 +36,10 @@
    their own column rather than a bar. */
 .mirror-page.is-dim:has(.haunted) { opacity: 1; }
 .mirror-page:has(.haunted) > .message { display: none; }
-.terrain.haunted > :not(.h-flash):not(.h-flourish):not(.h-grounds) { position: relative; z-index: 1; }
+.terrain.haunted > :not(.h-flash):not(.h-flourish):not(.h-grounds):not(.h-stars) { position: relative; z-index: 1; }
+.h-stars { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+.h-twinkle { animation: h-twinkle 4.5s ease-in-out infinite; }
+@keyframes h-twinkle { 0%, 100% { opacity: 0.9; } 50% { opacity: 0.2; } }
 
 .h-top { display: flex; flex-direction: column; gap: calc(var(--u) * 2); }
 .h-meta { display: flex; justify-content: space-between; align-items: baseline; gap: calc(var(--u) * 3); }
