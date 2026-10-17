@@ -1,6 +1,6 @@
 /*
-  The bottom of the haunted page: the house on its hill, bare trees, a
-  few graves and an iron fence, all in silhouette. The windows flicker
+  The bottom of the haunted page: a small church on its hill, bare trees,
+  a few graves and an iron fence, all in silhouette. The windows flicker
   like candles; bats drift across; when lightning strikes, a bolt comes
   down behind them while the room flashes.
 */
@@ -60,27 +60,28 @@ export function Grounds({ flash }: { flash: number }) {
 
       <path className="h-hill" d="M0 200 L0 168 C150 150 300 175 450 162 C600 150 700 158 800 150 C950 140 1050 160 1200 152 L1200 200 Z" />
 
-      {/* the house, under the train times where the columns end early */}
+      {/* a small church, under the train times where the columns end early */}
       <g transform="translate(-120 0)">
-      <circle cx="850" cy="110" r="90" fill="url(#h-glow)" className="h-houseglow" />
-      <g className="h-house">
-        <rect x="780" y="82" width="160" height="72" />
-        <polygon points="770,84 860,32 950,84" />
-        <rect x="738" y="52" width="52" height="102" />
-        <polygon points="732,54 764,0 796,54" />
-        <rect x="904" y="40" width="14" height="34" />
-        <polygon points="838,124 861,108 884,124" />
-      </g>
-      <g className="h-windows">
-        <path className="h-win" d="M755 92 v-14 a9 9 0 0 1 18 0 v14 Z" />
-        <rect className="h-win is-dark" x="755" y="106" width="18" height="22" />
-        <rect className="h-win" x="796" y="94" width="20" height="26" />
-        <rect className="h-win is-slow" x="826" y="94" width="20" height="26" />
-        <rect className="h-win is-dark" x="876" y="94" width="20" height="26" />
-        <rect className="h-win is-slow" x="908" y="94" width="20" height="26" />
-        <circle className="h-win" cx="860" cy="64" r="8" />
-        <path className="h-win is-door" d="M852 154 v-20 a9 9 0 0 1 18 0 v20 Z" />
-      </g>
+        <circle cx="850" cy="112" r="90" fill="url(#h-glow)" className="h-houseglow" />
+        <g className="h-house">
+          {/* the nave and its roof */}
+          <rect x="800" y="94" width="140" height="60" />
+          <polygon points="792,96 870,56 948,96" />
+          {/* the bell tower, its spire and cross */}
+          <rect x="752" y="72" width="48" height="82" />
+          <polygon points="746,74 776,20 806,74" />
+          <rect x="774" y="4" width="4" height="20" />
+          <rect x="768" y="9" width="16" height="4" />
+        </g>
+        <g className="h-windows">
+          <path className="h-win is-dark" d="M768 100 v-12 a8 8 0 0 1 16 0 v12 Z" />
+          <path className="h-win is-door" d="M766 154 v-18 a10 10 0 0 1 20 0 v18 Z" />
+          <path className="h-win" d="M820 138 v-22 a7 7 0 0 1 14 0 v22 Z" />
+          <path className="h-win is-slow" d="M853 138 v-22 a7 7 0 0 1 14 0 v22 Z" />
+          <path className="h-win" d="M886 138 v-22 a7 7 0 0 1 14 0 v22 Z" />
+          <path className="h-win is-slow" d="M916 138 v-22 a7 7 0 0 1 14 0 v22 Z" />
+          <circle className="h-win" cx="870" cy="80" r="7" />
+        </g>
       </g>
 
       <Tree x={118} y={168} s={1.15} />
