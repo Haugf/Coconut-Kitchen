@@ -5,7 +5,8 @@ import './settings.css'
 
 /*
   The phone page at /settings. Anyone on the home Wi-Fi can put a message
-  on the mirror, fix a calendar link, pick the style or switch the screen.
+  on the mirror, fix a calendar link, pick the style, summon a visitor to the
+  haunted page, or switch the screen.
   The server only answers on the home network and never sends a calendar's
   secret address back, just its host.
 */
@@ -312,6 +313,33 @@ export default function Settings() {
           ))}
         </div>
       </section>
+
+      {data.style === 'haunted' && (
+        <section className="s-section" aria-labelledby="visitors">
+          <h2 id="visitors">Visitors</h2>
+          <div className="s-chips">
+            {[
+              ['zombie', 'Zombie'],
+              ['balloon', 'Red balloon'],
+              ['cat', 'Black cat'],
+              ['crow', 'Crow'],
+              ['witch', 'Witch'],
+              ['hand', 'Hand'],
+            ].map(([id, label]) => (
+              <button
+                type="button"
+                key={id}
+                className="s-chip"
+                disabled={busy}
+                onClick={() => void post('/api/settings/summon', { visitor: id }, `${label} on the way.`)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          <p className="s-soft">Sends one across the grounds right now.</p>
+        </section>
+      )}
 
       <section className="s-section" aria-labelledby="screen">
         <h2 id="screen">Screen</h2>
