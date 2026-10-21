@@ -98,7 +98,7 @@ update.sh   the every-minute check: origin/main vs ~/mirror/.installed
 | `GET /api/status` | health summary (counts only) |
 | `GET /api/settings` | the phone settings page's view: people with link hosts and event counts, style, sleep (never a full calendar address) |
 | `POST /api/settings/unlock`, `/lock` | the PIN: sets or clears a cookie (30 days). Without it every other settings route answers 401 |
-| `POST /api/settings/{calendar,style,sleep,say,screen}` | changes from the settings page; home network and PIN. The first three rewrite config.json and restart the server |
+| `POST /api/settings/{calendar,style,sleep,say,screen,summon}` | changes from the settings page; home network and PIN. The first three rewrite config.json and restart the server; `summon` sends a visitor across the haunted page as a `summon` event on `/api/events` |
 | `POST /api/heartbeat` | the page checks in every minute |
 | `GET/POST /api/events` | live text messages over SSE |
 

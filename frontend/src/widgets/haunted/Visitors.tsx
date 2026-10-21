@@ -15,7 +15,8 @@ import { useEffect, useState } from 'react'
              the hill, rarer, and more likely late at night
 
   ?visitor=zombie (or any name) in the address sends only that one,
-  again and again, for a look.
+  again and again, for a look. The phone settings page can summon any
+  of them on demand (POST /api/settings/summon).
 */
 
 export type Visitor = 'zombie' | 'cat' | 'crow' | 'witch' | 'hand' | 'balloon'
@@ -51,27 +52,62 @@ function pick(now: Date, last: Visitor | null): Visitor {
   return options[0][0]
 }
 
-/** The visitor out on the grounds right now, if any. */
+/**
+ * The visitor out on the grounds right now, if any. One comes every
+ * minute or two on its own; a visitor summoned from the phone settings
+ * page (a "summon" event on /api/events) arrives at once, cutting off
+ * whoever was there.
+ */
 export function useVisitor(): Visitor | null {
   const [visitor, setVisitor] = useState<Visitor | null>(null)
   useEffect(() => {
     const forced = new URLSearchParams(window.location.search).get('visitor') as Visitor | null
     const only = forced && forced in STAY ? forced : null
     let timer = 0
+    let frame = 0
     let last: Visitor | null = null
     const quiet = (wait: number) => {
+      window.clearTimeout(timer)
+      timer = window.setTimeout(() => show(only ?? pick(new Date(), last)), wait)
+    }
+    const show = (v: Visitor) => {
+      window.clearTimeout(timer)
+      last = v
+      // clear first, so the same visitor twice in a row starts over
+      setVisitor(null)
+      frame = requestAnimationFrame(() => setVisitor(v))
       timer = window.setTimeout(() => {
-        const v = only ?? pick(new Date(), last)
-        last = v
-        setVisitor(v)
-        timer = window.setTimeout(() => {
-          setVisitor(null)
-          quiet(only ? 3000 : 60000 + Math.random() * 90000)
-        }, STAY[v])
-      }, wait)
+        setVisitor(null)
+        quiet(only ? 3000 : 60000 + Math.random() * 90000)
+      }, STAY[v])
     }
     quiet(only ? 1000 : 25000)
-    return () => window.clearTimeout(timer)
+
+    let source: EventSource | null = null
+    const onSummon = (e: MessageEvent) => {
+      try {
+        const v = (JSON.parse(e.data) as { text: string }).text as Visitor
+        if (v in STAY) show(v)
+      } catch {
+        /* ignore malformed events */
+      }
+    }
+    const connect = () => {
+      source?.close()
+      source = new EventSource('/api/events')
+      source.addEventListener('summon', onSummon)
+    }
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') connect()
+    }
+    connect()
+    document.addEventListener('visibilitychange', onVisible)
+    return () => {
+      window.clearTimeout(timer)
+      cancelAnimationFrame(frame)
+      document.removeEventListener('visibilitychange', onVisible)
+      source?.close()
+    }
   }, [])
   return visitor
 }
