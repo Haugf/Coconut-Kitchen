@@ -36,7 +36,7 @@
    their own column rather than a bar. */
 .mirror-page.is-dim:has(.haunted) { opacity: 1; }
 .mirror-page:has(.haunted) > .message { display: none; }
-.terrain.haunted > :not(.h-flash):not(.h-flourish):not(.h-grounds):not(.h-stars) { position: relative; z-index: 1; }
+.terrain.haunted > :not(.h-flash):not(.h-flourish):not(.h-grounds):not(.h-stars):not(.hv-sky) { position: relative; z-index: 1; }
 .h-stars { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
 .h-twinkle { animation: h-twinkle 4.5s ease-in-out infinite; }
 @keyframes h-twinkle { 0%, 100% { opacity: 0.9; } 50% { opacity: 0.2; } }
@@ -126,6 +126,114 @@
   75% { transform: translate(500px, -6px); }
   100% { transform: translate(800px, 26px); }
 }
+
+/* Visitors (Visitors.tsx): one at a time, all silhouettes but the
+   balloon. Paths are in the grounds' 1200x200 units. */
+.hv-path, .hv-path path, .hv-hand path { fill: #050307; }
+.hv-thin { fill: none !important; stroke: #050307; stroke-width: 1.2; stroke-linecap: round; }
+.hv-leg, .hv-tail, .hv-wave, .hv-wing, .hv-head, .hv-arms, .hv-cloak { transform-box: fill-box; }
+.hv-leg { transform-origin: 50% 0; }
+
+/* The zombie: a slow shamble with a limp, a stop by the church to look
+   at you (two dim green eyes), then on he goes. */
+.hv-zombie-path { animation: hv-zombie-path 48s linear forwards; }
+@keyframes hv-zombie-path {
+  0% { transform: translate(-40px, 169px); }
+  15% { transform: translate(190px, 166px); }
+  30% { transform: translate(410px, 163px); }
+  45% { transform: translate(625px, 157px); }
+  61%, 78% { transform: translate(900px, 150px); }
+  89% { transform: translate(1070px, 150px); }
+  100% { transform: translate(1250px, 153px); }
+}
+.hv-zombie .hv-leg.is-front { animation: hv-step 1.8s ease-in-out infinite; }
+.hv-zombie .hv-leg.is-back { animation: hv-step 1.8s ease-in-out -0.9s infinite; }
+.hv-zombie .hv-limp { animation: hv-limp 0.9s ease-in-out infinite; }
+@keyframes hv-step { 0%, 100% { transform: rotate(-16deg); } 50% { transform: rotate(14deg); } }
+@keyframes hv-limp { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-0.8px); } }
+.hv-zombie.is-looking .hv-leg, .hv-zombie.is-looking .hv-limp { animation-play-state: paused; }
+.hv-head { transform-origin: 20% 90%; }
+.hv-arms { transform-origin: 0% 20%; }
+.hv-zombie.is-looking .hv-head { animation: hv-look 8s ease-in-out forwards; }
+.hv-zombie.is-looking .hv-arms { animation: hv-droop 8s ease-in-out forwards; }
+@keyframes hv-look { 0% { transform: rotate(0); } 20%, 80% { transform: rotate(-14deg); } 100% { transform: rotate(0); } }
+@keyframes hv-droop { 0% { transform: rotate(0); } 25%, 70% { transform: rotate(18deg); } 100% { transform: rotate(0); } }
+.hv-path .hv-eye { fill: #B6F07A; opacity: 0; }
+.hv-zombie.is-looking .hv-eye { animation: hv-eyes 8s ease-in-out forwards; }
+@keyframes hv-eyes { 0%, 15% { opacity: 0; } 30%, 75% { opacity: 0.9; } 90%, 100% { opacity: 0; } }
+
+/* The cat trots in from the right, sits at the end of the hill with its
+   tail going, then trots off. */
+.hv-cat-path { animation: hv-cat-path 38s linear forwards; }
+@keyframes hv-cat-path {
+  0% { transform: translate(1240px, 153px); }
+  20% { transform: translate(870px, 149px); }
+  40% { transform: translate(560px, 158px); }
+  52.6%, 89.5% { transform: translate(168px, 166px); }
+  100% { transform: translate(-40px, 169px); }
+}
+.hv-cat { transform: scale(-1.3, 1.3); }
+.hv-cat .hv-leg.is-front { animation: hv-trot 0.5s ease-in-out infinite; }
+.hv-cat .hv-leg.is-back { animation: hv-trot 0.5s ease-in-out -0.25s infinite; }
+@keyframes hv-trot { 0%, 100% { transform: rotate(-22deg); } 50% { transform: rotate(22deg); } }
+.hv-tail { transform-origin: 0% 90%; }
+.hv-tail.is-swish { animation: hv-swish 2.6s ease-in-out infinite; }
+@keyframes hv-swish { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-24deg); } }
+
+/* The crow lands on a grave's cross, hops twice, and goes. */
+.hv-crow-path { animation: hv-crow-path 24s ease-in-out forwards; }
+@keyframes hv-crow-path {
+  0% { transform: translate(-30px, 30px); }
+  20%, 80% { transform: translate(240px, 138px); }
+  100% { transform: translate(760px, -30px); }
+}
+.hv-hop { animation: hv-hop 14.4s linear forwards; }
+@keyframes hv-hop {
+  0%, 30% { transform: translate(0, 0); }
+  32% { transform: translate(0, -4px); }
+  34%, 55% { transform: translate(0, 0) scaleX(1); }
+  57% { transform: translate(0, -4px) scaleX(-1); }
+  59%, 100% { transform: translate(0, 0) scaleX(-1); }
+}
+.hv-wing { transform-origin: 100% 100%; animation: hv-flap 0.36s ease-in-out infinite; }
+@keyframes hv-flap { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(-0.7); } }
+
+/* The witch crosses low, right to left, her cloak streaming. */
+.hv-witch-path { animation: hv-witch-path 22s linear forwards; }
+@keyframes hv-witch-path {
+  0% { transform: translate(1260px, 46px); }
+  50% { transform: translate(600px, 28px); }
+  100% { transform: translate(-60px, 52px); }
+}
+.hv-witch { animation: hv-ride 2.4s ease-in-out infinite; }
+@keyframes hv-ride { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-3px) rotate(-2deg); } }
+.hv-cloak { transform-origin: 0% 50%; animation: hv-cloak 0.8s ease-in-out infinite; }
+@keyframes hv-cloak { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(0.75); } }
+
+/* A hand rises from the soil between the graves, waves, and sinks. */
+.hv-hand-spot { transform: translate(306px, 167px) scale(1.3); }
+.hv-hand { animation: hv-hand 14s ease-in-out forwards; }
+@keyframes hv-hand {
+  0% { transform: translateY(32px); }
+  20%, 78% { transform: translateY(0); }
+  100% { transform: translateY(32px); }
+}
+.hv-wave { transform-origin: 50% 100%; animation: hv-wave 1.4s ease-in-out 3s 5; }
+@keyframes hv-wave { 0%, 100% { transform: rotate(0); } 30% { transform: rotate(-14deg); } 70% { transform: rotate(12deg); } }
+
+/* The red balloon, the only colour among the visitors: up out of the
+   hill, a pause to hover, then away over the top of the page. */
+.hv-sky { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+.hv-rise { animation: hv-rise 60s linear forwards; }
+@keyframes hv-rise {
+  0% { transform: translateY(0); }
+  35% { transform: translateY(-400px); }
+  50% { transform: translateY(-430px); }
+  100% { transform: translateY(-960px); }
+}
+.hv-sway { animation: hv-sway 7s ease-in-out infinite alternate; }
+@keyframes hv-sway { from { transform: translateX(-14px) rotate(-4deg); } to { transform: translateX(14px) rotate(4deg); } }
+.hv-string { fill: none; stroke: #CFC4AE; stroke-width: 0.8; opacity: 0.45; }
 
 /* Lightning: the sky behind the grounds lights, a bolt comes down, and
    the whole room flashes twice, softly. */
