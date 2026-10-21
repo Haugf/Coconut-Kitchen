@@ -15,6 +15,7 @@ import { rainAmount } from '../kitchen/rain'
 import { moonOn, moonPath, minutesToMidnight, hauntedLine } from './night'
 import { Grounds } from './Grounds'
 import { Stars } from './Stars'
+import { Sky, useVisitor } from './Visitors'
 import '../terrain/terrain.css'
 import './haunted.css'
 
@@ -99,6 +100,7 @@ export function Haunted() {
   const timers = useTimers()
   const calm = new URLSearchParams(window.location.search).has('calm')
   const strikes = useLightning(!calm)
+  const visitor = useVisitor()
   const moon = moonOn(now)
   const raining = rainAmount(wx.data?.code) > 0
 
@@ -113,6 +115,7 @@ export function Haunted() {
   return (
     <div className="terrain haunted">
       <Stars />
+      <Sky visitor={visitor} />
       <Flourish corner="tl" />
       <Flourish corner="tr" />
       <Flourish corner="bl" />
@@ -166,7 +169,7 @@ export function Haunted() {
         ))}
       </div>
 
-      <Grounds flash={strikes} />
+      <Grounds flash={strikes} visitor={visitor} />
       {strikes > 0 && <div key={strikes} className="h-flash" aria-hidden="true" />}
     </div>
   )

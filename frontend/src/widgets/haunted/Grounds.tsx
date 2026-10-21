@@ -1,7 +1,9 @@
+import { OnTheGrounds, type Visitor } from './Visitors'
+
 /*
   The bottom of the haunted page: a small church on its hill, bare trees,
   a few graves and an iron fence, all in silhouette. The windows flicker
-  like candles; bats drift across; when lightning strikes, a bolt comes
+  like candles; bats drift across, and now and then a visitor (Visitors.tsx); when lightning strikes, a bolt comes
   down behind them while the room flashes.
 */
 
@@ -36,7 +38,7 @@ function Bat({ x, y, delay }: { x: number; y: number; delay: number }) {
   )
 }
 
-export function Grounds({ flash }: { flash: number }) {
+export function Grounds({ flash, visitor }: { flash: number; visitor: Visitor | null }) {
   // Each strike lands somewhere different.
   const bx = 240 + ((flash * 337) % 700)
   return (
@@ -95,6 +97,8 @@ export function Grounds({ flash }: { flash: number }) {
       <Grave x={392} y={164} w={14} h={28} />
       <Grave x={418} y={163} w={10} h={24} cross />
       </g>
+
+      <OnTheGrounds visitor={visitor} />
 
       <g className="h-fence" transform="translate(-122 0)">
         <rect x="452" y="140" width="282" height="2.5" />
