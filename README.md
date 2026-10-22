@@ -167,6 +167,10 @@ It's locked with a PIN that lives only in `config.json` on the Pi, never in this
 
 Saving a change rewrites `config.json`, keeping everything else in it, and restarts the server, so the screen catches up within a few seconds. The page only answers on the home network.
 
+### iPhone app and widgets
+
+`ios/` holds a small iPhone app with a Today widget (the mirror's headline and day line on your Home and Lock Screen) and a Send to Mirror widget (one tap puts "Dinner's ready" on the screen). It uses the same API, on the home Wi-Fi. See [ios/README.md](ios/README.md) to build it.
+
 ## Widgets
 
 Everything beside Today is a widget: a folder in `frontend/src/widgets/` with a `widget.json`, found automatically. Each widget declares its settings and the web addresses it reads; the Pi fetches and caches those, so a widget never needs its own server. Choose which ones show, and in what order, with the `widgets` list in `config.json`.

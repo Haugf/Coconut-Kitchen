@@ -75,6 +75,7 @@ frontend/   Vite + React + TypeScript
   src/widgets/loader.tsx finds widget folders; hides a widget that crashes
   scripts/               new-widget.mjs, check-widgets.mjs
   dist/                  committed build the Pi serves
+ios/        the iPhone app and widgets (SwiftUI, built on Fred's Mac; see ios/README.md)
 deploy/     setup-pi.sh (one-time, needs sudo), mirror-status.sh, status reporting
 install.sh  builds and installs on the Pi (runs on every update)
 update.sh   the every-minute check: origin/main vs ~/mirror/.installed
@@ -103,6 +104,10 @@ update.sh   the every-minute check: origin/main vs ~/mirror/.installed
 | `GET/POST /api/events` | live text messages over SSE |
 
 ## Checks before you commit
+
+Changes under `ios/` can't be built in a Linux sandbox; say so in the pull
+request and keep `ios/Shared/Day.swift` in step with `terrain/day.ts`,
+`shape.ts` and `voice.ts`.
 
 ```
 cd backend && go vet ./... && go test ./...
