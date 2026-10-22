@@ -152,6 +152,8 @@ clips or overlaps, in both palettes.
 - Young Serif for the headline, the mark and messages; Figtree for
   everything else.
 - An observational voice ("A climb to Dinner at 7, then the day opens up.").
+- Ally draws for the mirror. When art comes from Ally, follow
+  docs/drawing-for-the-mirror.md and credit them in the commit.
 
 Transit colors are the MTA's: M `#FF6319`, L `#A7A9AC`, buses `#2F6BFF`.
 Keep things minimal; Fred has said more than once not to over-engineer it.

@@ -341,7 +341,7 @@ func (s *settingsAPI) say(w http.ResponseWriter, r *http.Request) {
 
 // visitors are who can be sent across the haunted page's grounds; the
 // same names as frontend/src/widgets/haunted/Visitors.tsx.
-var visitors = map[string]bool{"zombie": true, "cat": true, "crow": true, "witch": true, "hand": true, "balloon": true}
+var visitors = map[string]bool{"zombie": true, "cat": true, "crow": true, "witch": true, "hand": true, "balloon": true, "bats": true}
 
 // summon sends a visitor across the haunted page right now.
 func (s *settingsAPI) summon(w http.ResponseWriter, r *http.Request) {

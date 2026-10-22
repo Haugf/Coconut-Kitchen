@@ -325,6 +325,7 @@ export default function Settings() {
               ['crow', 'Crow'],
               ['witch', 'Witch'],
               ['hand', 'Hand'],
+              ['bats', 'Bats'],
             ].map(([id, label]) => (
               <button
                 type="button"

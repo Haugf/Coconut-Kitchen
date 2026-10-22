@@ -217,10 +217,10 @@ func TestSettingsSummon(t *testing.T) {
 	s.cfg.Style = "haunted"
 	ch := make(chan Message, 1)
 	s.hub.subs[ch] = struct{}{}
-	if w := call(mux, "POST", "/api/settings/summon", `{"visitor":"zombie"}`, "127.0.0.1:1"); w.Code != http.StatusOK {
+	if w := call(mux, "POST", "/api/settings/summon", `{"visitor":"bats"}`, "127.0.0.1:1"); w.Code != http.StatusOK {
 		t.Fatalf("haunted: got %d", w.Code)
 	}
-	if m := <-ch; m.Event != "summon" || m.Text != "zombie" {
+	if m := <-ch; m.Event != "summon" || m.Text != "bats" {
 		t.Fatalf("sent %+v", m)
 	}
 	if _, kept := s.hub.current(s.hub.last.At); kept {
