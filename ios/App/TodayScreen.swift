@@ -46,6 +46,8 @@ struct TodayScreen: View {
                               people: people,
                               empty: "Nothing yet.")
 
+                    SummonRow()
+
                     if let e = model.error {
                         Text(staleLine(e))
                             .font(Theme.sans(13))
@@ -140,6 +142,49 @@ struct EventList: View {
                 Text(who.count >= 2 ? "Both" : who[0])
                     .font(Theme.sans(12))
                     .foregroundStyle(Theme.inkGrey)
+            }
+        }
+    }
+}
+
+/// The haunted page's visitors, one tap each. Shown always; the mirror
+/// says so if it isn't haunted right now.
+struct SummonRow: View {
+    @State private var status: String?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("SUMMON")
+                .font(Theme.sans(11, .semibold))
+                .tracking(1.2)
+                .foregroundStyle(Theme.clay)
+            Rectangle().fill(Theme.hairline).frame(height: 1)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 18) {
+                    ForEach(MirrorVisitor.allCases, id: \.self) { v in
+                        Button {
+                            Task {
+                                do {
+                                    try await MirrorAPI().summon(v)
+                                    status = "\(v.label), on their way."
+                                } catch {
+                                    status = (error as? SummonError ?? .unreachable).errorDescription
+                                }
+                            }
+                        } label: {
+                            VStack(spacing: 4) {
+                                v.image.resizable().scaledToFit().frame(height: 34)
+                                    .foregroundStyle(v == .balloon ? Haunted.balloon : Theme.ink)
+                                Text(v.label).font(Theme.sans(11)).foregroundStyle(Theme.inkSoft)
+                            }
+                            .frame(minWidth: 48)
+                        }
+                        .accessibilityLabel("Summon \(v.label)")
+                    }
+                }
+            }
+            if let s = status {
+                Text(s).font(Theme.sans(13)).foregroundStyle(Theme.inkSoft)
             }
         }
     }

@@ -99,5 +99,6 @@ struct MirrorWidgets: WidgetBundle {
     var body: some Widget {
         TodayWidget()
         SendWidget()
+        SummonWidget()
     }
 }

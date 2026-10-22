@@ -8,6 +8,7 @@ struct SettingsScreen: View {
     @State private var name = Store.name
     @State private var host = Store.host
     @State private var token = Store.token
+    @State private var pin = ""
     @State private var presets = Store.presets.joined(separator: "\n")
     @State private var test: String?
 
@@ -40,6 +41,8 @@ struct SettingsScreen: View {
                         .autocorrectionDisabled()
                         .keyboardType(.URL)
                     SecureField("Token (only if set on the Pi)", text: $token)
+                    SecureField(Store.settingsToken.isEmpty ? "Settings PIN (to summon visitors)" : "Settings PIN (saved)", text: $pin)
+                        .textInputAutocapitalization(.never)
                     Button("Test the connection") { Task { await runTest() } }
                     if let t = test { Text(t).font(.footnote).foregroundStyle(.secondary) }
                 } header: {
@@ -64,6 +67,8 @@ struct SettingsScreen: View {
         Store.host = host
         Store.token = token
         Store.presets = presets.components(separatedBy: .newlines)
+        // Only a hash of the PIN is kept, the same one the settings page's cookie holds.
+        if !pin.isEmpty { Store.setPin(pin) }
         WidgetCenter.shared.reloadAllTimelines()
         Task { await model.refresh() }
     }

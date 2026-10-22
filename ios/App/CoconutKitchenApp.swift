@@ -30,6 +30,11 @@ struct MirrorShortcuts: AppShortcutsProvider {
                               "Message the mirror in \(.applicationName)"],
                     shortTitle: "Send to Mirror",
                     systemImageName: "text.bubble")
+        AppShortcut(intent: SummonVisitorIntent(),
+                    phrases: ["Summon \(\.$visitor) in \(.applicationName)",
+                              "Summon a visitor in \(.applicationName)"],
+                    shortTitle: "Summon a Visitor",
+                    systemImageName: "moon.stars")
     }
 }
 

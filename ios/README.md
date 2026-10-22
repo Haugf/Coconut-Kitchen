@@ -10,9 +10,16 @@ mirror. It reads the Pi's existing API, so nothing changes on the Pi.
 - **Send to Mirror widget** (small, medium): one-tap messages that show
   on the mirror for 20 seconds, signed with your name. The pencil opens
   the app to write anything.
+- **Summon widget** (small, medium): tap a silhouette to send bats, a
+  zombie, a witch, a hand, the cat, the crow or the red balloon across
+  the haunted page. Needs the settings PIN once, and the mirror on its
+  Haunted style. The silhouettes are the mirror's own shapes until Ally
+  redraws them ([drawing for the mirror](../docs/drawing-for-the-mirror.md));
+  they live in `Shared/Visitors.xcassets` as vector images.
 - **The app**: today and tomorrow, a line to write on the mirror (with
   "say it out loud" on the speaker), and settings.
-- **Siri and Shortcuts**: "Send to the mirror in Coconut Kitchen".
+- **Siri and Shortcuts**: "Send to the mirror in Coconut Kitchen",
+  "Summon bats in Coconut Kitchen".
 
 It only talks to the mirror on the home Wi-Fi. Away from home the app and
 widgets show the last thing the mirror said, and the Send buttons say
@@ -65,6 +72,7 @@ Internal testing skips App Review.
 | One-tap messages | Dinner's ready, Home soon, Love you | one per line; the widget shows the first 2 (small) or 4 (medium) |
 | Mirror | `mirror.local:8080` | the Pi's address on the home Wi-Fi; an IP works too |
 | Token | empty | only if `eventsToken` is set in the Pi's `config.json` |
+| Settings PIN | empty | the `/settings` page's PIN, for summoning; only its hash is kept on the phone |
 
 ## How it works
 
