@@ -129,6 +129,7 @@ func TestSettingsRejectsBadInput(t *testing.T) {
 		{"/api/settings/style", `{"style":"neon"}`},
 		{"/api/settings/sleep", `{"from":"25:00","to":"06:30"}`},
 		{"/api/settings/say", `{"text":"   "}`},
+		{"/api/settings/summon", `{"visitor":"dragon"}`},
 	} {
 		if w := call(mux, "POST", c.path, c.body, "127.0.0.1:1"); w.Code != http.StatusBadRequest {
 			t.Errorf("%s %s: got %d, want 400", c.path, c.body, w.Code)
@@ -205,5 +206,24 @@ func TestSettingsLockedWithoutAPin(t *testing.T) {
 	}
 	if w := callWith(mux, "POST", "/api/settings/unlock", `{"pin":""}`, "127.0.0.1:1", ""); w.Code != http.StatusConflict {
 		t.Fatalf("unlock with no PIN set: %d", w.Code)
+	}
+}
+
+func TestSettingsSummon(t *testing.T) {
+	s, mux, _, _ := newTestSettings(t)
+	if w := call(mux, "POST", "/api/settings/summon", `{"visitor":"zombie"}`, "127.0.0.1:1"); w.Code != http.StatusConflict {
+		t.Fatalf("not haunted: got %d, want 409", w.Code)
+	}
+	s.cfg.Style = "haunted"
+	ch := make(chan Message, 1)
+	s.hub.subs[ch] = struct{}{}
+	if w := call(mux, "POST", "/api/settings/summon", `{"visitor":"zombie"}`, "127.0.0.1:1"); w.Code != http.StatusOK {
+		t.Fatalf("haunted: got %d", w.Code)
+	}
+	if m := <-ch; m.Event != "summon" || m.Text != "zombie" {
+		t.Fatalf("sent %+v", m)
+	}
+	if _, kept := s.hub.current(s.hub.last.At); kept {
+		t.Fatal("a summon must not replay as the current message")
 	}
 }

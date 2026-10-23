@@ -62,6 +62,7 @@ func (s *settingsAPI) routes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /api/settings/sleep", s.local(s.setSleep))
 	mux.HandleFunc("POST /api/settings/say", s.local(s.say))
 	mux.HandleFunc("POST /api/settings/screen", s.local(s.screen))
+	mux.HandleFunc("POST /api/settings/summon", s.local(s.summon))
 }
 
 // homeOnly refuses anything that doesn't come from the home network.
@@ -335,6 +336,30 @@ func (s *settingsAPI) say(w http.ResponseWriter, r *http.Request) {
 		minutes = 10
 	}
 	s.hub.send(Message{Text: text, Source: strings.TrimSpace(req.From), TTL: minutes * 60, At: time.Now(), Speak: req.Speak})
+	writeJSON(w, http.StatusOK, map[string]any{"ok": true})
+}
+
+// visitors are who can be sent across the haunted page's grounds; the
+// same names as frontend/src/widgets/haunted/Visitors.tsx.
+var visitors = map[string]bool{"zombie": true, "cat": true, "crow": true, "witch": true, "hand": true, "balloon": true}
+
+// summon sends a visitor across the haunted page right now.
+func (s *settingsAPI) summon(w http.ResponseWriter, r *http.Request) {
+	var req struct {
+		Visitor string `json:"visitor"`
+	}
+	if !decode(w, r, &req) {
+		return
+	}
+	if !visitors[req.Visitor] {
+		http.Error(w, "No visitor by that name.", http.StatusBadRequest)
+		return
+	}
+	if s.cfg.Style != "haunted" {
+		http.Error(w, "Visitors only come to the Haunted page. Switch to it under Look.", http.StatusConflict)
+		return
+	}
+	s.hub.event("summon", req.Visitor)
 	writeJSON(w, http.StatusOK, map[string]any{"ok": true})
 }
 

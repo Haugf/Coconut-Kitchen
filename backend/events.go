@@ -20,6 +20,9 @@ type Message struct {
 	// Also say it out loud on the Google speaker, if there is one.
 	Speak bool      `json:"speak,omitempty"`
 	At    time.Time `json:"at"`
+	// Event names a non-message event on the stream (like "summon"), sent
+	// as its own SSE event type so the message bar never shows it.
+	Event string `json:"-"`
 }
 
 type hub struct {
@@ -98,6 +101,9 @@ func (h *hub) stream(w http.ResponseWriter, r *http.Request) {
 			return
 		case m := <-ch:
 			b, _ := json.Marshal(m)
+			if m.Event != "" {
+				fmt.Fprintf(w, "event: %s\n", m.Event)
+			}
 			fmt.Fprintf(w, "data: %s\n\n", b)
 			flusher.Flush()
 		case <-keepalive.C:
@@ -144,6 +150,19 @@ func (h *hub) send(m Message) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 	h.last = m
+	h.broadcast(m)
+}
+
+// event sends something to every screen that's listening now, without
+// keeping it: a summoned visitor shouldn't replay on a page that loads later.
+func (h *hub) event(name, text string) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	h.broadcast(Message{Event: name, Text: text, At: time.Now()})
+}
+
+// broadcast needs h.mu held.
+func (h *hub) broadcast(m Message) {
 	for ch := range h.subs {
 		select {
 		case ch <- m:
