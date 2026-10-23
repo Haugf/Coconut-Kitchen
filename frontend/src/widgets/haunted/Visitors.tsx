@@ -13,13 +13,15 @@ import { useEffect, useState } from 'react'
     hand     rises from the soil between the graves, waves, sinks
     balloon  the one thing in colour: a red balloon drifting up out of
              the hill, rarer, and more likely late at night
+    bats     a swarm pours out of the bell tower and scatters over the
+             page; they only come when summoned
 
   ?visitor=zombie (or any name) in the address sends only that one,
   again and again, for a look. The phone settings page can summon any
   of them on demand (POST /api/settings/summon).
 */
 
-export type Visitor = 'zombie' | 'cat' | 'crow' | 'witch' | 'hand' | 'balloon'
+export type Visitor = 'zombie' | 'cat' | 'crow' | 'witch' | 'hand' | 'balloon' | 'bats'
 
 // How long each stays, in ms. Matches the animations in haunted.css.
 export const STAY: Record<Visitor, number> = {
@@ -29,6 +31,7 @@ export const STAY: Record<Visitor, number> = {
   witch: 22000,
   hand: 14000,
   balloon: 60000,
+  bats: 16000,
 }
 
 function weights(now: Date): [Visitor, number][] {
@@ -235,6 +238,39 @@ function Hand() {
   )
 }
 
+// Where each bat ends up, relative to the belfry, and when it leaves.
+// Fixed rather than random so the swarm always reads as one burst.
+const SWARM = Array.from({ length: 22 }, (_, i) => {
+  const a = Math.PI * (0.06 + (0.88 * ((i * 9) % 22)) / 21) // spread across the sky
+  const reach = 520 + ((i * 131) % 260)
+  return {
+    dx: Math.round(Math.cos(a) * reach * 1.25),
+    dy: Math.round(-Math.sin(a) * reach * 0.8) - 60,
+    delay: ((i * 37) % 23) / 10, // 0 to 2.2 s
+    dur: 9 + ((i * 53) % 40) / 10, // 9 to 13 s
+    size: 2 + ((i * 29) % 8) / 5, // 2 to 3.4 times the little bats
+  }
+})
+
+function Bats() {
+  // out of the bell tower's dark window, in the grounds' coordinates
+  return (
+    <g className="hv-bats" transform="translate(656 92)">
+      {SWARM.map((b, i) => (
+        <g
+          key={i}
+          className="hv-bat"
+          style={{ '--dx': `${b.dx}px`, '--dy': `${b.dy}px`, '--s': b.size, animationDelay: `${b.delay}s`, animationDuration: `${b.dur}s` } as React.CSSProperties}
+        >
+          <g className="hv-batflap" style={{ animationDelay: `${-(i % 5) * 0.05}s` }}>
+            <path d="M-12 0 q4 -6 8 -2 q2 -4 4 0 q2 -4 4 0 q4 -4 8 2 q-6 -2 -12 3 q-6 -5 -12 -3 z" />
+          </g>
+        </g>
+      ))}
+    </g>
+  )
+}
+
 /** The visitor's figure inside the grounds' SVG. The balloon draws itself in Sky. */
 export function OnTheGrounds({ visitor }: { visitor: Visitor | null }) {
   return (
@@ -249,6 +285,7 @@ export function OnTheGrounds({ visitor }: { visitor: Visitor | null }) {
       {visitor === 'crow' && <Crow key="crow" />}
       {visitor === 'witch' && <Witch key="witch" />}
       {visitor === 'hand' && <Hand key="hand" />}
+      {visitor === 'bats' && <Bats key="bats" />}
     </>
   )
 }

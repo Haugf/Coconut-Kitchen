@@ -129,6 +129,18 @@
 
 /* Visitors (Visitors.tsx): one at a time, all silhouettes but the
    balloon. Paths are in the grounds' 1200x200 units. */
+
+/* Bats (summoned): they leave the grounds' strip and fly up over the page. */
+.h-grounds { overflow: visible; }
+.hv-bat { opacity: 0; animation: hv-bat 11s cubic-bezier(0.2, 0.55, 0.45, 1) forwards; }
+@keyframes hv-bat {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.5); }
+  6% { opacity: 1; }
+  70% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(var(--s)); }
+}
+.hv-batflap { transform-box: fill-box; transform-origin: 50% 40%; animation: hv-batflap 0.24s ease-in-out infinite; }
+@keyframes hv-batflap { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(0.25); } }
 .hv-path, .hv-path path, .hv-hand path { fill: #050307; }
 .hv-thin { fill: none !important; stroke: #050307; stroke-width: 1.2; stroke-linecap: round; }
 .hv-leg, .hv-tail, .hv-wave, .hv-wing, .hv-head, .hv-arms, .hv-cloak { transform-box: fill-box; }
