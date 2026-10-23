@@ -13,7 +13,7 @@ Today drawn as a line, the tide behind it, the next trains, and notes from your 
 [![No Node on the Pi](https://img.shields.io/badge/Node%20on%20the%20Pi-none-2C7A7F)](#how-it-works)
 [![Last commit](https://img.shields.io/github/last-commit/Haugf/coconut-kitchen?color=33261B)](https://github.com/Haugf/coconut-kitchen/commits/main)
 
-[Screenshots](#screenshots) · [Quick start](#quick-start) · [Widgets](#widgets) · [How it works](#how-it-works) · [Settings](#configuration)
+[Screenshots](#screenshots) · [Haunted](#the-haunted-coconut) · [iPhone](#iphone-app-and-widgets) · [Quick start](#quick-start) · [Widgets](#widgets) · [How it works](#how-it-works) · [Settings](#configuration)
 
 <img src="docs/screenshots/kitchen-day.png" alt="Coconut Kitchen on a 1280x720 screen: the headline, today's events, train times, a round minimap, and the day drawn as a line with the tide behind it" width="100%">
 
@@ -28,6 +28,8 @@ Today drawn as a line, the tide behind it, the next trains, and notes from your 
 - **Your Google speaker, on screen.** What it's playing (a song, or the station when it's radio), and the timers you set by voice, counting down in the kitchen.
 - **A settings page, behind a PIN.** Anyone at home can fix their calendar link, switch the look, or set sleep hours from their phone.
 - **Three looks, one switch.** Coconut Kitchen, Terrain, and the Haunted Coconut for Halloween parties, swapped with `mirror style` or from the phone.
+- **Summon a monster.** On the Haunted page, tap a zombie, witch or red balloon on your phone (the settings page or the iPhone widget) and it crosses the screen right away.
+- **An iPhone app.** Today and Send to Mirror widgets on the Home and Lock Screen, a Summon widget for parties, and Siri: "Summon a visitor in Coconut Kitchen".
 - **Looks after itself.** It updates from GitHub within about two minutes of a merge, keeps the last good data when a source fails, sleeps overnight, and reports its own health.
 
 ## Screenshots
@@ -53,6 +55,15 @@ Today drawn as a line, the tide behind it, the next trains, and notes from your 
 
 <table>
   <tr>
+    <td colspan="2"><img src="docs/screenshots/haunted.png" alt="The Haunted Coconut: a starry night, the moon's phase, a pasta timer, what's playing, the last trains home, and a witch flying over the church on the hill"></td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center"><sub><b>The Haunted Coconut</b>, for Halloween parties: a witch passing over the church</sub></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
     <td align="center" valign="top" width="33%"><img src="docs/screenshots/phone-mirror.png" width="220" alt="The mirror on a phone"></td>
     <td align="center" valign="top" width="33%"><img src="docs/screenshots/phone-settings.png" width="220" alt="The settings page: sending a message to the mirror"></td>
     <td align="center" valign="top" width="33%"><img src="docs/screenshots/phone-pin.png" width="220" alt="The settings page's PIN screen"></td>
@@ -61,6 +72,17 @@ Today drawn as a line, the tide behind it, the next trains, and notes from your 
     <td align="center"><sub>The mirror on a phone, at <code>mirror.local:8080</code></sub></td>
     <td align="center"><sub>Settings: send a message</sub></td>
     <td align="center"><sub>Locked with a PIN</sub></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td align="center" valign="top" width="35%"><img src="docs/screenshots/phone-visitors.png" width="230" alt="The phone settings page with the Haunted look on and a Visitors row: Zombie, Red balloon, Black cat, Crow, Witch, Hand"></td>
+    <td align="center" valign="top"><img src="docs/screenshots/iphone-summon-widget.png" alt="The iPhone Summon widget in small and medium sizes: silhouettes of bats, a zombie, a witch, a hand, a cat, a crow and a red balloon"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Summon from the phone page</sub></td>
+    <td align="center"><sub>…or from the iPhone's Summon widget (drawn from the widget's layout and its real silhouettes)</sub></td>
   </tr>
 </table>
 
@@ -152,7 +174,30 @@ gantt
 
 The first design, **Terrain** (the day as a ridge in a top band, with three acts), is still there. Switch with `mirror style terrain` and `mirror style kitchen`; the screen follows within a minute.
 
-For parties there's **the Haunted Coconut** (`mirror style haunted`): a starry night sky with gilt corners, the moon's phase, a countdown to midnight, what the speaker is playing, timers, the last trains home, and a small church on its hill along the bottom, with soft lightning every 20 to 60 seconds (`?calm` in the address turns it off). It never shows the calendar, and while it's on, the calendar's address on the mirror answers only the Pi itself, so guests on the Wi-Fi see nothing about anyone's week. `?style=haunted` previews it on a laptop without changing the mirror.
+### The Haunted Coconut
+
+For parties there's **the Haunted Coconut** (`mirror style haunted`, or **Look › Haunted** on the phone page): a starry night sky with gilt corners, the moon's phase, a countdown to midnight, what the speaker is playing, timers, the last trains home, and a small church on its hill along the bottom, with soft lightning every 20 to 60 seconds (`?calm` in the address turns it off). It never shows the calendar, and while it's on, the calendar's address on the mirror answers only the Pi itself, so guests on the Wi-Fi see nothing about anyone's week. `?style=haunted` previews it on a laptop without changing the mirror.
+
+<img src="docs/screenshots/haunted-zombie.png" width="480" alt="A zombie stopping on the hill by the church to look out of the screen">
+
+**Visitors.** Every minute or two a silhouette crosses the grounds, one at a time:
+
+| Visitor | What it does |
+|---|---|
+| Zombie | shambles along the hill, stops to look at you, moves on |
+| Black cat | trots in, sits by the graves with its tail going, leaves |
+| Crow | lands on a grave's cross, hops, flies off |
+| Witch | crosses low on her broom |
+| Hand | rises out of the soil between the graves, waves, sinks |
+| Red balloon | the one thing in colour, drifting up out of the hill; rarer, and more likely after 11 pm |
+
+**Launching one on demand.** Guests always ask, so there are three ways, all on the home Wi-Fi with the settings PIN:
+
+1. **Phone page:** open `http://mirror.local:8080/settings`, unlock, and with the Haunted look on a **Visitors** row appears. Tap one and it arrives at once, cutting off whoever was out.
+2. **iPhone:** the **Summon** widget (tap a silhouette), or Siri and Shortcuts: "Summon a visitor in Coconut Kitchen". See [iPhone app and widgets](#iphone-app-and-widgets).
+3. **Anything else:** `POST /api/settings/summon` with `{"visitor": "zombie"}` and the PIN cookie.
+
+Summoning only works while the Haunted look is on; otherwise the mirror answers *"Visitors only come to the Haunted page."* To rehearse without a phone, `?visitor=witch` in the address sends only that visitor, over and over.
 
 ## Settings from your phone
 
@@ -160,7 +205,8 @@ On the home Wi-Fi, open **http://mirror.local:8080/settings** (or the Pi's IP). 
 
 - put a message on the mirror, from whoever is sending it
 - check each person's calendar, and add or remove a calendar link (the page shows only which site a link points to, never the secret address)
-- switch between Coconut Kitchen and Terrain
+- switch between Coconut Kitchen, Terrain and Haunted
+- with Haunted on, summon a visitor across the screen ([how](#the-haunted-coconut))
 - turn the screen off or on now, and set the sleep hours
 
 It's locked with a PIN that lives only in `config.json` on the Pi, never in this public repo. Set it with `mirror pin ABCD`; letters or numbers, and case doesn't matter. Each phone remembers it for a month, changing the PIN signs every phone out, and five wrong tries lock the page for a minute.
@@ -169,7 +215,17 @@ Saving a change rewrites `config.json`, keeping everything else in it, and resta
 
 ### iPhone app and widgets
 
-`ios/` holds a small iPhone app with a Today widget (the mirror's headline and day line on your Home and Lock Screen) and a Send to Mirror widget (one tap puts "Dinner's ready" on the screen). It uses the same API, on the home Wi-Fi. See [ios/README.md](ios/README.md) to build it.
+`ios/` holds a small SwiftUI app for the mirror. It uses the same API as the phone page, only on the home Wi-Fi, so nothing changes on the Pi.
+
+| Widget | Sizes | What it does |
+|---|---|---|
+| **Today** | small, medium, large, Lock Screen | the mirror's headline and the day as a line (yours solid, the other dashed), and what's next |
+| **Send to Mirror** | small, medium | one tap puts "Dinner's ready" (or any of your one-tap messages) on the screen for 20 seconds, signed with your name |
+| **Summon** | small, medium | tap a silhouette to send a visitor across the Haunted page. Small shows four, medium shows them all. Needs the settings PIN once, in the app's settings |
+
+The app itself shows today and tomorrow, a line to write on the mirror (with "say it out loud" on the speaker), and settings. Siri and Shortcuts know two phrases: "Send to the mirror in Coconut Kitchen" and "Summon a visitor in Coconut Kitchen". Away from home the widgets keep the last thing the mirror said, and the buttons say they couldn't reach it.
+
+It's built on a Mac with Xcode and shared through TestFlight; see [ios/README.md](ios/README.md).
 
 ## Widgets
 
