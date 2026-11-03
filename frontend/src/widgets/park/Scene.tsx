@@ -1,4 +1,5 @@
 import { art } from './art'
+import { moonOn, moonPath } from '../haunted/night'
 import { CLUMPS, TIMES, clumpAt, dayToClump, dayX, electionDay, groundPath, groundY, skyColor, thanksgiving, type Sky, type Time } from './scene'
 
 const px = (n: number) => `calc(var(--s) * ${n.toFixed(1)})`
@@ -17,7 +18,13 @@ export function Scene({ now, time, sky }: { now: Date; time: Time; sky: Sky }) {
 
   return (
     <div className="pk-scene" style={{ background: skyColor(time, sky) }} aria-hidden="true">
-      {sky === 'clear' && <img src={time === 'night' ? art.moon : art.sun} alt="" style={box(scene.orb[0] - 70, scene.orb[1] - 70, 140, 140)} />}
+      {sky === 'clear' && time !== 'night' && <img src={art.sun} alt="" style={box(scene.orb[0] - 70, scene.orb[1] - 70, 140, 140)} />}
+      {sky === 'clear' && time === 'night' && (
+        <svg className="pk-moon" viewBox="0 0 100 100" style={box(scene.orb[0] - 70, scene.orb[1] - 70, 140, 140)}>
+          <circle cx="50" cy="50" r="46" fill="#232C45" />
+          <path d={moonPath(moonOn(now).phase, 50, 50, 46)} fill="#EFE8D2" />
+        </svg>
+      )}
       {sky !== 'clear' && (
         <div className={`pk-clouds is-${time === 'night' ? 'night' : sky}`}>
           <img src={art.clouds[0]} alt="" style={box(560, 40, 500, 180)} />

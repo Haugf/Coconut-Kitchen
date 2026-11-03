@@ -24,7 +24,7 @@
 .pk-left { grid-column: 1; grid-row: 1; }
 
 .pk-scene { position: absolute; inset: 0; overflow: hidden; transition: background 90s; }
-.pk-scene img, .pk-lake, .pk-art, .pk-clouds, .pk-wash, .pk-ground, .pk-today { position: absolute; }
+.pk-scene img, .pk-moon, .pk-lake, .pk-art, .pk-clouds, .pk-wash, .pk-ground, .pk-today { position: absolute; }
 .pk-art, .pk-clouds { inset: 0; }
 .pk-clouds.is-rain { filter: brightness(.6); }
 .pk-clouds.is-night { filter: brightness(.3); }

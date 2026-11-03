@@ -121,12 +121,6 @@ def clouds():
 
 def orbs():
     save("sun.svg", 360, 360, '<circle cx="180" cy="180" r="170" fill="#F7D98A"/>')
-    save(
-        "moon.svg", 360, 360,
-        '<circle cx="180" cy="180" r="170" fill="#EFE8D2"/>'
-        '<circle cx="130" cy="130" r="30" fill="#DCD3B8"/>'
-        '<circle cx="230" cy="220" r="44" fill="#DCD3B8"/>',
-    )
 
 
 def sticker():

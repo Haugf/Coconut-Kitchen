@@ -18,7 +18,6 @@ export const art = {
   treeline: find('treeline'),
   clouds: many(3, (n) => `cloud-${n}`),
   sun: find('sun'),
-  moon: find('moon'),
   sticker: find('sticker'),
   table: find('table'),
   turkey: find('turkey'),
