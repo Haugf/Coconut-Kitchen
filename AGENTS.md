@@ -154,10 +154,12 @@ clips or overlaps, in both palettes.
   never fetch or show the calendar, and while it's the style,
   `/api/calendar` answers only loopback (`partyPrivate`). Lightning stays at two soft pulses at
   most every 20 seconds (`?calm` turns it off).
-- `park` (src/widgets/park/) is Central Park in the fall. It keeps the
-  kitchen's tokens and husk ground and shows the park only through a
-  window in the middle, so it doesn't light up the room. Ally's art goes
-  in `park/art/` under the stand-in's name.
+- `park` (src/widgets/park/) is Central Park in the fall, the design Fred
+  approved: a full-screen scene with the clock, map and trains on the sky
+  and the month along the ground. It's the exception to the dark ground
+  rule, and has no Today list or tide strip. Don't change its layout
+  without showing Fred first. Ally's art goes in `park/art/` under the
+  stand-in's name.
 - Young Serif for the headline, the mark and messages; Figtree for
   everything else.
 - An observational voice ("A climb to Dinner at 7, then the day opens up.").

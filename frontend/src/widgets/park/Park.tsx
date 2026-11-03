@@ -6,23 +6,26 @@ import { useMessages } from '../../lib/useMessages'
 import { useEnabledWidgets } from '../../lib/widgets'
 import { WidgetSlot } from '../loader'
 import type { CalendarData, WeatherData } from '../terrain/types'
-import { timedEventsOn } from '../terrain/day'
-import { dateLine, todayItems, List } from '../terrain/lists'
-import { headline, partOfDay } from '../terrain/voice'
-import { DayStrip } from '../kitchen/DayStrip'
-import { Playing, useNowPlaying } from '../kitchen/Playing'
 import { Timers, useTimers } from '../kitchen/Timers'
 import { Scene } from './Scene'
-import { skyOf, timeOf, type Sky, type Time } from './scene'
+import { peaksFor, skyOf, timeOf, type Sky, type Time } from './scene'
 import '../terrain/terrain.css'
 import '../kitchen/kitchen.css'
 import './park.css'
 
 /*
-  Central Park: the kitchen page's words in dark side panels, with the
-  park through a window between them. ?day=14&time=dusk&sky=rain in the
-  address tries another day, hour or sky on this screen only.
+  Central Park: the whole screen is the park. A big clock on the sky at
+  the left, the map and trains on the sky at the right, and the month
+  along the ground. ?day=14&time=dusk&sky=rain in the address tries
+  another day, hour or sky on this screen only.
 */
+
+const SKY_WORDS: Record<Sky, string> = {
+  clear: 'and clear over the Park',
+  cloudy: 'and cloudy over the Park',
+  rain: 'and raining in the Park',
+  snow: 'and snowing in the Park',
+}
 
 export function Park() {
   const clock = useNow(60 * 1000)
@@ -30,7 +33,6 @@ export function Park() {
   const wx = useWidgetData<WeatherData>('/api/weather', 10 * 60 * 1000)
   const widgets = useEnabledWidgets()
   const message = useMessages()
-  const playing = useNowPlaying()
   const timers = useTimers()
 
   const q = new URLSearchParams(window.location.search)
@@ -39,44 +41,36 @@ export function Park() {
   const time = (q.get('time') as Time | null) ?? timeOf(now)
   const sky = (q.get('sky') as Sky | null) ?? skyOf(wx.data?.code)
 
-  const all = cal.data?.events ?? []
-  const people = cal.data?.people ?? []
+  const allDay = (cal.data?.events ?? [])
+    .filter((e) => e.allDay && new Date(e.start).getMonth() === now.getMonth())
+    .map((e) => ({ day: new Date(e.start).getDate(), title: e.title }))
+  const peaks = peaksFor(now, allDay)
+
+  const hours = now.getHours() % 12 || 12
+  const minutes = String(now.getMinutes()).padStart(2, '0')
+  const date = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
 
   return (
-    <div className="terrain kitchen park" data-calendar-missing={cal.data ? undefined : ''}>
-      <Scene now={now} time={time} sky={sky} />
+    <div className="terrain kitchen park" data-time={time}>
+      <Scene now={now} time={time} sky={sky} peaks={peaks} />
       <div className="pk-left">
-        <header className="k-top">
-          <div className="k-meta">
-            <p className="t-date">{dateLine(now, wx.data)}</p>
-          </div>
-          <h1 className="t-headline k-headline">
-            {cal.data ? headline(timedEventsOn(all, now)) : cal.error ? 'The calendar isn’t connected yet.' : ' '}
-          </h1>
-        </header>
-        {timers.length > 0 && <Timers timers={timers} />}
-        {message ? (
-          <section className="t-list k-said">
-            <h2 className="t-heading">In the kitchen</h2>
-            {message.source && <p className="k-from">From {message.source}</p>}
-            <p className="k-words">{message.text}</p>
-          </section>
-        ) : playing ? (
-          <Playing np={playing} />
-        ) : (
-          <List
-            heading="Today"
-            items={todayItems(all, people, wx.data, now)}
-            empty={cal.data ? `Nothing needs you ${partOfDay(now)}.` : 'Add calendar addresses to config.json on the Pi to fill this in.'}
-          />
+        <p className="pk-clock">
+          {hours}:{minutes}
+        </p>
+        <p className="pk-date">{date}</p>
+        {wx.data && (
+          <p className="pk-weather">
+            {Math.round(wx.data.temp)}° {SKY_WORDS[sky]}
+          </p>
         )}
+        {timers.length > 0 && <Timers timers={timers} />}
+        {message && <p className="k-words">{message.text}</p>}
       </div>
       <div className="pk-right">
         {widgets.map((w) => (
           <WidgetSlot key={w.id} widget={w} />
         ))}
       </div>
-      <DayStrip now={now} events={all} people={people} />
     </div>
   )
 }
