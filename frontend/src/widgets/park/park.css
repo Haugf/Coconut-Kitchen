@@ -1,44 +1,90 @@
 /*
-  Central Park. The kitchen's tokens and husk ground stay; the park shows
-  through a window in the middle, so the screen never lights up the room.
-  Only today's leaf and any rain or snow move, and both are transforms,
-  so the Pi stays cool.
+  Central Park. A full-screen scene with the words on the sky. Only
+  today's leaf and any rain or snow move, and both are transforms, so the
+  Pi stays cool.
 */
 .terrain.kitchen.park {
   --s: calc(100vw / 1920);
   position: relative;
   overflow: hidden;
-  background: var(--bg);
-  display: grid;
-  grid-template-columns: 30% minmax(0, 1fr) 25%;
-  grid-template-rows: minmax(0, 1fr) auto;
-  gap: calc(var(--u) * 2) 0;
+  padding: 0;
+  display: block;
+  background: transparent;
 }
-.park > :not(.pk-scene) { position: relative; z-index: 1; min-width: 0; min-height: 0; }
-.park .k-strip { grid-column: 1 / -1; grid-row: 2; }
-.park .k-headline { font-size: calc(var(--u) * 4.6) !important; }
-.park .t-col, .pk-left, .pk-right { display: flex; flex-direction: column; gap: calc(var(--u) * 3); overflow: hidden; }
-.pk-right { grid-column: 3; grid-row: 1; }
+
+.pk-left, .pk-right { position: absolute; z-index: 1; display: flex; flex-direction: column; }
+.pk-left {
+  left: calc(var(--s) * 80);
+  top: calc(var(--s) * 44);
+  width: calc(var(--s) * 560);
+  gap: calc(var(--s) * 6);
+}
+.pk-right {
+  --u: calc(var(--s) * 9.4);
+  left: calc(var(--s) * 1470);
+  top: calc(var(--s) * 40);
+  width: calc(var(--s) * 400);
+  flex-direction: column-reverse;
+  justify-content: flex-end;
+  gap: calc(var(--s) * 12);
+}
+.pk-right > * { min-width: 0; }
 .pk-right .t-transit { border-left: 0; padding-left: 0; }
-.pk-right .t-minimap { width: calc(var(--u) * 25); align-self: center; margin: 0; }
-.pk-left { grid-column: 1; grid-row: 1; }
+.pk-right .t-from { display: none; }
+.pk-right .t-minimap { width: calc(var(--s) * 250); align-self: center; margin: 0; }
+
+.pk-left, .pk-right {
+  --ink: #1E2F2A;
+  --ink-soft: #33463F;
+  --ink-grey: #4C5E56;
+  --hairline: #9FB0A8;
+  --edge: #2C3F2E;
+  --bg: #F3EFE4;
+  color: var(--ink);
+}
+.park[data-time='dusk'] .pk-left, .park[data-time='dusk'] .pk-right {
+  --ink: #2A1620;
+  --ink-soft: #3F2530;
+  --ink-grey: #52343F;
+  --hairline: #B5784F;
+  --edge: #2A1620;
+}
+.park[data-time='night'] .pk-left, .park[data-time='night'] .pk-right {
+  --ink: #F3EFE4;
+  --ink-soft: #CFCBC0;
+  --ink-grey: #A6A399;
+  --hairline: #3B4560;
+  --edge: #8D97AC;
+  --bg: #141C33;
+}
+
+.pk-clock { font-family: 'Young Serif', Georgia, serif; font-size: calc(var(--s) * 190); line-height: 1; }
+.pk-date { font-size: calc(var(--s) * 42); font-weight: 500; line-height: 1.2; }
+.pk-weather { font-size: calc(var(--s) * 32); line-height: 1.2; }
 
 .pk-scene { position: absolute; inset: 0; overflow: hidden; transition: background 90s; }
-.pk-scene img, .pk-moon, .pk-lake, .pk-art, .pk-clouds, .pk-wash, .pk-ground, .pk-today { position: absolute; }
+.pk-scene img, .pk-moon, .pk-lake, .pk-art, .pk-clouds, .pk-ground, .pk-today { position: absolute; }
 .pk-art, .pk-clouds { inset: 0; }
 .pk-clouds.is-rain { filter: brightness(.6); }
 .pk-clouds.is-night { filter: brightness(.3); }
-.pk-wash {
-  inset: 0;
-  background: linear-gradient(90deg, var(--bg) 30%, transparent 39%, transparent 64%, var(--bg) 71%);
-}
 .pk-ground { left: 0; top: 0; width: 100%; height: 100%; }
-.pk-ground path { fill: var(--bg); }
 .pk-sticker { rotate: -10deg; }
 
+.pk-label {
+  position: absolute;
+  top: calc(var(--s) * 960);
+  transform: translateX(-50%);
+  white-space: nowrap;
+  color: #F3EFE4;
+  font-size: calc(var(--s) * 30);
+  font-weight: 600;
+  line-height: 1;
+}
+.pk-tick { top: calc(var(--s) * 1016); font-size: calc(var(--s) * 24); font-weight: 400; }
+
 @keyframes pk-sway {
-  from { transform: translateX(-12px) rotate(14deg); }
-  to { transform: translateX(12px) rotate(38deg); }
+  from { transform: translateX(-10px) rotate(16deg); }
+  to { transform: translateX(10px) rotate(40deg); }
 }
 .pk-today img { position: static; width: 100%; height: 100%; display: block; animation: pk-sway 7s ease-in-out infinite alternate; }
 

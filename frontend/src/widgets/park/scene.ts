@@ -7,11 +7,11 @@
 export type Time = 'morning' | 'afternoon' | 'dusk' | 'night'
 export type Sky = 'clear' | 'cloudy' | 'rain' | 'snow'
 
-export const TIMES: Record<Time, { sky: string; lake: string; filter: string; orb: [number, number] }> = {
-  morning: { sky: '#D5E5E2', lake: '#6FA1A0', filter: 'none', orb: [800, 170] },
-  afternoon: { sky: '#BFDDEB', lake: '#4F93A8', filter: 'saturate(1.08)', orb: [1270, 120] },
-  dusk: { sky: '#E59A5B', lake: '#A8605A', filter: 'sepia(.3) saturate(1.2) brightness(.78)', orb: [1280, 420] },
-  night: { sky: '#141C33', lake: '#1E2F4A', filter: 'brightness(.42) saturate(.7)', orb: [760, 130] },
+export const TIMES: Record<Time, { ground: string; sky: string; lake: string; filter: string; orb: [number, number] }> = {
+  morning: { ground: '#2C3F2E', sky: '#D5E5E2', lake: '#6FA1A0', filter: 'none', orb: [640, 300] },
+  afternoon: { ground: '#35502F', sky: '#BFDDEB', lake: '#4F93A8', filter: 'saturate(1.08)', orb: [1500, 110] },
+  dusk: { ground: '#27301F', sky: '#E59A5B', lake: '#A8605A', filter: 'sepia(.3) saturate(1.2) brightness(.78)', orb: [1340, 430] },
+  night: { ground: '#131C19', sky: '#141C33', lake: '#1E2F4A', filter: 'brightness(.42) saturate(.7)', orb: [640, 170] },
 }
 
 const GREY: Record<Exclude<Sky, 'clear'>, Record<Time, string>> = {
@@ -50,8 +50,28 @@ export function electionDay(year: number): number {
 }
 
 export const CLUMPS = 30
-const CANOPY = { x: 960, y: 270, rx: 300, ry: 250 }
-const BASE = 745
+const CANOPY = { x: 1000, y: 300, rx: 310, ry: 270 }
+const BASE = 905
+
+export interface Peak {
+  day: number
+  height: number
+  label: string
+}
+
+/** Election Day and Thanksgiving in November, plus all-day events from the calendar. */
+export function peaksFor(date: Date, allDay: { day: number; title: string }[]): Peak[] {
+  const peaks: Peak[] = []
+  if (date.getMonth() === 10) {
+    peaks.push({ day: electionDay(date.getFullYear()), height: 0.35, label: 'Election Day' })
+    peaks.push({ day: thanksgiving(date.getFullYear()), height: 1, label: 'Thanksgiving' })
+  }
+  for (const e of allDay) {
+    if (peaks.length >= 4) break
+    if (peaks.every((p) => Math.abs(p.day - e.day) >= 4)) peaks.push({ day: e.day, height: 0.7, label: e.title })
+  }
+  return peaks
+}
 
 export const dayToClump = (day: number) => (day * 11) % CLUMPS
 
@@ -61,14 +81,14 @@ export function clumpAt(i: number) {
   return { x: CANOPY.x + r * CANOPY.rx * Math.cos(a), y: CANOPY.y + r * CANOPY.ry * Math.sin(a) }
 }
 
-export const dayX = (day: number, last: number) => 60 + ((day - 1) * 1800) / (last - 1)
+export const dayX = (day: number, last: number) => 90 + ((day - 1) * 1740) / (last - 1)
 
-export function groundY(day: number, peak: number | null) {
-  return peak === null ? BASE : BASE - 62 * Math.exp(-(((day - peak) / 1.5) ** 2))
+export function groundY(day: number, peaks: Peak[]) {
+  return peaks.reduce((y, p) => y - p.height * 80 * Math.exp(-(((day - p.day) / 1.6) ** 2)), BASE)
 }
 
-export function groundPath(last: number, peak: number | null) {
-  let d = `M0 1080 L0 ${groundY(-1, peak)}`
-  for (let day = -1; day <= last + 2; day += 0.5) d += ` L${dayX(day, last).toFixed(1)} ${groundY(day, peak).toFixed(1)}`
+export function groundPath(last: number, peaks: Peak[]) {
+  let d = `M0 1080 L0 ${groundY(-1, peaks).toFixed(1)}`
+  for (let day = -1; day <= last + 2; day += 0.5) d += ` L${dayX(day, last).toFixed(1)} ${groundY(day, peaks).toFixed(1)}`
   return `${d} L1920 1080 Z`
 }
