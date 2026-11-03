@@ -39,8 +39,7 @@ landscape at 1280x720 @ 50Hz (the cable shimmers at 1080p). It shows:
 The kitchen page reuses the terrain page's logic (`terrain/day.ts`,
 `shape.ts`, `voice.ts`, `lists.tsx`) and restyles everything, widgets
 included, by redefining the same tokens. Both pages stay: `"style"` in
-config.json picks one (`mirror style kitchen|terrain|haunted`, or `park`
-from the phone page), served at
+config.json picks one (`mirror style kitchen|terrain|haunted|park`), served at
 `/api/style`; scenes ask for `'page'` and App resolves it. Change one page
 without breaking the other.
 
@@ -157,9 +156,8 @@ clips or overlaps, in both palettes.
   most every 20 seconds (`?calm` turns it off).
 - `park` (src/widgets/park/) is Central Park in the fall. It keeps the
   kitchen's tokens and husk ground and shows the park only through a
-  window in the middle, so it doesn't light up the room. It's chosen from
-  the phone page; `mirror style` doesn't list it yet. Ally's art goes in
-  `park/art/` under the stand-in's name.
+  window in the middle, so it doesn't light up the room. Ally's art goes
+  in `park/art/` under the stand-in's name.
 - Young Serif for the headline, the mark and messages; Figtree for
   everything else.
 - An observational voice ("A climb to Dinner at 7, then the day opens up.").

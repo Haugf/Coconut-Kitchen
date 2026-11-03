@@ -27,7 +27,7 @@ Today drawn as a line, the tide behind it, the next trains, and notes from your 
 - **Messages from your phone.** `mirror say "Rice is done"`, or the phone page, puts a note on the screen for as long as you choose, and can say it out loud on your Google speaker.
 - **Your Google speaker, on screen.** What it's playing (a song, or the station when it's radio), and the timers you set by voice, counting down in the kitchen.
 - **A settings page, behind a PIN.** Anyone at home can fix their calendar link, switch the look, or set sleep hours from their phone.
-- **Four looks, one switch.** Coconut Kitchen, Terrain, the Haunted Coconut for Halloween parties, and Central Park in the fall, swapped from the phone. All but Central Park also switch with `mirror style`.
+- **Four looks, one switch.** Coconut Kitchen, Terrain, the Haunted Coconut for Halloween parties, and Central Park in the fall, swapped with `mirror style` or from the phone.
 - **Summon a monster.** On the Haunted page, tap a zombie, witch or red balloon on your phone (the settings page or the iPhone widget) and it crosses the screen right away.
 - **An iPhone app.** Today and Send to Mirror widgets on the Home and Lock Screen, a Summon widget for parties, and Siri: "Summon a visitor in Coconut Kitchen".
 - **Looks after itself.** It updates from GitHub within about two minutes of a merge, keeps the last good data when a source fails, sleeps overnight, and reports its own health.
@@ -310,7 +310,7 @@ Everyday chores, from any SSH session on the Pi:
 | Screen off / on now | `mirror off`, `mirror on` |
 | See or set sleep hours | `mirror sleep`, `mirror sleep 00:30 07:00`, `mirror sleep never` |
 | Put a message on screen | `mirror say "Laundry is done" 15` |
-| Switch page style | `mirror style terrain`, `mirror style kitchen`, `mirror style haunted` (plain `mirror style` shows which is on) |
+| Switch page style | `mirror style terrain`, `mirror style kitchen`, `mirror style haunted`, `mirror style park` (plain `mirror style` shows which is on) |
 | Set the settings page PIN | `mirror pin ABCD` (plain `mirror pin` says whether one is set) |
 | Centre the minimap on home | `mirror home "your address"` |
 | Update now instead of waiting | `mirror update` |
