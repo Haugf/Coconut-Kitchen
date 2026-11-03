@@ -39,7 +39,8 @@ landscape at 1280x720 @ 50Hz (the cable shimmers at 1080p). It shows:
 The kitchen page reuses the terrain page's logic (`terrain/day.ts`,
 `shape.ts`, `voice.ts`, `lists.tsx`) and restyles everything, widgets
 included, by redefining the same tokens. Both pages stay: `"style"` in
-config.json picks one (`mirror style kitchen|terrain|haunted`), served at
+config.json picks one (`mirror style kitchen|terrain|haunted`, or `park`
+from the phone page), served at
 `/api/style`; scenes ask for `'page'` and App resolves it. Change one page
 without breaking the other.
 
@@ -93,7 +94,7 @@ update.sh   the every-minute check: origin/main vs ~/mirror/.installed
 | `GET /api/cast` | the Google speaker: `{speaker, connected, state?, app?, title?, subtitle?, live?, duration?, position?, at}` (never its address) |
 | `GET /api/timers` | timers set by voice on the speaker: `{enabled, timers[{label?, state, fireAt?, duration, left?}], at}` |
 | `GET /api/sleep` | `{asleep, from, to}` |
-| `GET /api/style` | `{style}`: `kitchen`, `terrain` or `haunted` |
+| `GET /api/style` | `{style}`: `kitchen`, `terrain`, `haunted` or `park` |
 | `GET /api/widgets` | enabled widgets in order: `{id, name, width, settings, sources}` (never secrets) |
 | `GET /api/w/{id}/{source}` | a widget's data source, fetched and cached by the Pi |
 | `GET /api/status` | health summary (counts only) |
@@ -154,6 +155,11 @@ clips or overlaps, in both palettes.
   never fetch or show the calendar, and while it's the style,
   `/api/calendar` answers only loopback (`partyPrivate`). Lightning stays at two soft pulses at
   most every 20 seconds (`?calm` turns it off).
+- `park` (src/widgets/park/) is Central Park in the fall. It keeps the
+  kitchen's tokens and husk ground and shows the park only through a
+  window in the middle, so it doesn't light up the room. It's chosen from
+  the phone page; `mirror style` doesn't list it yet. Ally's art goes in
+  `park/art/` under the stand-in's name.
 - Young Serif for the headline, the mark and messages; Figtree for
   everything else.
 - An observational voice ("A climb to Dinner at 7, then the day opens up.").

@@ -299,6 +299,7 @@ export default function Settings() {
             ['kitchen', 'Coconut Kitchen'],
             ['terrain', 'Terrain'],
             ['haunted', 'Haunted'],
+            ['park', 'Central Park'],
           ].map(([id, label]) => (
             <button
               type="button"

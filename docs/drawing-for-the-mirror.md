@@ -35,6 +35,10 @@ shapes as vector images in `ios/Assets.xcassets`.
 - **Visitors:** the grounds along the bottom are 1200 by 200. A zombie is
   about 50 tall, a bat about 24 wide. Put the feet (or the middle, for
   fliers) at the bottom center of the drawing.
+- **Central Park:** the list, with the sizes and names, is the art list
+  page Fred shares. Name each file after its stand-in in
+  `frontend/src/widgets/park/art/` (`trunk.png` replaces `trunk.svg`).
+  Colors are free here, since it's a whole scene.
 - **Widget icons:** square, simple enough to read at the size of a
   fingertip.
 
