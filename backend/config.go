@@ -13,8 +13,9 @@ type Config struct {
 	// "Authorization: Bearer <token>".
 	EventsToken string `json:"eventsToken"`
 	// Which page the mirror shows: "kitchen" (Coconut Kitchen),
-	// "terrain" (the first design) or "haunted" (the Halloween party
-	// page, which never shows the calendar). Set it with `mirror style`.
+	// "terrain" (the first design), "haunted" (the Halloween party
+	// page, which never shows the calendar) or "park" (Central Park in
+	// the fall). Set it with `mirror style`, or park from the phone page.
 	Style string `json:"style"`
 	// The PIN for the phone settings page. Until one is set the page stays
 	// locked. Set it on the Pi with `mirror pin`; never commit it.

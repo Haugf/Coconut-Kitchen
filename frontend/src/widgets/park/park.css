@@ -1,0 +1,61 @@
+/*
+  Central Park. The kitchen's tokens and husk ground stay; the park shows
+  through a window in the middle, so the screen never lights up the room.
+  Only today's leaf and any rain or snow move, and both are transforms,
+  so the Pi stays cool.
+*/
+.terrain.kitchen.park {
+  --s: calc(100vw / 1920);
+  position: relative;
+  overflow: hidden;
+  background: var(--bg);
+  display: grid;
+  grid-template-columns: 30% minmax(0, 1fr) 25%;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: calc(var(--u) * 2) 0;
+}
+.park > :not(.pk-scene) { position: relative; z-index: 1; min-width: 0; min-height: 0; }
+.park .k-strip { grid-column: 1 / -1; grid-row: 2; }
+.park .k-headline { font-size: calc(var(--u) * 4.6) !important; }
+.park .t-col, .pk-left, .pk-right { display: flex; flex-direction: column; gap: calc(var(--u) * 3); overflow: hidden; }
+.pk-right { grid-column: 3; grid-row: 1; }
+.pk-right .t-transit { border-left: 0; padding-left: 0; }
+.pk-right .t-minimap { width: calc(var(--u) * 25); align-self: center; margin: 0; }
+.pk-left { grid-column: 1; grid-row: 1; }
+
+.pk-scene { position: absolute; inset: 0; overflow: hidden; transition: background 90s; }
+.pk-scene img, .pk-moon, .pk-lake, .pk-art, .pk-clouds, .pk-wash, .pk-ground, .pk-today { position: absolute; }
+.pk-art, .pk-clouds { inset: 0; }
+.pk-clouds.is-rain { filter: brightness(.6); }
+.pk-clouds.is-night { filter: brightness(.3); }
+.pk-wash {
+  inset: 0;
+  background: linear-gradient(90deg, var(--bg) 30%, transparent 39%, transparent 64%, var(--bg) 71%);
+}
+.pk-ground { left: 0; top: 0; width: 100%; height: 100%; }
+.pk-ground path { fill: var(--bg); }
+.pk-sticker { rotate: -10deg; }
+
+@keyframes pk-sway {
+  from { transform: translateX(-12px) rotate(14deg); }
+  to { transform: translateX(12px) rotate(38deg); }
+}
+.pk-today img { position: static; width: 100%; height: 100%; display: block; animation: pk-sway 7s ease-in-out infinite alternate; }
+
+@keyframes pk-drop { from { transform: translateY(-500px); } to { transform: translateY(0); } }
+.pk-rain, .pk-snow {
+  position: absolute;
+  inset: -500px 0 0;
+  will-change: transform;
+}
+.pk-rain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='500'%3E%3Cpath d='M40 30l-8 28M150 90l-8 28M260 20l-8 28M370 110l-8 28M470 50l-8 28M90 190l-8 28M210 240l-8 28M320 200l-8 28M430 260l-8 28M30 330l-8 28M140 370l-8 28M250 320l-8 28M360 390l-8 28M470 350l-8 28M80 450l-8 28M300 450l-8 28' stroke='%23E3EEF3' stroke-width='3' stroke-opacity='.6' stroke-linecap='round'/%3E%3C/svg%3E");
+  animation: pk-drop 1.1s steps(22) infinite;
+}
+.pk-snow {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='500'%3E%3Cpath d='M40 30h.01M150 90h.01M260 20h.01M370 110h.01M470 50h.01M90 190h.01M210 240h.01M320 200h.01M430 260h.01M30 330h.01M140 370h.01M250 320h.01M360 390h.01M470 350h.01M80 450h.01M300 450h.01' stroke='white' stroke-width='8' stroke-opacity='.9' stroke-linecap='round'/%3E%3C/svg%3E");
+  animation: pk-drop 16s steps(320) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pk-today img, .pk-rain, .pk-snow { animation: none; }
+}

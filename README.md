@@ -27,7 +27,7 @@ Today drawn as a line, the tide behind it, the next trains, and notes from your 
 - **Messages from your phone.** `mirror say "Rice is done"`, or the phone page, puts a note on the screen for as long as you choose, and can say it out loud on your Google speaker.
 - **Your Google speaker, on screen.** What it's playing (a song, or the station when it's radio), and the timers you set by voice, counting down in the kitchen.
 - **A settings page, behind a PIN.** Anyone at home can fix their calendar link, switch the look, or set sleep hours from their phone.
-- **Three looks, one switch.** Coconut Kitchen, Terrain, and the Haunted Coconut for Halloween parties, swapped with `mirror style` or from the phone.
+- **Four looks, one switch.** Coconut Kitchen, Terrain, the Haunted Coconut for Halloween parties, and Central Park in the fall, swapped from the phone. All but Central Park also switch with `mirror style`.
 - **Summon a monster.** On the Haunted page, tap a zombie, witch or red balloon on your phone (the settings page or the iPhone widget) and it crosses the screen right away.
 - **An iPhone app.** Today and Send to Mirror widgets on the Home and Lock Screen, a Summon widget for parties, and Siri: "Summon a visitor in Coconut Kitchen".
 - **Looks after itself.** It updates from GitHub within about two minutes of a merge, keeps the last good data when a source fails, sleeps overnight, and reports its own health.
@@ -154,6 +154,7 @@ python3 ../dev/mock_api.py --style terrain
 | Getting around | L both ways at Myrtle–Wyckoff, M to Manhattan at Forest Av, B13 both ways at Gates/Fairview | MTA GTFS-realtime, MTA Bus Time | 30 s |
 | Minimap | A small round map: the M and L, three stations, and a dot for every train or bus heading to your stops, with its minutes. A hollow mark means it hasn't left the start of the line yet | Same feeds, streets from OpenStreetMap | 15 s |
 | Rain on the window | While it's raining outside, the page sits behind a rainy window: a blurred river through the glass, drops on it, a few running down. Heavier rain, more drops. Off when it's dry; `?rain=1` in the address tries it | Open-Meteo's current weather | 10 min |
+| Central Park | An optional style (**Look › Central Park** on the phone page): a window onto the park between the lists and widgets. One clump leaves the tree each day and one leaf falls, landing on its date. The scene follows the hour and the weather. `?day=14&time=dusk&sky=rain` in the address tries another day | Clock, Open-Meteo | 1 min / 10 min |
 | Night mode | Same page, darker and dimmer, fading over a minute and a half; it also fades in when the screen wakes | Clock | 10 pm to 5 am |
 | Sleep | Screen off (monitor in standby); the Pi keeps running and updating | Clock | 1:00 to 6:30 am |
 

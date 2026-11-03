@@ -287,8 +287,8 @@ func (s *settingsAPI) setStyle(w http.ResponseWriter, r *http.Request) {
 	if !decode(w, r, &req) {
 		return
 	}
-	if req.Style != "kitchen" && req.Style != "terrain" && req.Style != "haunted" {
-		http.Error(w, "style must be kitchen, terrain or haunted", http.StatusBadRequest)
+	if req.Style != "kitchen" && req.Style != "terrain" && req.Style != "haunted" && req.Style != "park" {
+		http.Error(w, "style must be kitchen, terrain, haunted or park", http.StatusBadRequest)
 		return
 	}
 	s.finish(w, s.change(func(raw map[string]any) error {
